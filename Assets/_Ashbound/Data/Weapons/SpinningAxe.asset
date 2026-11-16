@@ -1,0 +1,71 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc975138bf0f04bc5a32c7f80bfc4f06, type: 3}
+  m_Name: SpinningAxe
+  m_EditorClassIdentifier: Assembly-CSharp::WeaponDef
+  weaponName: Spinning Axe
+  awakeningName: Crimson Whirlwind
+  color: {r: 0.7882353, g: 0.76862746, b: 0.7294118, a: 1}
+  kind: 1
+  icon: {fileID: 21300000, guid: 1f54a81f93f954fe188673b9c03ddbe9, type: 3}
+  projectile: {fileID: 21300000, guid: abfe4b0583cc74394b0b023f6a56e531, type: 3}
+  damage: 12
+  cooldown: 0
+  speed: 6
+  area: 1
+  lifetime: 0
+  knockback: 3
+  count: 1
+  pierce: 0
+  explode: 0
+  levels:
+  - damage: 0.25
+    count: 0
+    cooldown: 0
+    area: 0
+    pierce: 0
+    explode: 0
+  - damage: 0
+    count: 1
+    cooldown: 0
+    area: 0
+    pierce: 0
+    explode: 0
+  - damage: 0
+    count: 0
+    cooldown: 0
+    area: 0.25
+    pierce: 0
+    explode: 0
+  - damage: 0
+    count: 1
+    cooldown: 0
+    area: 0
+    pierce: 0
+    explode: 0
+  awakening:
+    damage: 0.5
+    count: 2
+    cooldown: 0
+    area: 0
+    pierce: 0
+    explode: 0
+  evolvePassive: {fileID: 11400000, guid: e03e33d66b88640bb9545de58870d727, type: 2}
+  evolvesInto: {fileID: 11400000, guid: d0187ce8fedf34e018594345e98aa627, type: 2}
+  isEvolution: 0
+  levelText:
+  - A heavy axe whirls around you
+  - +25% damage
+  - +1 axe
+  - Orbit 25% wider
+  - +1 axe
+  - 'Crimson Whirlwind: +2 axes, +50% damage'

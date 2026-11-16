@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8c9bc1c2e73f7412eaf8c5c1c0b9cd3a, type: 3}
+  m_Name: Assassin
+  m_EditorClassIdentifier: Assembly-CSharp::ClassData
+  className: Assassin
+  color: {r: 0.29803923, g: 0.7647059, b: 0.5411765, a: 1}
+  role: "Fast \xB7 risky \xB7 crits"
+  mechanic: 'Shadowstep: dash with brief invisibility; stealth attacks crit'
+  defaultWeapon: Throwing Daggers
+  portrait: {fileID: 21300000, guid: 8a1fa0ee303b84378b02e0092b0e0158, type: 3}
+  unlocked: 0
+  paths:
+  - {fileID: 11400000, guid: 2f4b524586f4147eab7b8bfea4c5fd04, type: 2}
+  - {fileID: 11400000, guid: ae7015952bf9344559f4aeb55842c940, type: 2}
+  - {fileID: 11400000, guid: 8c4cabd26cfd14f168f2f4733afb89cb, type: 2}
+  - {fileID: 11400000, guid: 44fdecf9ced244e4980e9ce8c99b6cc4, type: 2}
+  - {fileID: 11400000, guid: cc07354f448634dd2af26e9d89dc64e4, type: 2}
+  weapons:
+  - {fileID: 11400000, guid: 5ebb7544b2b10404fb7af880bd3b3434, type: 2}
+  - {fileID: 11400000, guid: ec74e85434d064eb7a1df1780b3c41a7, type: 2}
+  - {fileID: 11400000, guid: 139e03b39bed4408bb009719c52b250f, type: 2}
+  defaultPathWeapon: {fileID: 11400000, guid: f5f90668d0b69437bb009d0d3d5e00f4, type: 2}
+  unlockHint: Win 1 run (survive 15:00) to unlock

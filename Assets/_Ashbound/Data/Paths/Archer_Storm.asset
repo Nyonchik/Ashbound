@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5fb1cb00587248a6ac5fed5884d5c5d, type: 3}
+  m_Name: Archer_Storm
+  m_EditorClassIdentifier: Assembly-CSharp::PathData
+  pathName: Storm
+  color: {r: 0.43529412, g: 0.8901961, b: 0.81960785, a: 1}
+  startingSkill: Multishot
+  playsLike: Volume of fire
+  ascension: 'Rain of Arrows: arrows constantly fall from the sky around you'
+  unlocked: 1
+  weapon: {fileID: 11400000, guid: ac79cd7cb6f7548a5b71d6a93b1a8255, type: 2}

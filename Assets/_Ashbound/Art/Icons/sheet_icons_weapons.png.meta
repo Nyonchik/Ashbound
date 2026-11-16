@@ -1,0 +1,600 @@
+fileFormatVersion: 2
+guid: 639cd311a99ac42a5ad41d570b56682d
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 2012262859265551648
+    second: sheet_icons_weapons_0
+  - first:
+      213: -2553424512886178352
+    second: sheet_icons_weapons_1
+  - first:
+      213: -7567515911162289712
+    second: sheet_icons_weapons_2
+  - first:
+      213: 2528964731210435293
+    second: sheet_icons_weapons_3
+  - first:
+      213: 8992301788312912014
+    second: sheet_icons_weapons_4
+  - first:
+      213: -5572930310172447757
+    second: sheet_icons_weapons_5
+  - first:
+      213: -7296822973216856247
+    second: sheet_icons_weapons_6
+  - first:
+      213: 5811761898535195971
+    second: sheet_icons_weapons_7
+  - first:
+      213: 3813945665082992998
+    second: sheet_icons_weapons_8
+  - first:
+      213: -8463791055636303887
+    second: sheet_icons_weapons_9
+  - first:
+      213: 6402314042246352374
+    second: sheet_icons_weapons_10
+  - first:
+      213: -6338948861269773519
+    second: sheet_icons_weapons_11
+  - first:
+      213: 4321500326712479320
+    second: sheet_icons_weapons_12
+  - first:
+      213: 8845936936916645209
+    second: sheet_icons_weapons_13
+  - first:
+      213: 8855015387393281173
+    second: sheet_icons_weapons_14
+  - first:
+      213: 6802431484857486904
+    second: sheet_icons_weapons_15
+  - first:
+      213: -7095640690808639470
+    second: sheet_icons_weapons_16
+  - first:
+      213: 2848589843358539156
+    second: sheet_icons_weapons_17
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationMethod: 0
+  spriteTessellationDetail: -1
+  spriteGeometrySubdivision: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: sheet_icons_weapons_0
+      rect:
+        serializedVersion: 2
+        x: 760
+        y: 686
+        width: 299
+        height: 376
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 02d2c39b86efceb10800000000000000
+      internalID: 2012262859265551648
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sheet_icons_weapons_1
+      rect:
+        serializedVersion: 2
+        x: 826
+        y: 1055
+        width: 6
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0ddf4a42fe9609cd0800000000000000
+      internalID: -2553424512886178352
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sheet_icons_weapons_2
+      rect:
+        serializedVersion: 2
+        x: 1099
+        y: 712
+        width: 334
+        height: 346
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0d12e0b8f58caf690800000000000000
+      internalID: -7567515911162289712
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sheet_icons_weapons_3
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 714
+        width: 363
+        height: 333
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dda0a452600b81320800000000000000
+      internalID: 2528964731210435293
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sheet_icons_weapons_4
+      rect:
+        serializedVersion: 2
+        x: 384
+        y: 720
+        width: 336
+        height: 318
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e80408d45d21bcc70800000000000000
+      internalID: 8992301788312912014
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sheet_icons_weapons_5
+      rect:
+        serializedVersion: 2
+        x: 746
+        y: 761
+        width: 77
+        height: 63
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3fbe928d869f8a2b0800000000000000
+      internalID: -5572930310172447757
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sheet_icons_weapons_6
+      rect:
+        serializedVersion: 2
+        x: 1095
+        y: 747
+        width: 79
+        height: 107
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 947ef748a2a7cba90800000000000000
+      internalID: -7296822973216856247
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sheet_icons_weapons_7
+      rect:
+        serializedVersion: 2
+        x: 20
+        y: 358
+        width: 345
+        height: 334
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 345175997a687a050800000000000000
+      internalID: 5811761898535195971
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sheet_icons_weapons_8
+      rect:
+        serializedVersion: 2
+        x: 378
+        y: 394
+        width: 345
+        height: 242
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 669a9ef006bdde430800000000000000
+      internalID: 3813945665082992998
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sheet_icons_weapons_9
+      rect:
+        serializedVersion: 2
+        x: 737
+        y: 396
+        width: 330
+        height: 270
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1ff6ba3c0e29a8a80800000000000000
+      internalID: -8463791055636303887
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sheet_icons_weapons_10
+      rect:
+        serializedVersion: 2
+        x: 1087
+        y: 372
+        width: 347
+        height: 307
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6fdc69453b699d850800000000000000
+      internalID: 6402314042246352374
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sheet_icons_weapons_11
+      rect:
+        serializedVersion: 2
+        x: 1303
+        y: 578
+        width: 118
+        height: 108
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 133f5aa88978708a0800000000000000
+      internalID: -6338948861269773519
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sheet_icons_weapons_12
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 361
+        height: 336
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 85e8e6e96ad09fb30800000000000000
+      internalID: 4321500326712479320
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sheet_icons_weapons_13
+      rect:
+        serializedVersion: 2
+        x: 366
+        y: 15
+        width: 359
+        height: 358
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9557c6eb6c413ca70800000000000000
+      internalID: 8845936936916645209
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sheet_icons_weapons_14
+      rect:
+        serializedVersion: 2
+        x: 726
+        y: 228
+        width: 283
+        height: 143
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 59cc136349553ea70800000000000000
+      internalID: 8855015387393281173
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sheet_icons_weapons_15
+      rect:
+        serializedVersion: 2
+        x: 734
+        y: 111
+        width: 62
+        height: 123
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 83e0dd70567176e50800000000000000
+      internalID: 6802431484857486904
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sheet_icons_weapons_16
+      rect:
+        serializedVersion: 2
+        x: 770
+        y: 20
+        width: 299
+        height: 287
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2103b82d268378d90800000000000000
+      internalID: -7095640690808639470
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sheet_icons_weapons_17
+      rect:
+        serializedVersion: 2
+        x: 1093
+        y: 31
+        width: 341
+        height: 310
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 49ddb2cbe59388720800000000000000
+      internalID: 2848589843358539156
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      sheet_icons_weapons_0: 2012262859265551648
+      sheet_icons_weapons_1: -2553424512886178352
+      sheet_icons_weapons_10: 6402314042246352374
+      sheet_icons_weapons_11: -6338948861269773519
+      sheet_icons_weapons_12: 4321500326712479320
+      sheet_icons_weapons_13: 8845936936916645209
+      sheet_icons_weapons_14: 8855015387393281173
+      sheet_icons_weapons_15: 6802431484857486904
+      sheet_icons_weapons_16: -7095640690808639470
+      sheet_icons_weapons_17: 2848589843358539156
+      sheet_icons_weapons_2: -7567515911162289712
+      sheet_icons_weapons_3: 2528964731210435293
+      sheet_icons_weapons_4: 8992301788312912014
+      sheet_icons_weapons_5: -5572930310172447757
+      sheet_icons_weapons_6: -7296822973216856247
+      sheet_icons_weapons_7: 5811761898535195971
+      sheet_icons_weapons_8: 3813945665082992998
+      sheet_icons_weapons_9: -8463791055636303887
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

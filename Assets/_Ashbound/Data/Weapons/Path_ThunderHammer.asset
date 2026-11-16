@@ -1,0 +1,71 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc975138bf0f04bc5a32c7f80bfc4f06, type: 3}
+  m_Name: Path_ThunderHammer
+  m_EditorClassIdentifier: Assembly-CSharp::WeaponDef
+  weaponName: Thunder Hammer
+  awakeningName: Storm Echo
+  color: {r: 0.43529412, g: 0.8901961, b: 0.81960785, a: 1}
+  kind: 2
+  icon: {fileID: 21300000, guid: f585591bc35b6495a937a3ec826ab55e, type: 3}
+  projectile: {fileID: 0}
+  damage: 18
+  cooldown: 2
+  speed: 0
+  area: 0.9
+  lifetime: 0
+  knockback: 4
+  count: 1
+  pierce: 0
+  explode: 0
+  levels:
+  - damage: 0.25
+    count: 0
+    cooldown: 0
+    area: 0
+    pierce: 0
+    explode: 0
+  - damage: 0
+    count: 0
+    cooldown: 0
+    area: 0.25
+    pierce: 0
+    explode: 0
+  - damage: 0
+    count: 0
+    cooldown: 0.2
+    area: 0
+    pierce: 0
+    explode: 0
+  - damage: 0.25
+    count: 0
+    cooldown: 0
+    area: 0.2
+    pierce: 0
+    explode: 0
+  awakening:
+    damage: 0.5
+    count: 0
+    cooldown: 0.3
+    area: 0
+    pierce: 0
+    explode: 1
+  evolvePassive: {fileID: 0}
+  evolvesInto: {fileID: 0}
+  isEvolution: 0
+  levelText:
+  - Slams the ground, hitting everything near you
+  - +25% damage
+  - Slam 25% wider
+  - Slams 20% more often
+  - +25% damage, 20% wider
+  - 'Storm Echo: faster slams that set off a second blast'

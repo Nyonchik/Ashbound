@@ -1,0 +1,1640 @@
+fileFormatVersion: 2
+guid: a6465b616279b461fbc4598af14da982
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 9053119221321494932
+    second: hero_berserker_0
+  - first:
+      213: -287394554095752308
+    second: hero_berserker_1
+  - first:
+      213: 7041555434965179085
+    second: hero_berserker_2
+  - first:
+      213: -2507405413366892923
+    second: hero_berserker_3
+  - first:
+      213: -8878542524355272915
+    second: hero_berserker_4
+  - first:
+      213: 5985440748985769929
+    second: hero_berserker_5
+  - first:
+      213: 6792151642731524233
+    second: hero_berserker_6
+  - first:
+      213: -1497480854269760321
+    second: hero_berserker_7
+  - first:
+      213: -12578962261241783
+    second: hero_berserker_8
+  - first:
+      213: 988231551819860067
+    second: hero_berserker_9
+  - first:
+      213: 3863016769168032849
+    second: hero_berserker_10
+  - first:
+      213: 5978233178604356607
+    second: hero_berserker_11
+  - first:
+      213: 4297975095102541412
+    second: hero_berserker_12
+  - first:
+      213: -1333911249118487430
+    second: hero_berserker_13
+  - first:
+      213: -1821836090204672953
+    second: hero_berserker_14
+  - first:
+      213: -3532894207160426471
+    second: hero_berserker_15
+  - first:
+      213: 2027352704713385321
+    second: hero_berserker_16
+  - first:
+      213: -3514230928874510769
+    second: hero_berserker_17
+  - first:
+      213: -4299574405390341512
+    second: hero_berserker_18
+  - first:
+      213: 5523779888285850605
+    second: hero_berserker_19
+  - first:
+      213: -4621995796483175050
+    second: hero_berserker_20
+  - first:
+      213: 8281909049516280892
+    second: hero_berserker_21
+  - first:
+      213: -4435647576781369025
+    second: hero_berserker_22
+  - first:
+      213: 529443296137912841
+    second: hero_berserker_23
+  - first:
+      213: -4758861567429512145
+    second: hero_berserker_24
+  - first:
+      213: 1938388847758506331
+    second: hero_berserker_25
+  - first:
+      213: 6397115419976544106
+    second: hero_berserker_26
+  - first:
+      213: 4911335089146359095
+    second: hero_berserker_27
+  - first:
+      213: 6092082835912499442
+    second: hero_berserker_28
+  - first:
+      213: 8095142116909743091
+    second: hero_berserker_29
+  - first:
+      213: -5417041759087311805
+    second: hero_berserker_30
+  - first:
+      213: -3628440166208726442
+    second: hero_berserker_31
+  - first:
+      213: 5257939686568696670
+    second: hero_berserker_32
+  - first:
+      213: 158848524339181744
+    second: hero_berserker_33
+  - first:
+      213: -1088412682006051548
+    second: hero_berserker_34
+  - first:
+      213: 7838401481202469980
+    second: hero_berserker_35
+  - first:
+      213: -8474329316952050039
+    second: hero_berserker_36
+  - first:
+      213: -7533261609536362518
+    second: hero_berserker_37
+  - first:
+      213: -5636787347462353131
+    second: hero_berserker_38
+  - first:
+      213: 3910116444589772365
+    second: hero_berserker_39
+  - first:
+      213: 2957467939029397757
+    second: hero_berserker_40
+  - first:
+      213: -3616529703032509073
+    second: hero_berserker_41
+  - first:
+      213: 4361631566334424918
+    second: hero_berserker_42
+  - first:
+      213: -1309478111358305612
+    second: hero_berserker_43
+  - first:
+      213: -8482701151228695343
+    second: hero_berserker_44
+  - first:
+      213: -423355738613904124
+    second: hero_berserker_45
+  - first:
+      213: 8712943245386654797
+    second: hero_berserker_46
+  - first:
+      213: -2193684350921151518
+    second: hero_berserker_47
+  - first:
+      213: -7730437787030287507
+    second: hero_berserker_48
+  - first:
+      213: 6040801558058775643
+    second: hero_berserker_49
+  - first:
+      213: -3695383127683585963
+    second: hero_berserker_50
+  - first:
+      213: 4063162682361986756
+    second: hero_berserker_51
+  - first:
+      213: 1491937577951892377
+    second: hero_berserker_52
+  - first:
+      213: 6909967387606850105
+    second: hero_berserker_53
+  - first:
+      213: 6655858228697100682
+    second: hero_berserker_54
+  - first:
+      213: 4780045743226652538
+    second: hero_berserker_55
+  - first:
+      213: -7786859948252099075
+    second: hero_berserker_56
+  - first:
+      213: -6591909492338651785
+    second: hero_berserker_57
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationMethod: 0
+  spriteTessellationDetail: -1
+  spriteGeometrySubdivision: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: hero_berserker_0
+      rect:
+        serializedVersion: 2
+        x: 246
+        y: 1243
+        width: 16
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 491f02067f323ad70800000000000000
+      internalID: 9053119221321494932
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hero_berserker_1
+      rect:
+        serializedVersion: 2
+        x: 281
+        y: 1240
+        width: 9
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c8badbcfc28f20cf0800000000000000
+      internalID: -287394554095752308
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hero_berserker_2
+      rect:
+        serializedVersion: 2
+        x: 295
+        y: 1220
+        width: 58
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dca125f3c51a8b160800000000000000
+      internalID: 7041555434965179085
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hero_berserker_3
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 1241
+        height: 1238
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 586ff54bf08e33dd0800000000000000
+      internalID: -2507405413366892923
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hero_berserker_4
+      rect:
+        serializedVersion: 2
+        x: 129
+        y: 1213
+        width: 23
+        height: 25
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d2f9a985d9419c480800000000000000
+      internalID: -8878542524355272915
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hero_berserker_5
+      rect:
+        serializedVersion: 2
+        x: 259
+        y: 1218
+        width: 23
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9cfd17326ae801350800000000000000
+      internalID: 5985440748985769929
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hero_berserker_6
+      rect:
+        serializedVersion: 2
+        x: 629
+        y: 1212
+        width: 13
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9803995cee1924e50800000000000000
+      internalID: 6792151642731524233
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hero_berserker_7
+      rect:
+        serializedVersion: 2
+        x: 743
+        y: 1203
+        width: 8
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fbc6d47d811e73be0800000000000000
+      internalID: -1497480854269760321
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hero_berserker_8
+      rect:
+        serializedVersion: 2
+        x: 750
+        y: 1204
+        width: 7
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 94096ce108f43dff0800000000000000
+      internalID: -12578962261241783
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hero_berserker_9
+      rect:
+        serializedVersion: 2
+        x: 88
+        y: 1116
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3684e0a4c57e6bd00800000000000000
+      internalID: 988231551819860067
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hero_berserker_10
+      rect:
+        serializedVersion: 2
+        x: 48
+        y: 1078
+        width: 19
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 15443afc8413c9530800000000000000
+      internalID: 3863016769168032849
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hero_berserker_11
+      rect:
+        serializedVersion: 2
+        x: 1212
+        y: 1028
+        width: 7
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ff3ca23e663f6f250800000000000000
+      internalID: 5978233178604356607
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hero_berserker_12
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 877
+        width: 7
+        height: 81
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 46e001dc39975ab30800000000000000
+      internalID: 4297975095102541412
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hero_berserker_13
+      rect:
+        serializedVersion: 2
+        x: 7
+        y: 933
+        width: 8
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a7c156a49cefc7de0800000000000000
+      internalID: -1333911249118487430
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hero_berserker_14
+      rect:
+        serializedVersion: 2
+        x: 80
+        y: 919
+        width: 14
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 74c2d5c7ab987b6e0800000000000000
+      internalID: -1821836090204672953
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hero_berserker_15
+      rect:
+        serializedVersion: 2
+        x: 16
+        y: 889
+        width: 19
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 910ea29cf63a8fec0800000000000000
+      internalID: -3532894207160426471
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hero_berserker_16
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 789
+        width: 19
+        height: 61
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9656ed62b8a922c10800000000000000
+      internalID: 2027352704713385321
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hero_berserker_17
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 837
+        width: 25
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f466eb1e691fa3fc0800000000000000
+      internalID: -3514230928874510769
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hero_berserker_18
+      rect:
+        serializedVersion: 2
+        x: 30
+        y: 810
+        width: 9
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 87ae851cbd7d454c0800000000000000
+      internalID: -4299574405390341512
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hero_berserker_19
+      rect:
+        serializedVersion: 2
+        x: 1206
+        y: 724
+        width: 7
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: deb99baca8868ac40800000000000000
+      internalID: 5523779888285850605
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hero_berserker_20
+      rect:
+        serializedVersion: 2
+        x: 1212
+        y: 730
+        width: 17
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 67d854dbf4f5bdfb0800000000000000
+      internalID: -4621995796483175050
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hero_berserker_21
+      rect:
+        serializedVersion: 2
+        x: 54
+        y: 706
+        width: 9
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c3cc28ea6604fe270800000000000000
+      internalID: 8281909049516280892
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hero_berserker_22
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 637
+        width: 54
+        height: 74
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f31df1da70a6172c0800000000000000
+      internalID: -4435647576781369025
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hero_berserker_23
+      rect:
+        serializedVersion: 2
+        x: 78
+        y: 708
+        width: 11
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 902230b6fd5f85700800000000000000
+      internalID: 529443296137912841
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hero_berserker_24
+      rect:
+        serializedVersion: 2
+        x: 88
+        y: 710
+        width: 8
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f24fa123e9025fdb0800000000000000
+      internalID: -4758861567429512145
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hero_berserker_25
+      rect:
+        serializedVersion: 2
+        x: 28
+        y: 622
+        width: 35
+        height: 55
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b597933136a86ea10800000000000000
+      internalID: 1938388847758506331
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hero_berserker_26
+      rect:
+        serializedVersion: 2
+        x: 1190
+        y: 644
+        width: 23
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a6f20e2c49e17c850800000000000000
+      internalID: 6397115419976544106
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hero_berserker_27
+      rect:
+        serializedVersion: 2
+        x: 1212
+        y: 626
+        width: 9
+        height: 25
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 73dea710e31982440800000000000000
+      internalID: 4911335089146359095
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hero_berserker_28
+      rect:
+        serializedVersion: 2
+        x: 47
+        y: 515
+        width: 10
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2f0a1d0ef0d6b8450800000000000000
+      internalID: 6092082835912499442
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hero_berserker_29
+      rect:
+        serializedVersion: 2
+        x: 56
+        y: 513
+        width: 63
+        height: 126
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3fb75bc8dd8b75070800000000000000
+      internalID: 8095142116909743091
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hero_berserker_30
+      rect:
+        serializedVersion: 2
+        x: 1204
+        y: 527
+        width: 19
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 344c428883dc2d4b0800000000000000
+      internalID: -5417041759087311805
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hero_berserker_31
+      rect:
+        serializedVersion: 2
+        x: 20
+        y: 489
+        width: 19
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 65a9e54a4e035adc0800000000000000
+      internalID: -3628440166208726442
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hero_berserker_32
+      rect:
+        serializedVersion: 2
+        x: 92
+        y: 499
+        width: 20
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e5b1b548944f7f840800000000000000
+      internalID: 5257939686568696670
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hero_berserker_33
+      rect:
+        serializedVersion: 2
+        x: 20
+        y: 471
+        width: 19
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0b8f45a24e7543200800000000000000
+      internalID: 158848524339181744
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hero_berserker_34
+      rect:
+        serializedVersion: 2
+        x: 80
+        y: 457
+        width: 7
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 425cfffae6e25e0f0800000000000000
+      internalID: -1088412682006051548
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hero_berserker_35
+      rect:
+        serializedVersion: 2
+        x: 86
+        y: 457
+        width: 12
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c5c08f51e9897cc60800000000000000
+      internalID: 7838401481202469980
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hero_berserker_36
+      rect:
+        serializedVersion: 2
+        x: 88
+        y: 451
+        width: 8
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 986f4699262256a80800000000000000
+      internalID: -8474329316952050039
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hero_berserker_37
+      rect:
+        serializedVersion: 2
+        x: 37
+        y: 354
+        width: 26
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ae76f73aa7a747790800000000000000
+      internalID: -7533261609536362518
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hero_berserker_38
+      rect:
+        serializedVersion: 2
+        x: 56
+        y: 320
+        width: 11
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 51f0710c5cb16c1b0800000000000000
+      internalID: -5636787347462353131
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hero_berserker_39
+      rect:
+        serializedVersion: 2
+        x: 62
+        y: 320
+        width: 7
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d4ecf2e8036834630800000000000000
+      internalID: 3910116444589772365
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hero_berserker_40
+      rect:
+        serializedVersion: 2
+        x: 70
+        y: 326
+        width: 13
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: df03474db690b0920800000000000000
+      internalID: 2957467939029397757
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hero_berserker_41
+      rect:
+        serializedVersion: 2
+        x: 85
+        y: 326
+        width: 11
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f6d291375618fcdc0800000000000000
+      internalID: -3616529703032509073
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hero_berserker_42
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 278
+        width: 48
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6577e78fcc0a78c30800000000000000
+      internalID: 4361631566334424918
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hero_berserker_43
+      rect:
+        serializedVersion: 2
+        x: 62
+        y: 246
+        width: 17
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4bab65b789cc3dde0800000000000000
+      internalID: -1309478111358305612
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hero_berserker_44
+      rect:
+        serializedVersion: 2
+        x: 88
+        y: 266
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1dc67390f34674a80800000000000000
+      internalID: -8482701151228695343
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hero_berserker_45
+      rect:
+        serializedVersion: 2
+        x: 78
+        y: 229
+        width: 22
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 40d8b42e230ff1af0800000000000000
+      internalID: -423355738613904124
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hero_berserker_46
+      rect:
+        serializedVersion: 2
+        x: 62
+        y: 216
+        width: 7
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d442961f7b79ae870800000000000000
+      internalID: 8712943245386654797
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hero_berserker_47
+      rect:
+        serializedVersion: 2
+        x: 88
+        y: 208
+        width: 22
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2ebe20a94b77e81e0800000000000000
+      internalID: -2193684350921151518
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hero_berserker_48
+      rect:
+        serializedVersion: 2
+        x: 38
+        y: 168
+        width: 17
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d6b8dc15ac7f7b490800000000000000
+      internalID: -7730437787030287507
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hero_berserker_49
+      rect:
+        serializedVersion: 2
+        x: 70
+        y: 166
+        width: 19
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b5438b2f20d35d350800000000000000
+      internalID: 6040801558058775643
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hero_berserker_50
+      rect:
+        serializedVersion: 2
+        x: 88
+        y: 176
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 558a275df9c57bcc0800000000000000
+      internalID: -3695383127683585963
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hero_berserker_51
+      rect:
+        serializedVersion: 2
+        x: 44
+        y: 104
+        width: 39
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4ce3fca9ee0436830800000000000000
+      internalID: 4063162682361986756
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hero_berserker_52
+      rect:
+        serializedVersion: 2
+        x: 85
+        y: 144
+        width: 9
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 99311e0925d64b410800000000000000
+      internalID: 1491937577951892377
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hero_berserker_53
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 55
+        width: 15
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 93a17db7ab225ef50800000000000000
+      internalID: 6909967387606850105
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hero_berserker_54
+      rect:
+        serializedVersion: 2
+        x: 80
+        y: 13
+        width: 136
+        height: 60
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a81f9d47bcb5e5c50800000000000000
+      internalID: 6655858228697100682
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hero_berserker_55
+      rect:
+        serializedVersion: 2
+        x: 86
+        y: 67
+        width: 14
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a7784271742265240800000000000000
+      internalID: 4780045743226652538
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hero_berserker_56
+      rect:
+        serializedVersion: 2
+        x: 40
+        y: 17
+        width: 11
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dfd87b432248fe390800000000000000
+      internalID: -7786859948252099075
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hero_berserker_57
+      rect:
+        serializedVersion: 2
+        x: 1130
+        y: 2
+        width: 10
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 77d01adfd35d484a0800000000000000
+      internalID: -6591909492338651785
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      hero_berserker_0: 9053119221321494932
+      hero_berserker_1: -287394554095752308
+      hero_berserker_10: 3863016769168032849
+      hero_berserker_11: 5978233178604356607
+      hero_berserker_12: 4297975095102541412
+      hero_berserker_13: -1333911249118487430
+      hero_berserker_14: -1821836090204672953
+      hero_berserker_15: -3532894207160426471
+      hero_berserker_16: 2027352704713385321
+      hero_berserker_17: -3514230928874510769
+      hero_berserker_18: -4299574405390341512
+      hero_berserker_19: 5523779888285850605
+      hero_berserker_2: 7041555434965179085
+      hero_berserker_20: -4621995796483175050
+      hero_berserker_21: 8281909049516280892
+      hero_berserker_22: -4435647576781369025
+      hero_berserker_23: 529443296137912841
+      hero_berserker_24: -4758861567429512145
+      hero_berserker_25: 1938388847758506331
+      hero_berserker_26: 6397115419976544106
+      hero_berserker_27: 4911335089146359095
+      hero_berserker_28: 6092082835912499442
+      hero_berserker_29: 8095142116909743091
+      hero_berserker_3: -2507405413366892923
+      hero_berserker_30: -5417041759087311805
+      hero_berserker_31: -3628440166208726442
+      hero_berserker_32: 5257939686568696670
+      hero_berserker_33: 158848524339181744
+      hero_berserker_34: -1088412682006051548
+      hero_berserker_35: 7838401481202469980
+      hero_berserker_36: -8474329316952050039
+      hero_berserker_37: -7533261609536362518
+      hero_berserker_38: -5636787347462353131
+      hero_berserker_39: 3910116444589772365
+      hero_berserker_4: -8878542524355272915
+      hero_berserker_40: 2957467939029397757
+      hero_berserker_41: -3616529703032509073
+      hero_berserker_42: 4361631566334424918
+      hero_berserker_43: -1309478111358305612
+      hero_berserker_44: -8482701151228695343
+      hero_berserker_45: -423355738613904124
+      hero_berserker_46: 8712943245386654797
+      hero_berserker_47: -2193684350921151518
+      hero_berserker_48: -7730437787030287507
+      hero_berserker_49: 6040801558058775643
+      hero_berserker_5: 5985440748985769929
+      hero_berserker_50: -3695383127683585963
+      hero_berserker_51: 4063162682361986756
+      hero_berserker_52: 1491937577951892377
+      hero_berserker_53: 6909967387606850105
+      hero_berserker_54: 6655858228697100682
+      hero_berserker_55: 4780045743226652538
+      hero_berserker_56: -7786859948252099075
+      hero_berserker_57: -6591909492338651785
+      hero_berserker_6: 6792151642731524233
+      hero_berserker_7: -1497480854269760321
+      hero_berserker_8: -12578962261241783
+      hero_berserker_9: 988231551819860067
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

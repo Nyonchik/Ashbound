@@ -1,0 +1,523 @@
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.Pool;
+
+/// <summary>Owns one run: time, XP and levels, kills, gold, weapons, passives, upgrades, drops, stages, win/lose and unlocks.</summary>
+public class RunManager : MonoBehaviour
+{
+    public static RunManager Instance { get; private set; }
+
+    [Header("Scene")]
+    [SerializeField] PlayerController player;
+    [SerializeField] EnemySpawner spawner;
+    [SerializeField] HUD hud;
+    [SerializeField] LevelUpScreen levelUp;
+    [SerializeField] GameOverScreen gameOver;
+    [SerializeField] SpriteRenderer ground;
+
+    [Header("Prefabs")]
+    [SerializeField] Projectile projectilePrefab;
+    [SerializeField] XPGem gemPrefab;
+    [SerializeField] Vfx vfxPrefab;
+    [SerializeField] SpriteRenderer orbPrefab;
+    [SerializeField] Pickup pickupPrefab;
+    [SerializeField] DamageNumber damageNumberPrefab;
+    [SerializeField] DeathPop deathPopPrefab;
+
+    [Header("Pickup art: meat, medkit, magnet, gold bag, chest")]
+    [SerializeField] Sprite[] pickupSprites = new Sprite[5];
+
+    [Header("Content")]
+    [SerializeField] WeaponDef fallbackPathWeapon;
+    [SerializeField] List<WeaponDef> weaponPool = new();
+    [SerializeField] List<PassiveDef> passivePool = new();
+    [SerializeField] List<ClassData> classes = new();
+    [SerializeField] List<StageData> stages = new();
+
+    [Header("Rules")]
+    [SerializeField] float runLength = 900f;
+    [SerializeField] int maxWeapons = 5;
+    [SerializeField] int maxPassives = 5;
+
+    public float RunTime { get; private set; }
+    public bool IsOver { get; private set; }
+
+    int level = 1, xp, xpNeeded, kills, gold, pendingLevelUps, bossesAlive, activeNumbers;
+    float lastBossWarning = -1f;
+    Weapon pathWeapon;
+    readonly List<Weapon> weapons = new();
+    readonly List<PassiveDef> passives = new();
+    readonly List<int> passiveLevels = new();
+    readonly HashSet<string> banished = new();
+
+    ObjectPool<Projectile> projectiles;
+    ObjectPool<XPGem> gems;
+    ObjectPool<Vfx> vfx;
+    ObjectPool<DamageNumber> numbers;
+    ObjectPool<DeathPop> pops;
+    Transform poolRoot;
+
+    void Awake()
+    {
+        Instance = this;
+        if (SaveSystem.Data.runsPlayed == 0) GameSpeed.Fast = false;
+        GameSpeed.Resume();
+        poolRoot = new GameObject("Pooled").transform;
+        projectiles = MakePool(projectilePrefab, 64, 2000);
+        gems = MakePool(gemPrefab, 128, 2000);
+        vfx = MakePool(vfxPrefab, 64, 1000);
+        numbers = MakePool(damageNumberPrefab, 64, 300);
+        pops = MakePool(deathPopPrefab, 32, 300);
+    }
+
+    ObjectPool<T> MakePool<T>(T prefab, int capacity, int max) where T : Component =>
+        new(() => Instantiate(prefab, poolRoot),
+            x => x.gameObject.SetActive(true),
+            x => x.gameObject.SetActive(false),
+            x => { if (x) Destroy(x.gameObject); },
+            false, capacity, max);
+
+    void OnDestroy()
+    {
+        if (Instance == this) Instance = null;
+    }
+
+    void Start()
+    {
+        var stats = player.Stats;
+        // permanent upgrades from the main menu
+        stats.AddMaxHealth(MetaUpgrades.Bonus("health"));
+        stats.damageMul += MetaUpgrades.Bonus("damage");
+        stats.moveMul += MetaUpgrades.Bonus("speed");
+        stats.pickupMul += MetaUpgrades.Bonus("pickup");
+
+        stats.OnHealthChanged += (h, m) => hud.SetHealth(Mathf.CeilToInt(h), Mathf.CeilToInt(m));
+        stats.OnDied += () => EndRun(false);
+        hud.SetHealth(Mathf.CeilToInt(stats.Health), Mathf.CeilToInt(stats.MaxHealth));
+
+        xpNeeded = XpFor(level);
+        hud.SetXP(0, xpNeeded, level);
+        hud.SetKills(0);
+        hud.SetGold(0);
+
+        var stage = RunSelection.Stage != null ? RunSelection.Stage : (stages.Count > 0 ? stages[0] : null);
+        RunSelection.Stage = stage;
+        spawner.SetStage(stage);
+        if (ground != null && stage != null) ground.color = stage.groundTint;
+
+        var cls = RunSelection.Class;
+        var path = RunSelection.Path;
+        var def = path != null && path.weapon != null ? path.weapon
+                : cls != null && cls.defaultPathWeapon != null ? cls.defaultPathWeapon
+                : fallbackPathWeapon;
+        pathWeapon = AddWeapon(def, true);
+
+        levelUp.SetCharges(2 + Mathf.RoundToInt(MetaUpgrades.Bonus("rerolls")), 1);
+        levelUp.OnPicked += option =>
+        {
+            option.apply?.Invoke();
+            RefreshLoadout();
+            if (pendingLevelUps > 0) { pendingLevelUps--; OfferLevelUp(); }
+        };
+        levelUp.OnRerollRequested += () => levelUp.Show(level, BuildOptions());
+        levelUp.OnBanished += option =>
+        {
+            if (!string.IsNullOrEmpty(option.key)) banished.Add(option.key);
+            levelUp.Show(level, BuildOptions());
+        };
+
+        spawner.Init(this);
+        RefreshLoadout();
+        AudioManager.PlayMusic("music_run");
+    }
+
+    void Update()
+    {
+        if (IsOver) return;
+        RunTime += Time.deltaTime;
+
+        float untilBoss = spawner.NextBossTime - RunTime;
+        if (spawner.NextBossTime > 0f && untilBoss > 0f && untilBoss <= 20f)
+        {
+            hud.ShowBossWarning(spawner.NextBossName, Mathf.CeilToInt(untilBoss));
+            if (lastBossWarning != spawner.NextBossTime) { lastBossWarning = spawner.NextBossTime; AudioManager.Play("boss", 0.8f); }
+        }
+        else hud.HideBossWarning();
+
+        if (RunTime >= runLength && spawner.AllBossesSpawned && bossesAlive <= 0) EndRun(true);
+    }
+
+    // ---------------- events from gameplay
+
+    public void OnBossSpawned()
+    {
+        bossesAlive++;
+        CameraFollow.Shake(0.35f, 0.5f);
+        AudioManager.Play("boss", 1f);
+    }
+
+    public void OnEnemyKilled(Enemy e, int xpValue)
+    {
+        Vector2 position = e.transform.position;
+        kills++;
+        hud.SetKills(kills);
+        AudioManager.Play("death", 0.35f, 0.9f + Random.value * 0.25f, 0.05f);
+        if (e.Body != null)
+        {
+            float s = e.transform.localScale.x;
+            pops.Get().Play(e.Body.sprite, e.Body.color, e.Body.transform.position, new Vector3(e.FacingSign * s, s, 1f), p => pops.Release(p));
+        }
+        SpawnVfx(position, 0.3f + e.Radius, Palette.Ember, 0.25f);
+
+        if (Random.value < 0.1f) { gold++; hud.SetGold(gold); }
+        SpawnGem(position, xpValue);
+
+        if (e.IsBoss)
+        {
+            bossesAlive--;
+            gold += 50; hud.SetGold(gold);
+            CameraFollow.Shake(0.4f, 0.5f);
+            SpawnPickup(PickupKind.Chest, position + Vector2.left * 0.8f);
+            SpawnPickup(PickupKind.Medkit, position + Vector2.right * 0.8f);
+            return;
+        }
+
+        float r = Random.value;
+        if (r < 0.010f) SpawnPickup(PickupKind.Meat, position);
+        else if (r < 0.014f) SpawnPickup(PickupKind.Magnet, position);
+        else if (r < 0.016f) SpawnPickup(PickupKind.Medkit, position);
+        else if (r < 0.022f) SpawnPickup(PickupKind.GoldBag, position);
+    }
+
+    void SpawnGem(Vector2 position, int value)
+    {
+        if (XPGem.Active.Count > 350) { AddXP(value); return; }
+        gems.Get().Init(this, gems, value, position);
+    }
+
+    void SpawnPickup(PickupKind kind, Vector2 position)
+    {
+        if (pickupPrefab == null) return;
+        var p = Instantiate(pickupPrefab, position, Quaternion.identity);
+        p.Init(kind, pickupSprites != null && (int)kind < pickupSprites.Length ? pickupSprites[(int)kind] : null, position);
+    }
+
+    public void CollectPickup(Pickup p)
+    {
+        var stats = player.Stats;
+        switch (p.Kind)
+        {
+            case PickupKind.Meat: stats.Heal(30f); AudioManager.Play("heal", 0.8f); break;
+            case PickupKind.Medkit: stats.Heal(stats.MaxHealth); AudioManager.Play("heal", 1f, 1.15f); break;
+            case PickupKind.Magnet:
+                foreach (var g in XPGem.Active) g.Magnetize();
+                AudioManager.Play("magnet", 0.9f);
+                break;
+            case PickupKind.GoldBag: gold += 15; hud.SetGold(gold); AudioManager.Play("coin", 0.9f); break;
+            case PickupKind.Chest: gold += 25; hud.SetGold(gold); AudioManager.Play("coin", 1f); QueueLevelUp(); break;
+        }
+        SpawnVfx(p.transform.position, 0.8f, Palette.Gold, 0.3f);
+    }
+
+#if UNITY_EDITOR
+    // Editor-only test key: F2 grants one level-up.
+    void LateUpdate()
+    {
+        var k = UnityEngine.InputSystem.Keyboard.current;
+        if (k != null && k.f2Key.wasPressedThisFrame && !IsOver && !levelUp.IsOpen) AddXP(xpNeeded - xp);
+        if (k != null && k.f3Key.wasPressedThisFrame && !IsOver)
+            { foreach (var w in weapons) while (w.CanLevel && !w.IsPath) w.LevelUp(); RefreshLoadout(); }
+        if (k != null && k.f4Key.wasPressedThisFrame && !IsOver) player.Stats.TakeDamage(99999f);
+    }
+#endif
+
+    public void AddXP(int amount)
+    {
+        if (IsOver) return;
+        xp += amount;
+        while (xp >= xpNeeded)
+        {
+            xp -= xpNeeded;
+            level++;
+            xpNeeded = XpFor(level);
+            pendingLevelUps++;
+        }
+        hud.SetXP(xp, xpNeeded, level);
+        if (pendingLevelUps > 0 && !levelUp.IsOpen) { pendingLevelUps--; OfferLevelUp(); }
+    }
+
+    void QueueLevelUp()
+    {
+        pendingLevelUps++;
+        if (!levelUp.IsOpen && !IsOver) { pendingLevelUps--; OfferLevelUp(); }
+    }
+
+    static int XpFor(int lv) => 5 + (lv - 1) * 5 + Mathf.Max(0, lv - 20) * 10;
+
+    // ---------------- end of run, rewards and unlocks
+
+    void EndRun(bool won)
+    {
+        if (IsOver) return;
+        IsOver = true;
+        hud.HideBossWarning();
+
+        var save = SaveSystem.Data;
+        var stage = RunSelection.Stage;
+        var cls = RunSelection.Class;
+        save.runsPlayed++;
+        save.totalKills += kills;
+        int earned = Mathf.RoundToInt(gold * (stage != null ? stage.goldMultiplier : 1f) * (1f + MetaUpgrades.Bonus("greed")));
+        save.gold += earned;
+        var notes = new List<string> { $"+{earned} gold" };
+
+        if (RunTime >= 600f)
+        {
+            if (cls != null)
+                foreach (var p in cls.paths)
+                    if (!SaveSystem.IsPathUnlocked(cls, p))
+                    {
+                        save.unlockedPaths.Add(SaveSystem.PathKey(cls, p));
+                        notes.Add($"New Path: {cls.className} · {p.pathName}");
+                        break;
+                    }
+            var next = stage != null ? stages.Find(s => s.order == stage.order + 1) : null;
+            if (next != null && !SaveSystem.IsStageUnlocked(next))
+            {
+                save.unlockedStages.Add(next.stageName);
+                notes.Add($"New stage: {next.stageName}");
+            }
+        }
+
+        if (won)
+        {
+            if (stage != null && !save.stagesWon.Contains(stage.stageName))
+            {
+                save.stagesWon.Add(stage.stageName);
+                notes.Add("Crown shard recovered!");
+            }
+            UnlockClass("Assassin", save.stagesWon.Count >= 1, notes);
+            UnlockClass("Tank (Knight)", save.stagesWon.Count >= 2, notes);
+        }
+        if (save.runsPlayed == 1) notes.Add("x2 speed unlocked!");
+
+        SaveSystem.Save();
+        AudioManager.Play(won ? "victory" : "gameover", 0.9f);
+        gameOver.Show(won, RunTime, level, kills, gold, string.Join("\n", notes));
+    }
+
+    void UnlockClass(string className, bool condition, List<string> notes)
+    {
+        if (!condition) return;
+        var c = classes.Find(x => x != null && x.className == className);
+        if (c == null || SaveSystem.IsClassUnlocked(c)) return;
+        SaveSystem.Data.unlockedClasses.Add(c.className);
+        if (c.paths.Count > 0) SaveSystem.Data.unlockedPaths.Add(SaveSystem.PathKey(c, c.paths[0]));
+        notes.Add($"New hero: {c.className}!");
+    }
+
+    // ---------------- upgrades
+
+    void OfferLevelUp()
+    {
+        if (IsOver) return;
+        var options = BuildOptions();
+        if (options.Count == 0) { player.Stats.Heal(25f); return; }
+        levelUp.Show(level, options);
+    }
+
+    List<WeaponDef> ClassWeaponPool()
+    {
+        var cls = RunSelection.Class;
+        if (cls == null) return weaponPool;
+        var pool = new List<WeaponDef>(cls.weapons);
+        foreach (var p in cls.paths)
+            if (p != RunSelection.Path && p.weapon != null && SaveSystem.IsPathUnlocked(cls, p) && !pool.Contains(p.weapon))
+                pool.Add(p.weapon);
+        return pool;
+    }
+
+    List<UpgradeOption> BuildOptions()
+    {
+        var candidates = new List<UpgradeOption>();
+        foreach (var w in weapons)
+        {
+            if (w.CanEvolve(passives)) candidates.Add(EvolutionOption(w));
+            else if (w.CanLevel) candidates.Add(WeaponOption(w));
+        }
+
+        int extraWeapons = 0;
+        foreach (var w in weapons) if (!w.IsPath) extraWeapons++;
+        if (extraWeapons < maxWeapons)
+            foreach (var d in ClassWeaponPool())
+                if (d != null && !Owns(d)) candidates.Add(NewWeaponOption(d));
+
+        for (int i = 0; i < passives.Count; i++) if (passiveLevels[i] < 5) candidates.Add(PassiveOption(passives[i], passiveLevels[i]));
+        if (passives.Count < maxPassives)
+            foreach (var p in passivePool)
+                if (p != null && !passives.Contains(p)) candidates.Add(PassiveOption(p, 0));
+
+        candidates.RemoveAll(c => banished.Contains(c.key));
+
+        var result = new List<UpgradeOption>();
+        var special = candidates.Find(c => c.IsAwakening);
+        if (special != null) { result.Add(special); candidates.Remove(special); }
+        while (result.Count < 3 && candidates.Count > 0)
+        {
+            int i = Random.Range(0, candidates.Count);
+            result.Add(candidates[i]);
+            candidates.RemoveAt(i);
+        }
+        return result;
+    }
+
+    bool Owns(WeaponDef d)
+    {
+        foreach (var w in weapons) if (w.Def == d || (w.IsEvolved && d.evolvesInto == w.Def)) return true;
+        return false;
+    }
+
+    static string EvolveHint(WeaponDef d) =>
+        d.evolvePassive != null && d.evolvesInto != null ? $"\n<color=#FFD95A>Evolves at Lv 5 with {d.evolvePassive.passiveName}</color>" : "";
+
+    UpgradeOption WeaponOption(Weapon w)
+    {
+        int next = w.Level + 1;
+        bool awaken = next == 6;
+        return new UpgradeOption
+        {
+            key = "w:" + w.Def.name,
+            tag = awaken ? "AWAKENING" : w.IsPath ? "PATH SKILL" : "WEAPON",
+            name = awaken && !string.IsNullOrEmpty(w.Def.awakeningName) ? w.Def.awakeningName : w.Def.weaponName,
+            levelLine = awaken ? $"{w.Def.weaponName} · Lv 5 » Awakened" : $"Lv {w.Level} » Lv {next}",
+            effect = w.NextLevelText + (next == 5 && !w.IsPath ? EvolveHint(w.Def) : ""),
+            color = w.Def.color,
+            icon = w.Def.icon,
+            fromLevel = w.Level,
+            toLevel = next,
+            apply = w.LevelUp,
+        };
+    }
+
+    UpgradeOption EvolutionOption(Weapon w)
+    {
+        var evolved = w.Def.evolvesInto;
+        return new UpgradeOption
+        {
+            key = "e:" + evolved.name,
+            tag = "EVOLUTION",
+            name = evolved.weaponName,
+            levelLine = $"{w.Def.weaponName} + {w.Def.evolvePassive.passiveName}",
+            effect = evolved.levelText != null && evolved.levelText.Length > 0 ? evolved.levelText[0] : "",
+            color = evolved.color,
+            icon = evolved.icon,
+            fromLevel = 5,
+            toLevel = 6,
+            apply = () =>
+            {
+                w.Evolve();
+                AudioManager.Play("evolve", 1f);
+                CameraFollow.Shake(0.25f, 0.35f);
+                SpawnVfx(player.transform.position, 3f, Palette.Gold, 0.6f);
+            },
+        };
+    }
+
+    UpgradeOption NewWeaponOption(WeaponDef d) => new()
+    {
+        key = "w:" + d.name,
+        tag = "NEW WEAPON",
+        name = d.weaponName,
+        levelLine = "Lv 1",
+        effect = (d.levelText != null && d.levelText.Length > 0 ? d.levelText[0] : "") + EvolveHint(d),
+        color = d.color,
+        icon = d.icon,
+        fromLevel = 0,
+        toLevel = 1,
+        apply = () => AddWeapon(d, false),
+    };
+
+    UpgradeOption PassiveOption(PassiveDef p, int currentLevel) => new()
+    {
+        key = "p:" + p.name,
+        tag = currentLevel == 0 ? "NEW PASSIVE" : "PASSIVE",
+        name = p.passiveName,
+        levelLine = currentLevel == 0 ? "Lv 1" : $"Lv {currentLevel} » Lv {currentLevel + 1}",
+        effect = p.description,
+        color = p.color,
+        icon = p.icon,
+        fromLevel = currentLevel,
+        toLevel = currentLevel + 1,
+        apply = () => ApplyPassive(p),
+    };
+
+    Weapon AddWeapon(WeaponDef def, bool isPath)
+    {
+        var go = new GameObject(def.weaponName);
+        go.transform.SetParent(player.transform, false);
+        var w = go.AddComponent<Weapon>();
+        w.Setup(def, player.Stats, isPath);
+        weapons.Add(w);
+        return w;
+    }
+
+    void ApplyPassive(PassiveDef p)
+    {
+        int i = passives.IndexOf(p);
+        if (i < 0) { passives.Add(p); passiveLevels.Add(0); i = passives.Count - 1; }
+        passiveLevels[i]++;
+
+        var s = player.Stats;
+        switch (p.stat)
+        {
+            case PassiveStat.Damage: s.damageMul += p.perLevel; break;
+            case PassiveStat.Cooldown: s.cooldownMul *= 1f - p.perLevel; break;
+            case PassiveStat.MoveSpeed: s.moveMul += p.perLevel; break;
+            case PassiveStat.MaxHealth: s.AddMaxHealth(p.perLevel); break;
+            case PassiveStat.Area: s.areaMul += p.perLevel; break;
+            case PassiveStat.Pickup: s.pickupMul += p.perLevel; break;
+        }
+        foreach (var w in weapons) w.Refresh();
+    }
+
+    void RefreshLoadout()
+    {
+        if (pathWeapon != null)
+            hud.SetPathSkill(pathWeapon.Def.icon, pathWeapon.Def.color, Mathf.Min(pathWeapon.Level, 5), pathWeapon.Golden,
+                pathWeapon.Awakened ? pathWeapon.Def.awakeningName : pathWeapon.Def.weaponName);
+
+        int slot = 0;
+        foreach (var w in weapons)
+        {
+            if (w.IsPath || slot >= 5) continue;
+            hud.SetWeapon(slot++, w.Def.icon, w.Def.color, Mathf.Min(w.Level, 5), w.Golden);
+        }
+        for (int i = 0; i < passives.Count && i < 5; i++) hud.SetPassive(i, passives[i].icon, passives[i].color, passiveLevels[i]);
+    }
+
+    // ---------------- pools for weapons and effects
+
+    public Projectile GetProjectile() => projectiles.Get();
+    public void ReleaseProjectile(Projectile p) => projectiles.Release(p);
+
+    public void SpawnVfx(Vector2 position, float radius, Color color, float seconds)
+    {
+        vfx.Get().Play(position, radius, color, seconds, v => vfx.Release(v));
+    }
+
+    public void ShowDamage(Vector3 position, float amount, bool big)
+    {
+        if (damageNumberPrefab == null || activeNumbers > 90 || amount < 1f) return;
+        activeNumbers++;
+        var color = big ? Palette.Gold : amount >= 30f ? new Color(1f, 0.6f, 0.25f) : Color.white;
+        numbers.Get().Play(position, Mathf.RoundToInt(amount), color, big || amount >= 30f ? 4.2f : 3.2f, n => { activeNumbers--; numbers.Release(n); });
+    }
+
+    public SpriteRenderer CreateOrb(Transform parent, Color color, Sprite art = null)
+    {
+        var o = Instantiate(orbPrefab, parent);
+        if (art != null) { o.sprite = art; o.color = Color.white; }
+        else o.color = color;
+        return o;
+    }
+}

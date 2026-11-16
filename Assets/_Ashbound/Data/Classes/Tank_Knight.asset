@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8c9bc1c2e73f7412eaf8c5c1c0b9cd3a, type: 3}
+  m_Name: Tank_Knight
+  m_EditorClassIdentifier: Assembly-CSharp::ClassData
+  className: Tank (Knight)
+  color: {r: 0.2901961, g: 0.56078434, b: 0.90588236, a: 1}
+  role: "Slow \xB7 durable"
+  mechanic: 'Fortify: blocking builds a shockwave that releases automatically'
+  defaultWeapon: Guardian Shield
+  portrait: {fileID: 21300000, guid: f562b947ba9b1424daba39139d613105, type: 3}
+  unlocked: 0
+  paths:
+  - {fileID: 11400000, guid: 7ca6dc4cd88ba46daad31d8dd2756199, type: 2}
+  - {fileID: 11400000, guid: 55fd09b8eccfd4ecfb85965e83d4cca3, type: 2}
+  - {fileID: 11400000, guid: 3cc59e9af34e049cbaebc3cdf6e47f06, type: 2}
+  - {fileID: 11400000, guid: 71a42440ea6cd4f65bfea99404876549, type: 2}
+  - {fileID: 11400000, guid: 3902495cc80c84a86bae2b169d43d6e3, type: 2}
+  weapons:
+  - {fileID: 11400000, guid: ec74e85434d064eb7a1df1780b3c41a7, type: 2}
+  - {fileID: 11400000, guid: 7ce7b815b508142d89bebc9b7c9d26ab, type: 2}
+  - {fileID: 11400000, guid: 3cb6f68016f774577abf1d02f3f67051, type: 2}
+  defaultPathWeapon: {fileID: 11400000, guid: bf9da8d1074a04e6babe1700a6455411, type: 2}
+  unlockHint: Win 2 runs to unlock

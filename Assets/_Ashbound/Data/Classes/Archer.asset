@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8c9bc1c2e73f7412eaf8c5c1c0b9cd3a, type: 3}
+  m_Name: Archer
+  m_EditorClassIdentifier: Assembly-CSharp::ClassData
+  className: Archer
+  color: {r: 0.9490196, g: 0.7019608, b: 0.23921569, a: 1}
+  role: "Ranged \xB7 positioning"
+  mechanic: 'Focus: standing still charges stronger shots; moving resets it'
+  defaultWeapon: Piercing Arrows
+  portrait: {fileID: 21300000, guid: e09ee5519199349ad87741a9d99bd093, type: 3}
+  unlocked: 1
+  paths:
+  - {fileID: 11400000, guid: 44ae56f0a6e1c4ba281aa510115c9134, type: 2}
+  - {fileID: 11400000, guid: 3c2ab0e613ff749c1949d8ab8ce72e80, type: 2}
+  - {fileID: 11400000, guid: d8fc8da36b78b419d95f149449f3e53e, type: 2}
+  - {fileID: 11400000, guid: 2a5d55259a4ef4cc2a3f6065df58ef67, type: 2}
+  - {fileID: 11400000, guid: 221e7f5e49cf64c9b9622308e553aef8, type: 2}
+  weapons:
+  - {fileID: 11400000, guid: 5ebb7544b2b10404fb7af880bd3b3434, type: 2}
+  - {fileID: 11400000, guid: 139e03b39bed4408bb009719c52b250f, type: 2}
+  - {fileID: 11400000, guid: 7ce7b815b508142d89bebc9b7c9d26ab, type: 2}
+  defaultPathWeapon: {fileID: 11400000, guid: 13e44dddb846b4a30b18cd558b4cbf2c, type: 2}
+  unlockHint: 

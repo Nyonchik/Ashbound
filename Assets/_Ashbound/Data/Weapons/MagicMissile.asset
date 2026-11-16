@@ -1,0 +1,71 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc975138bf0f04bc5a32c7f80bfc4f06, type: 3}
+  m_Name: MagicMissile
+  m_EditorClassIdentifier: Assembly-CSharp::WeaponDef
+  weaponName: Magic Missile
+  awakeningName: Starfall
+  color: {r: 0.7254902, g: 0.6509804, b: 1, a: 1}
+  kind: 0
+  icon: {fileID: 21300000, guid: 620ef38c4672f4599b898a173d5b48cf, type: 3}
+  projectile: {fileID: 21300000, guid: d7a06a4fc7505407aaab8a966776bad5, type: 3}
+  damage: 10
+  cooldown: 1.2
+  speed: 10
+  area: 0.8
+  lifetime: 2
+  knockback: 0.5
+  count: 2
+  pierce: 0
+  explode: 0
+  levels:
+  - damage: 0
+    count: 1
+    cooldown: 0
+    area: 0
+    pierce: 0
+    explode: 0
+  - damage: 0.25
+    count: 0
+    cooldown: 0
+    area: 0
+    pierce: 0
+    explode: 0
+  - damage: 0
+    count: 0
+    cooldown: 0.2
+    area: 0
+    pierce: 0
+    explode: 0
+  - damage: 0
+    count: 2
+    cooldown: 0
+    area: 0
+    pierce: 0
+    explode: 0
+  awakening:
+    damage: 0.3
+    count: 3
+    cooldown: 0
+    area: 0
+    pierce: 0
+    explode: 1
+  evolvePassive: {fileID: 11400000, guid: 95c9d5daac19444d28aa2f79d69487da, type: 2}
+  evolvesInto: {fileID: 11400000, guid: 28273dc752c4f40ffaa497f398f0aa9c, type: 2}
+  isEvolution: 0
+  levelText:
+  - Fires 2 missiles at the nearest enemy
+  - +1 missile
+  - +25% damage
+  - Fires 20% faster
+  - +2 missiles
+  - 'Starfall: +3 missiles that explode'

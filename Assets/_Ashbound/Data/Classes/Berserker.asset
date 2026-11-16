@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8c9bc1c2e73f7412eaf8c5c1c0b9cd3a, type: 3}
+  m_Name: Berserker
+  m_EditorClassIdentifier: Assembly-CSharp::ClassData
+  className: Berserker
+  color: {r: 0.8980392, g: 0.28235295, b: 0.3019608, a: 1}
+  role: Melee brawler
+  mechanic: 'Rage: lower HP means more damage and attack speed'
+  defaultWeapon: Spinning Axe
+  portrait: {fileID: 21300000, guid: 8768bdb44ef274c0f85deda1fdc62010, type: 3}
+  unlocked: 1
+  paths:
+  - {fileID: 11400000, guid: 6e4a62ed0b2794bad9bbdbeaf2778800, type: 2}
+  - {fileID: 11400000, guid: 37727cc02a78641ffb62648ee3c3886f, type: 2}
+  - {fileID: 11400000, guid: cb706b0d32e8d4c738478a96a78f778e, type: 2}
+  - {fileID: 11400000, guid: ff4c64c0cea3348e0807c22eeadaa1c4, type: 2}
+  - {fileID: 11400000, guid: a24fd5db147e747ad8602af32b65da59, type: 2}
+  weapons:
+  - {fileID: 11400000, guid: ec74e85434d064eb7a1df1780b3c41a7, type: 2}
+  - {fileID: 11400000, guid: 5ebb7544b2b10404fb7af880bd3b3434, type: 2}
+  - {fileID: 11400000, guid: 7ce7b815b508142d89bebc9b7c9d26ab, type: 2}
+  defaultPathWeapon: {fileID: 11400000, guid: 2d8a0e367c3014938907d817954ddeed, type: 2}
+  unlockHint: 
