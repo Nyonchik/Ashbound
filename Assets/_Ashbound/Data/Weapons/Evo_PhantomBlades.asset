@@ -19,13 +19,13 @@ MonoBehaviour:
   icon: {fileID: 21300000, guid: 4e8a912b9d61741cc93839e506b1fe4a, type: 3}
   projectile: {fileID: 21300000, guid: 73f822af2dc514658a4381933a00a607, type: 3}
   damage: 16
-  cooldown: 0.25
-  speed: 17
-  area: 0.9
-  lifetime: 1.2
+  cooldown: 0.9
+  speed: 12
+  area: 1
+  lifetime: 1.1
   knockback: 0.5
   count: 3
-  pierce: 6
+  pierce: 0
   explode: 0
   levels:
   - damage: 0
@@ -59,13 +59,17 @@ MonoBehaviour:
     area: 0
     pierce: 0
     explode: 0
+  style: 6
+  effect: {fileID: 0}
+  awakenIcon: {fileID: 0}
+  awakenProjectile: {fileID: 0}
   evolvePassive: {fileID: 0}
   evolvesInto: {fileID: 0}
   isEvolution: 1
   levelText:
-  - 'EVOLVED: ghost blades fly nonstop and pierce 7 enemies'
-  - 'EVOLVED: ghost blades fly nonstop and pierce 7 enemies'
-  - 'EVOLVED: ghost blades fly nonstop and pierce 7 enemies'
-  - 'EVOLVED: ghost blades fly nonstop and pierce 7 enemies'
-  - 'EVOLVED: ghost blades fly nonstop and pierce 7 enemies'
-  - 'EVOLVED: ghost blades fly nonstop and pierce 7 enemies'
+  - 'EVOLVED: 3 ghost blades boomerang back to you, 2 more circle you'
+  - 'EVOLVED: 3 ghost blades boomerang back to you, 2 more circle you'
+  - 'EVOLVED: 3 ghost blades boomerang back to you, 2 more circle you'
+  - 'EVOLVED: 3 ghost blades boomerang back to you, 2 more circle you'
+  - 'EVOLVED: 3 ghost blades boomerang back to you, 2 more circle you'
+  - 'EVOLVED: 3 ghost blades boomerang back to you, 2 more circle you'

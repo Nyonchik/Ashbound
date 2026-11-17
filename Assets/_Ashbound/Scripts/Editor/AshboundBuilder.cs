@@ -60,6 +60,7 @@ public static class AshboundBuilder
     }
 
     static Sprite Icon(string name) => ArtFile($"InGame/Icons/{name}.png", 100);
+    static Sprite FxArtFile(string name) => ArtFile($"InGame/Effects/{name}.png", 256);
     static Sprite Proj(string name) => name == null ? null : ArtFile($"InGame/Projectiles/{name}.png", 200);
 
     static readonly Dictionary<string, (string icon, string proj)> weaponArt = new()
@@ -454,6 +455,7 @@ public static class AshboundBuilder
         w.count = count; w.pierce = pierce; w.explode = explode;
         w.levels = levels; w.awakening = awakening; w.levelText = text;
         w.isEvolution = false; w.evolvePassive = null; w.evolvesInto = null;
+        w.style = WeaponStyle.Default; w.effect = null; w.awakenIcon = null; w.awakenProjectile = null;
         if (contentBuilding != null) contentBuilding.byFile[file] = w;
         if (weaponArt.TryGetValue(file, out var wa)) { w.icon = Icon(wa.icon); w.projectile = Proj(wa.proj); }
         EditorUtility.SetDirty(w);
@@ -572,16 +574,41 @@ public static class AshboundBuilder
         {
             var w = c.byFile[baseFile]; w.evolvePassive = passiveByName[passive]; w.evolvesInto = evo; EditorUtility.SetDirty(w);
         }
-        Pair("ArcaneOrb", "Reach", Evo("Evo_BlackHole", "Black Hole", "#9B5DE5", WeaponKind.Orbit, 30, 0, 3, 1.8f, 0, 4f, 3, 0, false,
-            "EVOLVED: three collapsing stars orbit you and crush everything"));
-        Pair("MagicMissile", "Haste", Evo("Evo_Starfall", "Starfall", "#C9B8FF", WeaponKind.Projectile, 22, 0.6f, 11, 1f, 2f, 1f, 5, 0, true,
-            "EVOLVED: a rain of 5 exploding stars, twice as often"));
-        Pair("FrostNova", "Vitality", Evo("Evo_Glacier", "Glacier", "#9BD8FF", WeaponKind.Nova, 26, 1.4f, 0, 1.8f, 0, 4f, 1, 0, true,
-            "EVOLVED: huge ice blasts that shatter the horde"));
-        Pair("SpinningAxe", "Might", Evo("Evo_CrimsonWhirlwind", "Crimson Whirlwind", "#E5484D", WeaponKind.Orbit, 30, 0, 9, 1.6f, 0, 5f, 4, 0, false,
-            "EVOLVED: a red tornado of 4 axes spins around you"));
-        Pair("ThrowingDaggers", "Swiftness", Evo("Evo_PhantomBlades", "Phantom Blades", "#4CC38A", WeaponKind.Projectile, 16, 0.25f, 17, 0.9f, 1.2f, 0.5f, 3, 6, false,
-            "EVOLVED: ghost blades fly nonstop and pierce 7 enemies"));
+        Pair("ArcaneOrb", "Reach", Evo("Evo_BlackHole", "Black Hole", "#9B5DE5", WeaponKind.Nova, 30, 3.2f, 0, 1.2f, 0, 0f, 1, 0, false,
+            "EVOLVED: opens on the biggest crowd, pulls everything in, then explodes"));
+        Pair("MagicMissile", "Haste", Evo("Evo_Starfall", "Starfall", "#C9B8FF", WeaponKind.Projectile, 26, 1.5f, 0, 1f, 0, 3f, 6, 0, false,
+            "EVOLVED: volleys of 6 stars fall on enemies all over the screen"));
+        Pair("FrostNova", "Vitality", Evo("Evo_Glacier", "Glacier", "#9BD8FF", WeaponKind.Nova, 26, 2.0f, 0, 1.4f, 0, 3f, 1, 0, false,
+            "EVOLVED: ice spikes erupt around you and slow enemies by 75%"));
+        Pair("SpinningAxe", "Might", Evo("Evo_CrimsonWhirlwind", "Crimson Whirlwind", "#E5484D", WeaponKind.Orbit, 22, 0, 9, 1.0f, 0, 5f, 4, 0, false,
+            "EVOLVED: a giant red tornado full of axes surrounds you"));
+        Pair("ThrowingDaggers", "Swiftness", Evo("Evo_PhantomBlades", "Phantom Blades", "#4CC38A", WeaponKind.Projectile, 16, 0.9f, 12, 1f, 1.1f, 0.5f, 3, 0, false,
+            "EVOLVED: 3 ghost blades boomerang back to you, 2 more circle you"));
+        // ---- looks: styles, impact art, awakened icons
+        void Look(string file, WeaponStyle style, string effect = null, string awakenIcon = null, string awakenProj = null)
+        {
+            if (!c.byFile.TryGetValue(file, out var w)) return;
+            w.style = style;
+            w.effect = effect != null ? FxArtFile(effect) : null;
+            w.awakenIcon = awakenIcon != null ? Icon(awakenIcon) : null;
+            w.awakenProjectile = awakenProj != null ? FxArtFile(awakenProj) : null;
+            EditorUtility.SetDirty(w);
+        }
+        Look("Path_Fireball", WeaponStyle.Default, "fx_fire_burst", "awk_inferno_core");
+        Look("Path_TidalWave", WeaponStyle.Wave, null, "awk_maelstrom");
+        Look("Path_ChainLightning", WeaponStyle.Chain, null, "awk_thunderstorm_heart");
+        Look("Path_BloodAxes", WeaponStyle.Default, null, "awk_crimson_rampage");
+        Look("Path_ThunderHammer", WeaponStyle.Hammer, "fx_fire_burst", "awk_storm_echo");
+        Look("Path_PiercingShot", WeaponStyle.Default, null, "awk_railshot", "fx_golden_arrow");
+        Look("Path_Multishot", WeaponStyle.Default, null, "awk_arrow_storm", "fx_golden_arrow");
+        Look("Path_ShadowDaggers", WeaponStyle.Default, null, "awk_night_reaper");
+        Look("Path_GuardianShields", WeaponStyle.Default, null, "awk_aegis_wall");
+        Look("FrostNova", WeaponStyle.Frost, "fx_frost_burst");
+        Look("Evo_BlackHole", WeaponStyle.BlackHole);
+        Look("Evo_Starfall", WeaponStyle.Starfall, "fx_star_burst");
+        Look("Evo_Glacier", WeaponStyle.Glacier, "fx_frost_burst");
+        Look("Evo_CrimsonWhirlwind", WeaponStyle.Whirlwind);
+        Look("Evo_PhantomBlades", WeaponStyle.PhantomBlades);
         contentBuilding = null;
 
         AssetDatabase.SaveAssets();
@@ -1050,7 +1077,9 @@ public static class AshboundBuilder
         var h = row.gameObject.AddComponent<HorizontalLayoutGroup>(); h.spacing = 24; h.childAlignment = TextAnchor.MiddleLeft;
         h.childControlWidth = true; h.childControlHeight = true; h.childForceExpandWidth = false; h.childForceExpandHeight = false;
         var l = Txt(row, "Label", label, fBlack, 28, Palette.Text); l.gameObject.AddComponent<LayoutElement>().preferredWidth = 240;
-        var sl = Node("Slider", row); Fixed(sl, 380, 40);
+        var sl = Node("Slider", row); Fixed(sl, 380, 48);
+        // Invisible hit area over the whole slider: a click anywhere on the track jumps the value there (not only by dragging the knob).
+        var hit = sl.gameObject.AddComponent<Image>(); hit.color = new Color(0, 0, 0, 0); hit.raycastTarget = true;
         var bg = Node("Background", sl); Place(bg, new Vector2(0, 0.5f), new Vector2(1, 0.5f), Center, Vector2.zero, new Vector2(0, 18)); Img(bg, sFill, Palette.Outline, 3f);
         var fa = Node("Fill Area", sl); Place(fa, new Vector2(0, 0.5f), new Vector2(1, 0.5f), Center, Vector2.zero, new Vector2(-20, 18));
         var fill = Node("Fill", fa); Place(fill, Vector2.zero, new Vector2(0, 1), Center, Vector2.zero, new Vector2(10, 0)); Img(fill, sFill, Palette.Accent, 3f);
@@ -1223,6 +1252,15 @@ public static class AshboundBuilder
         var bossText = Txt(boss, "Text", "The Ash Warden arrives in 0:18", fBlack, 22, Hex("#FFB3B5"), TextAlignmentOptions.Center);
         Stretch(bossText.rectTransform, 12, 12, 0, 0);
 
+        // Boss health bar
+        var bb = Node("BossBar", canvas); Place(bb, new Vector2(0.5f, 1), new Vector2(0.5f, 1), new Vector2(0.5f, 1), new Vector2(0, -116), new Vector2(900, 70));
+        Img(bb, sPanel, new Color(0.11f, 0.106f, 0.133f, 0.95f));
+        var bbName = Txt(bb, "Name", "The Ash Warden", fTitle, 26, Hex("#FFB3B5"), TextAlignmentOptions.Center);
+        Place(bbName.rectTransform, new Vector2(0, 1), new Vector2(1, 1), new Vector2(0.5f, 1), new Vector2(0, -4), new Vector2(-24, 34));
+        var bbBg = Node("Bar", bb); Place(bbBg, new Vector2(0, 0), new Vector2(1, 0), new Vector2(0.5f, 0), new Vector2(0, 12), new Vector2(-36, 20)); Img(bbBg, sFill, Palette.Outline, 3f);
+        var bbFill = Node("Fill", bbBg); Stretch(bbFill, 3, 3, 3, 3);
+        var bbFillImg = FilledImg(bbFill, Palette.Health); bbFillImg.fillAmount = 1f;
+
         // Stats + pause (top-right)
         var pauseBtn = Btn(Inst(prefabs.secondary, canvas, "PauseButton"), "", 78, 78);
         Place((RectTransform)pauseBtn.transform, TopRight, TopRight, TopRight, new Vector2(-30, -45), new Vector2(78, 78));
@@ -1257,7 +1295,7 @@ public static class AshboundBuilder
 
         var pathCol = Node("PathSkill", loadout);
         var pcv = pathCol.gameObject.AddComponent<VerticalLayoutGroup>(); pcv.spacing = 6; pcv.childAlignment = TextAnchor.UpperCenter; pcv.childControlWidth = true; pcv.childControlHeight = true; pcv.childForceExpandWidth = false; pcv.childForceExpandHeight = false;
-        var pathSlot = MakeSlot(pathCol, "PathSlot", 114, 114, 5);
+        var pathSlot = MakeSlot(pathCol, "PathSlot", 114, 114, 5, Palette.Accent);
         var pathLabel = Txt(pathCol, "SkillName", "Fireball", fBlack, 17, Palette.Gold, TextAlignmentOptions.Center);
 
         var slotsCol = Node("Slots", loadout);
@@ -1265,8 +1303,8 @@ public static class AshboundBuilder
         var wRow = Row(slotsCol, "Weapons", 12);
         var pRow = Row(slotsCol, "Passives", 12);
         var weapons = new List<Object>(); var passives = new List<Object>();
-        for (int i = 0; i < 5; i++) weapons.Add(MakeSlot(wRow, "Weapon" + (i + 1), 78, 78, 5));
-        for (int i = 0; i < 5; i++) passives.Add(MakeSlot(pRow, "Passive" + (i + 1), 78, 60, 5));
+        for (int i = 0; i < 5; i++) weapons.Add(MakeSlot(wRow, "Weapon" + (i + 1), 78, 78, 5, Palette.Health));
+        for (int i = 0; i < 5; i++) passives.Add(MakeSlot(pRow, "Passive" + (i + 1), 78, 60, 5, Palette.XPGem));
 
         // Level-up overlay
         var lvlUp = Node("LevelUpScreen", canvas); Stretch(lvlUp, 0, 0, 0, 0);
@@ -1289,12 +1327,25 @@ public static class AshboundBuilder
         // Pause overlay
         var pause = Node("PauseOverlay", canvas); Stretch(pause, 0, 0, 0, 0);
         Img(pause, null, new Color(0.04f, 0.04f, 0.06f, 0.8f)).raycastTarget = true;
-        var pp = Node("Panel", pause); Place(pp, Center, Center, Center, Vector2.zero, new Vector2(540, 420)); Img(pp, sPanel, Palette.Panel);
-        var ppv = pp.gameObject.AddComponent<VerticalLayoutGroup>(); ppv.padding = new RectOffset(45, 45, 42, 42); ppv.spacing = 24; ppv.childAlignment = TextAnchor.UpperCenter;
+        var pp = Node("Panel", pause); Place(pp, Center, Center, Center, Vector2.zero, new Vector2(1500, 960)); Img(pp, sPanel, Palette.Panel);
+        var ppv = pp.gameObject.AddComponent<VerticalLayoutGroup>(); ppv.padding = new RectOffset(42, 42, 30, 36); ppv.spacing = 16; ppv.childAlignment = TextAnchor.UpperCenter;
         ppv.childControlWidth = true; ppv.childControlHeight = true; ppv.childForceExpandWidth = true; ppv.childForceExpandHeight = false;
-        Txt(pp, "Title", "PAUSED", fTitle, 60, Palette.Text, TextAlignmentOptions.Center);
-        var resume = Btn(Inst(prefabs.primary, pp, "Resume"), "Resume");
-        var toMenu = Btn(Inst(prefabs.secondary, pp, "MainMenu"), "Main menu");
+        var pTitle = Txt(pp, "Title", "PAUSED", fTitle, 60, Palette.Accent, TextAlignmentOptions.Center); pTitle.fontSharedMaterial = mTitleGlow;
+        var pStats = Txt(pp, "Stats", "Level 1", fBold, 22, Palette.TextMuted, TextAlignmentOptions.Center);
+        var lbl = Txt(pp, "LoadoutLabel", "YOUR BUILD", fBlack, 19, Palette.TextMuted); lbl.characterSpacing = 6;
+        foreach (var (t, mh) in new[] { (pTitle, 78f), (pStats, 32f), (lbl, 26f) }) t.gameObject.AddComponent<LayoutElement>().minHeight = mh;
+        var grid = Node("Loadout", pp); { var gle = grid.gameObject.AddComponent<LayoutElement>(); gle.minHeight = gle.preferredHeight = 336; }
+        var pgl = grid.gameObject.AddComponent<GridLayoutGroup>();
+        pgl.cellSize = new Vector2(340, 100); pgl.spacing = new Vector2(12, 12); pgl.childAlignment = TextAnchor.UpperCenter;
+        pgl.constraint = GridLayoutGroup.Constraint.FixedColumnCount; pgl.constraintCount = 4;
+        var musicS = LabeledSlider(pp, "Music");
+        var sfxS = LabeledSlider(pp, "Sound effects");
+        var pBtnRow = Row(pp, "Buttons", 24);
+        var resume = Btn(Inst(prefabs.primary, pBtnRow, "Resume"), "Resume", 340, 84);
+        var restart = Btn(Inst(prefabs.secondary, pBtnRow, "Restart"), "Restart run", 340, 84);
+        var toMenu = Btn(Inst(prefabs.secondary, pBtnRow, "MainMenu"), "Main menu", 340, 84);
+        foreach (var b in new[] { resume, restart, toMenu }) { var le = b.GetComponent<LayoutElement>(); le.minHeight = 84; le.minWidth = 340; }
+        pp.sizeDelta = new Vector2(1480, 900);
 
         // Components
         var hud = canvas.gameObject.AddComponent<HUD>();
@@ -1304,12 +1355,13 @@ public static class AshboundBuilder
         Set(hud, "pathSlot", pathSlot); Set(hud, "pathSlotLabel", pathLabel);
         SetArr(hud, "weaponSlots", weapons); SetArr(hud, "passiveSlots", passives);
         Set(hud, "speedButton", speedBtn); Set(hud, "speedLabel", speedLbl);
+        Set(hud, "bossBar", bb.gameObject); Set(hud, "bossBarFill", bbFillImg); Set(hud, "bossBarName", bbName);
 
         var pm = canvas.gameObject.AddComponent<PauseMenu>();
         Set(pm, "overlay", pause.gameObject); Set(pm, "levelUpScreen", lvlUp.gameObject);
-        UnityEventTools.AddPersistentListener(pauseBtn.onClick, new UnityAction(pm.Toggle));
-        UnityEventTools.AddPersistentListener(resume.onClick, new UnityAction(pm.Toggle));
-        UnityEventTools.AddPersistentListener(toMenu.onClick, new UnityAction(pm.ToMainMenu));
+        Set(pm, "loadoutGrid", grid); Set(pm, "font", fBold); Set(pm, "boldFont", fBlack); Set(pm, "cardSprite", sPanel); Set(pm, "ringSprite", sRing);
+        Set(pm, "statsText", pStats); Set(pm, "musicSlider", musicS); Set(pm, "sfxSlider", sfxS); Set(pm, "restartButton", restart);
+        Set(pm, "pauseButton", pauseBtn); Set(pm, "resumeButton", resume); Set(pm, "menuButton", toMenu);
 
         // Game over overlay
         var over = Node("GameOverScreen", canvas); Stretch(over, 0, 0, 0, 0);
@@ -1341,6 +1393,15 @@ public static class AshboundBuilder
         SetArr(run, "pickupSprites", new List<Object> { Icon("pickup_meat"), Icon("pickup_medkit"), Icon("icon_magnet"), Icon("pickup_gold_bag"), Icon("pickup_chest") });
         SetArr(run, "classes", classesCache.ConvertAll(c => (Object)c));
         SetArr(run, "stages", stagesCache.ConvertAll(c => (Object)c));
+        var rso = new SerializedObject(run);
+        var fxp = rso.FindProperty("fxArt");
+        foreach (var (field, file) in new[] {
+            ("lightning", "fx_lightning"), ("blackHole", "fx_black_hole"), ("fallingStar", "fx_falling_star"), ("iceSpikes", "fx_ice_spikes"),
+            ("tornado", "fx_tornado"), ("ghostDagger", "fx_ghost_dagger"), ("frostBurst", "fx_frost_burst"), ("starBurst", "fx_star_burst"),
+            ("wave", "fx_wave"), ("crater", "fx_crater"), ("fireBurst", "fx_fire_burst"), ("goldenArrow", "fx_golden_arrow"),
+            ("firePatch", "fx_fire_patch"), ("poison", "fx_poison"), ("bossBullet", "fx_boss_bullet"), ("arenaRing", "fx_arena_ring") })
+            fxp.FindPropertyRelative(field).objectReferenceValue = Fresh(FxArtFile(file));
+        rso.ApplyModifiedPropertiesWithoutUndo();
 
         lvlUp.gameObject.SetActive(false);
         pause.gameObject.SetActive(false);
@@ -1430,7 +1491,7 @@ public static class AshboundBuilder
         return Txt(box, "Value", "", fBold, 22, Palette.Text);
     }
 
-    static SkillSlot MakeSlot(Transform parent, string name, float w, float h, int pipCount)
+    static SkillSlot MakeSlot(Transform parent, string name, float w, float h, int pipCount, Color typeColor)
     {
         var root = Node(name, parent);
         var v = root.gameObject.AddComponent<VerticalLayoutGroup>(); v.spacing = 6; v.childAlignment = TextAnchor.UpperCenter;
@@ -1444,6 +1505,10 @@ public static class AshboundBuilder
         for (int i = 0; i < pipCount; i++) { var p = Node("Pip", pipsRow); Fixed(p, w > 100 ? 18 : 12, 7); pips.Add(Img(p, sFill, Palette.Rock, 6f)); }
         var slot = root.gameObject.AddComponent<SkillSlot>();
         Set(slot, "frame", frameImg); Set(slot, "icon", iconImg); SetArr(slot, "pips", pips);
+        var border = Node("Border", frame); Stretch(border, -3, -3, -3, -3);
+        var borderImg = Img(border, sRing, typeColor, w < 100 ? 1.8f : 1.4f);
+        Set(slot, "border", borderImg);
+        var sso = new SerializedObject(slot); sso.FindProperty("typeColor").colorValue = typeColor; sso.ApplyModifiedPropertiesWithoutUndo();
         return slot;
     }
 

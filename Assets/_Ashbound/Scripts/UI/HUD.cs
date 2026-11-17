@@ -13,6 +13,9 @@ public class HUD : MonoBehaviour
     [SerializeField] TMP_Text pathSlotLabel;
     [SerializeField] SkillSlot[] weaponSlots = new SkillSlot[5];
     [SerializeField] SkillSlot[] passiveSlots = new SkillSlot[5];
+    [SerializeField] GameObject bossBar;
+    [SerializeField] Image bossBarFill;
+    [SerializeField] TMP_Text bossBarName;
     [SerializeField] Button speedButton;
     [SerializeField] TMP_Text speedLabel;
 
@@ -30,6 +33,7 @@ public class HUD : MonoBehaviour
         foreach (var s in weaponSlots) s.Set(null, Color.white, 0);
         foreach (var s in passiveSlots) s.Set(null, Color.white, 0);
         bossWarning.SetActive(false);
+        if (bossBar) bossBar.SetActive(false);
         SetXP(0, 100, 1);
         if (speedButton != null)
         {
@@ -96,6 +100,16 @@ public class HUD : MonoBehaviour
         bossWarning.SetActive(true);
         bossWarningText.text = $"{bossName} arrives in 0:{seconds:00}";
     }
+
+    public void ShowBossBar(string bossName, float fraction)
+    {
+        if (!bossBar) return;
+        if (!bossBar.activeSelf) bossBar.SetActive(true);
+        bossBarName.text = bossName;
+        bossBarFill.fillAmount = Mathf.Lerp(bossBarFill.fillAmount, fraction, 12f * Time.unscaledDeltaTime);
+    }
+
+    public void HideBossBar() { if (bossBar && bossBar.activeSelf) { bossBar.SetActive(false); bossBarFill.fillAmount = 1f; } }
 
     public void HideBossWarning() => bossWarning.SetActive(false);
 }

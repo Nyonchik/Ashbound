@@ -5,6 +5,9 @@ using UnityEngine.InputSystem;
 public class PlayerController : MonoBehaviour
 {
     public static PlayerController Instance { get; private set; }
+    /// <summary>Boss arena: while set, the player can't leave this circle.</summary>
+    public static Vector2? ArenaCenter;
+    public static float ArenaRadius = 7f;
 
     [SerializeField] Transform visual;
     [Tooltip("Tinted with the chosen class color")] [SerializeField] SpriteRenderer[] classTinted;
@@ -90,6 +93,13 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
-        rb.MovePosition(rb.position + input * stats.MoveSpeed * Time.fixedDeltaTime);
+        Vector2 next = rb.position + input * stats.MoveSpeed * Time.fixedDeltaTime;
+        if (ArenaCenter.HasValue)
+        {
+            Vector2 off = next - ArenaCenter.Value;
+            float max = ArenaRadius * 0.8f - 0.3f;   // stay inside the rune band
+            if (off.sqrMagnitude > max * max) next = ArenaCenter.Value + off.normalized * max;
+        }
+        rb.MovePosition(next);
     }
 }

@@ -18,10 +18,10 @@ MonoBehaviour:
   kind: 1
   icon: {fileID: 21300000, guid: 0751ebf6b6e8f4de6baf791b62c37d0b, type: 3}
   projectile: {fileID: 21300000, guid: e2b4ed3d1bf5c45e78b733ed94c99912, type: 3}
-  damage: 30
+  damage: 22
   cooldown: 0
   speed: 9
-  area: 1.6
+  area: 1
   lifetime: 0
   knockback: 5
   count: 4
@@ -59,13 +59,17 @@ MonoBehaviour:
     area: 0
     pierce: 0
     explode: 0
+  style: 5
+  effect: {fileID: 0}
+  awakenIcon: {fileID: 0}
+  awakenProjectile: {fileID: 0}
   evolvePassive: {fileID: 0}
   evolvesInto: {fileID: 0}
   isEvolution: 1
   levelText:
-  - 'EVOLVED: a red tornado of 4 axes spins around you'
-  - 'EVOLVED: a red tornado of 4 axes spins around you'
-  - 'EVOLVED: a red tornado of 4 axes spins around you'
-  - 'EVOLVED: a red tornado of 4 axes spins around you'
-  - 'EVOLVED: a red tornado of 4 axes spins around you'
-  - 'EVOLVED: a red tornado of 4 axes spins around you'
+  - 'EVOLVED: a giant red tornado full of axes surrounds you'
+  - 'EVOLVED: a giant red tornado full of axes surrounds you'
+  - 'EVOLVED: a giant red tornado full of axes surrounds you'
+  - 'EVOLVED: a giant red tornado full of axes surrounds you'
+  - 'EVOLVED: a giant red tornado full of axes surrounds you'
+  - 'EVOLVED: a giant red tornado full of axes surrounds you'

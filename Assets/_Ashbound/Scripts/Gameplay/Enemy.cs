@@ -30,8 +30,23 @@ public class Enemy : MonoBehaviour
     EnemySpawner owner;
     float hp, speed, damage, flash, bob, radius;
     int xp;
-    Vector2 knock;
+    Vector2 knock, pull;
     Color baseColor;
+    float slowTimer, slowMul = 1f;
+    static readonly Color FrozenTint = new(0.55f, 0.85f, 1f);
+    Color CurrentColor => slowTimer > 0f ? baseColor * FrozenTint : baseColor;
+
+    /// <summary>Slow (mul 0.25 = 75% slower) for a while; tints the enemy icy.</summary>
+    public void Slow(float seconds, float mul)
+    {
+        if (dead) return;
+        slowTimer = Mathf.Max(slowTimer, seconds);
+        slowMul = IsBoss ? Mathf.Max(mul, 0.6f) : mul;
+        if (flash <= 0f) body.color = CurrentColor;
+    }
+
+    /// <summary>Drag toward a point this physics step (black holes). Bosses resist.</summary>
+    public void Pull(Vector2 velocity) { if (!dead) pull += IsBoss ? velocity * 0.25f : velocity; }
     bool dead;
 
     public bool IsBoss { get; private set; }
@@ -50,6 +65,10 @@ public class Enemy : MonoBehaviour
     void OnDisable() => Active.Remove(this);
 
     public SpriteRenderer Body => body;
+    public EnemySpawner Owner => owner;
+    /// <summary>Set by boss attacks (charges, wind-ups). Null = normal chasing.</summary>
+    public Vector2? ForcedVelocity;
+    public void Teleport(Vector2 p) { rb.position = p; transform.position = p; knock = Vector2.zero; }
     public float FacingSign => visual != null ? Mathf.Sign(visual.localScale.x) : 1f;
 
     public void Init(EnemySpawner spawner, EnemyType type, float healthScale, float damageScale, Color stageTint, Vector2 position)
@@ -68,7 +87,7 @@ public class Enemy : MonoBehaviour
         body.sprite = type.sprite != null ? type.sprite : defaultSprite;
         baseColor = type.tint * stageTint;
         body.color = baseColor;
-        knock = Vector2.zero;
+        knock = Vector2.zero; pull = Vector2.zero; slowTimer = 0f; slowMul = 1f; ForcedVelocity = null;
         flash = 0f;
         dead = false;
         bob = Random.value * 10f;
@@ -80,7 +99,10 @@ public class Enemy : MonoBehaviour
         var p = PlayerController.Instance;
         if (p == null || dead) return;
         Vector2 dir = ((Vector2)p.transform.position - rb.position).normalized;
-        rb.linearVelocity = dir * speed + knock;
+        if (ForcedVelocity.HasValue) { rb.linearVelocity = ForcedVelocity.Value * (slowTimer > 0f ? Mathf.Max(slowMul, 0.6f) : 1f); pull = Vector2.zero; return; }
+        float sp = slowTimer > 0f ? speed * slowMul : speed;
+        rb.linearVelocity = dir * sp + knock + pull;
+        pull = Vector2.zero;
         knock = Vector2.Lerp(knock, Vector2.zero, 8f * Time.fixedDeltaTime);
     }
 
@@ -101,10 +123,15 @@ public class Enemy : MonoBehaviour
             }
         }
 
+        if (slowTimer > 0f)
+        {
+            slowTimer -= Time.deltaTime;
+            if (slowTimer <= 0f && flash <= 0f) body.color = baseColor;
+        }
         if (flash > 0f)
         {
             flash -= Time.deltaTime;
-            body.color = flash > 0f ? HitColor : baseColor;
+            body.color = flash > 0f ? HitColor : CurrentColor;
         }
     }
 

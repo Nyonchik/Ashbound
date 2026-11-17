@@ -59,6 +59,10 @@ MonoBehaviour:
     area: 0.3
     pierce: 0
     explode: 0
+  style: 0
+  effect: {fileID: 0}
+  awakenIcon: {fileID: 21300000, guid: 0a2cb09dc13a4427794d48909a2bbb76, type: 3}
+  awakenProjectile: {fileID: 0}
   evolvePassive: {fileID: 0}
   evolvesInto: {fileID: 0}
   isEvolution: 0

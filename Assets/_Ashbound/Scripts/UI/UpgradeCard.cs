@@ -22,6 +22,15 @@ public class UpgradeCard : MonoBehaviour
     [SerializeField] Button button;
     Sprite defaultIcon;
 
+    /// <summary>Card color by upgrade type: weapons red, passives blue, Path skills orange, evolutions/awakenings gold.</summary>
+    public static Color TypeColor(string tag, bool special)
+    {
+        if (special || tag == "EVOLUTION" || tag == "AWAKENING") return Palette.Gold;
+        if (tag != null && tag.Contains("PASSIVE")) return Palette.XPGem;
+        if (tag == "PATH SKILL") return Palette.Accent;
+        return Palette.Health;
+    }
+
     public void Setup(UpgradeOption o, Action<UpgradeOption> onPick)
     {
         bool awake = o.IsAwakening;
@@ -35,10 +44,12 @@ public class UpgradeCard : MonoBehaviour
         icon.preserveAspect = true;
         icon.rectTransform.localScale = Vector3.one * (o.icon != null ? 1.45f : 1f);
 
+        var type = TypeColor(o.tag, awake);
         frame.color = awake ? Palette.AwakenBg : Palette.Panel;
-        tagBg.color = awake ? Palette.Gold : Palette.Rock;
-        tagText.color = awake ? Palette.Outline : Palette.Text;
-        goldRing.enabled = awake;
+        tagBg.color = type;
+        tagText.color = Palette.Outline;
+        goldRing.enabled = true;
+        goldRing.color = awake ? Palette.Gold : new Color(type.r, type.g, type.b, 0.9f);
         glow.enabled = awake;
 
         for (int i = 0; i < pips.Length; i++)

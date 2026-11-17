@@ -2,6 +2,9 @@ using UnityEngine;
 
 public enum WeaponKind { Projectile, Orbit, Nova }
 
+/// <summary>How a weapon looks and behaves beyond its basic kind.</summary>
+public enum WeaponStyle { Default, Chain, BlackHole, Starfall, Glacier, Whirlwind, PhantomBlades, Wave, Hammer, Frost }
+
 /// <summary>Bonus added at one upgrade step. Fractions: 0.25 = +25%. cooldown 0.2 = 20% faster.</summary>
 [System.Serializable]
 public struct LevelBonus
@@ -38,6 +41,12 @@ public class WeaponDef : ScriptableObject
     [Header("Upgrades")]
     [Tooltip("Lv 2, Lv 3, Lv 4, Lv 5")] public LevelBonus[] levels = new LevelBonus[4];
     public LevelBonus awakening;
+
+    [Header("Look")]
+    public WeaponStyle style;
+    [Tooltip("Impact / burst sprite (explosions, nova)")] public Sprite effect;
+    [Tooltip("Icon after Awakening (Lv 6)")] public Sprite awakenIcon;
+    [Tooltip("Projectile / orb sprite after Awakening")] public Sprite awakenProjectile;
 
     [Header("Evolution (class weapons)")]
     [Tooltip("At Lv 5, owning this passive lets the weapon evolve")] public PassiveDef evolvePassive;

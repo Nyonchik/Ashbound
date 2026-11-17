@@ -27,6 +27,17 @@ public class RunManager : MonoBehaviour
     [Header("Pickup art: meat, medkit, magnet, gold bag, chest")]
     [SerializeField] Sprite[] pickupSprites = new Sprite[5];
 
+    [System.Serializable]
+    public class FxArt
+    {
+        public Sprite lightning, blackHole, fallingStar, iceSpikes, tornado, ghostDagger, frostBurst, starBurst;
+        public Sprite wave, crater, fireBurst, goldenArrow, firePatch, poison, bossBullet, arenaRing;
+    }
+    [Header("Effect art (skills, bosses)")]
+    [SerializeField] FxArt fxArt = new();
+    public FxArt Art => fxArt;
+    [SerializeField] float arenaRadius = 6.5f;
+
     [Header("Content")]
     [SerializeField] WeaponDef fallbackPathWeapon;
     [SerializeField] List<WeaponDef> weaponPool = new();
@@ -68,6 +79,52 @@ public class RunManager : MonoBehaviour
         vfx = MakePool(vfxPrefab, 64, 1000);
         numbers = MakePool(damageNumberPrefab, 64, 300);
         pops = MakePool(deathPopPrefab, 32, 300);
+        fx = new ObjectPool<FxSprite>(() =>
+            {
+                var go = new GameObject("Fx");
+                go.transform.SetParent(poolRoot, false);
+                var sr = go.AddComponent<SpriteRenderer>();
+                sr.sharedMaterial = SpriteMaterial;
+                var f = go.AddComponent<FxSprite>();
+                f.sr = sr;
+                return f;
+            },
+            x => x.gameObject.SetActive(true), x => x.gameObject.SetActive(false), x => { if (x) Destroy(x.gameObject); },
+            false, 64, 1500);
+        PlayerController.ArenaCenter = null;
+    }
+
+    ObjectPool<FxSprite> fx;
+    public Material SpriteMaterial => orbPrefab.sharedMaterial;
+    public Sprite FallbackSprite => orbPrefab.sprite;
+
+    /// <summary>One-shot sprite effect (pooled). Chain .Scale/.Move/.Rotate/.Spin/.FadeFrom on the result.</summary>
+    public FxSprite Fx(Sprite s, Vector2 pos, Color c, float seconds, int order = 12) =>
+        fx.Get().Setup(s != null ? s : FallbackSprite, pos, c, seconds, f => fx.Release(f), order);
+
+    // ---------------- loadout info for the pause screen
+    public IReadOnlyList<Weapon> Weapons => weapons;
+    public IReadOnlyList<PassiveDef> Passives => passives;
+    public int PassiveLevel(PassiveDef p) { int i = passives.IndexOf(p); return i < 0 ? 0 : passiveLevels[i]; }
+    public int Level => level;
+
+    // ---------------- boss arena + health bar
+    readonly List<(Enemy e, string name)> liveBosses = new();
+    SpriteRenderer arena;
+
+    void UpdateBosses()
+    {
+        liveBosses.RemoveAll(b => b.e == null || !b.e.isActiveAndEnabled || b.e.HealthFraction <= 0f || !b.e.IsBoss);
+        if (liveBosses.Count > 0)
+        {
+            hud.ShowBossBar(liveBosses[0].name, liveBosses[0].e.HealthFraction);
+            if (arena != null) arena.transform.Rotate(0f, 0f, 6f * Time.deltaTime);
+        }
+        else
+        {
+            hud.HideBossBar();
+            if (arena != null) { Destroy(arena.gameObject); arena = null; PlayerController.ArenaCenter = null; }
+        }
     }
 
     ObjectPool<T> MakePool<T>(T prefab, int capacity, int max) where T : Component =>
@@ -144,14 +201,30 @@ public class RunManager : MonoBehaviour
         }
         else hud.HideBossWarning();
 
+        UpdateBosses();
         if (RunTime >= runLength && spawner.AllBossesSpawned && bossesAlive <= 0) EndRun(true);
     }
 
     // ---------------- events from gameplay
 
-    public void OnBossSpawned()
+    public void OnBossSpawned(Enemy boss, string bossName)
     {
         bossesAlive++;
+        liveBosses.Add((boss, bossName));
+        if (arena == null)
+        {
+            Vector2 c = player.transform.position;
+            PlayerController.ArenaCenter = c;
+            PlayerController.ArenaRadius = arenaRadius;
+            arena = CreateOrb(null, Color.white, fxArt.arenaRing);
+            arena.name = "Boss Arena";
+            arena.transform.position = c;
+            arena.sortingOrder = -6;
+            float w = arena.sprite != null ? arena.sprite.bounds.size.x : 1f;
+            arena.transform.localScale = Vector3.one * (arenaRadius * 2f / w);
+            arena.color = fxArt.arenaRing == null ? new Color(1f, 0.5f, 0.2f, 0.25f) : new Color(1f, 1f, 1f, 0.42f);
+            boss.Teleport(c + Random.insideUnitCircle.normalized * (arenaRadius * 0.6f));
+        }
         CameraFollow.Shake(0.35f, 0.5f);
         AudioManager.Play("boss", 1f);
     }
@@ -226,8 +299,13 @@ public class RunManager : MonoBehaviour
         var k = UnityEngine.InputSystem.Keyboard.current;
         if (k != null && k.f2Key.wasPressedThisFrame && !IsOver && !levelUp.IsOpen) AddXP(xpNeeded - xp);
         if (k != null && k.f3Key.wasPressedThisFrame && !IsOver)
-            { foreach (var w in weapons) while (w.CanLevel && !w.IsPath) w.LevelUp(); RefreshLoadout(); }
+            {
+                foreach (var w in weapons) while (w.CanLevel && !w.IsPath) w.LevelUp();
+                foreach (var p in new List<PassiveDef>(passives)) while (PassiveLevel(p) < 5) ApplyPassive(p);
+                RefreshLoadout();
+            }
         if (k != null && k.f4Key.wasPressedThisFrame && !IsOver) player.Stats.TakeDamage(99999f);
+        if (k != null && k.f5Key.wasPressedThisFrame && !IsOver && spawner.NextBossTime > RunTime) RunTime = spawner.NextBossTime - 1f;
     }
 #endif
 
@@ -342,7 +420,7 @@ public class RunManager : MonoBehaviour
         var candidates = new List<UpgradeOption>();
         foreach (var w in weapons)
         {
-            if (w.CanEvolve(passives)) candidates.Add(EvolutionOption(w));
+            if (w.CanEvolve(PassiveLevel)) candidates.Add(EvolutionOption(w));
             else if (w.CanLevel) candidates.Add(WeaponOption(w));
         }
 
@@ -378,7 +456,7 @@ public class RunManager : MonoBehaviour
     }
 
     static string EvolveHint(WeaponDef d) =>
-        d.evolvePassive != null && d.evolvesInto != null ? $"\n<color=#FFD95A>Evolves at Lv 5 with {d.evolvePassive.passiveName}</color>" : "";
+        d.evolvePassive != null && d.evolvesInto != null ? $"\n<color=#FFD95A>Evolves with {d.evolvePassive.passiveName} Lv 5</color>" : "";
 
     UpgradeOption WeaponOption(Weapon w)
     {
@@ -392,7 +470,7 @@ public class RunManager : MonoBehaviour
             levelLine = awaken ? $"{w.Def.weaponName} · Lv 5 » Awakened" : $"Lv {w.Level} » Lv {next}",
             effect = w.NextLevelText + (next == 5 && !w.IsPath ? EvolveHint(w.Def) : ""),
             color = w.Def.color,
-            icon = w.Def.icon,
+            icon = awaken && w.Def.awakenIcon != null ? w.Def.awakenIcon : w.Def.icon,
             fromLevel = w.Level,
             toLevel = next,
             apply = w.LevelUp,
@@ -443,13 +521,21 @@ public class RunManager : MonoBehaviour
         tag = currentLevel == 0 ? "NEW PASSIVE" : "PASSIVE",
         name = p.passiveName,
         levelLine = currentLevel == 0 ? "Lv 1" : $"Lv {currentLevel} » Lv {currentLevel + 1}",
-        effect = p.description,
+        effect = p.description + PassiveEvolveHint(p),
         color = p.color,
         icon = p.icon,
         fromLevel = currentLevel,
         toLevel = currentLevel + 1,
         apply = () => ApplyPassive(p),
     };
+
+    string PassiveEvolveHint(PassiveDef p)
+    {
+        foreach (var w in weapons)
+            if (!w.IsEvolved && w.Def.evolvePassive == p && w.Def.evolvesInto != null)
+                return $"\n<color=#FFD95A>Lv 5 + {w.Def.weaponName} Lv 5 » {w.Def.evolvesInto.weaponName}</color>";
+        return "";
+    }
 
     Weapon AddWeapon(WeaponDef def, bool isPath)
     {
@@ -483,14 +569,13 @@ public class RunManager : MonoBehaviour
     void RefreshLoadout()
     {
         if (pathWeapon != null)
-            hud.SetPathSkill(pathWeapon.Def.icon, pathWeapon.Def.color, Mathf.Min(pathWeapon.Level, 5), pathWeapon.Golden,
-                pathWeapon.Awakened ? pathWeapon.Def.awakeningName : pathWeapon.Def.weaponName);
+            hud.SetPathSkill(pathWeapon.Icon, pathWeapon.Def.color, Mathf.Min(pathWeapon.Level, 5), pathWeapon.Golden, pathWeapon.DisplayName);
 
         int slot = 0;
         foreach (var w in weapons)
         {
             if (w.IsPath || slot >= 5) continue;
-            hud.SetWeapon(slot++, w.Def.icon, w.Def.color, Mathf.Min(w.Level, 5), w.Golden);
+            hud.SetWeapon(slot++, w.Icon, w.Def.color, Mathf.Min(w.Level, 5), w.Golden);
         }
         for (int i = 0; i < passives.Count && i < 5; i++) hud.SetPassive(i, passives[i].icon, passives[i].color, passiveLevels[i]);
     }

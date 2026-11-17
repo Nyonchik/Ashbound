@@ -15,16 +15,16 @@ MonoBehaviour:
   weaponName: Black Hole
   awakeningName: Black Hole
   color: {r: 0.60784316, g: 0.3647059, b: 0.8980392, a: 1}
-  kind: 1
+  kind: 2
   icon: {fileID: 21300000, guid: 258f98ae3c1984444b9caf05921d840c, type: 3}
   projectile: {fileID: 21300000, guid: 9a89bd2ea80fc41338c6bd998d66bd87, type: 3}
   damage: 30
-  cooldown: 0
-  speed: 3
-  area: 1.8
+  cooldown: 3.2
+  speed: 0
+  area: 1.2
   lifetime: 0
-  knockback: 4
-  count: 3
+  knockback: 0
+  count: 1
   pierce: 0
   explode: 0
   levels:
@@ -59,13 +59,17 @@ MonoBehaviour:
     area: 0
     pierce: 0
     explode: 0
+  style: 2
+  effect: {fileID: 0}
+  awakenIcon: {fileID: 0}
+  awakenProjectile: {fileID: 0}
   evolvePassive: {fileID: 0}
   evolvesInto: {fileID: 0}
   isEvolution: 1
   levelText:
-  - 'EVOLVED: three collapsing stars orbit you and crush everything'
-  - 'EVOLVED: three collapsing stars orbit you and crush everything'
-  - 'EVOLVED: three collapsing stars orbit you and crush everything'
-  - 'EVOLVED: three collapsing stars orbit you and crush everything'
-  - 'EVOLVED: three collapsing stars orbit you and crush everything'
-  - 'EVOLVED: three collapsing stars orbit you and crush everything'
+  - 'EVOLVED: opens on the biggest crowd, pulls everything in, then explodes'
+  - 'EVOLVED: opens on the biggest crowd, pulls everything in, then explodes'
+  - 'EVOLVED: opens on the biggest crowd, pulls everything in, then explodes'
+  - 'EVOLVED: opens on the biggest crowd, pulls everything in, then explodes'
+  - 'EVOLVED: opens on the biggest crowd, pulls everything in, then explodes'
+  - 'EVOLVED: opens on the biggest crowd, pulls everything in, then explodes'

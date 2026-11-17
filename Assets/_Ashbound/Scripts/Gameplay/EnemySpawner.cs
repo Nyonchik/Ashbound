@@ -15,9 +15,9 @@ public class EnemySpawner : MonoBehaviour
 
     [SerializeField] EnemyType[] bosses =
     {
-        new() { name = "The Ash Warden", health = 900, speed = 1.3f, damage = 25, scale = 3f, xp = 40, tint = new Color(0.75f, 0.75f, 0.85f), isBoss = true, startTime = 300 },
-        new() { name = "The Rotting Matriarch", health = 2600, speed = 1.5f, damage = 30, scale = 3.2f, xp = 80, tint = new Color(0.85f, 0.7f, 0.9f), isBoss = true, startTime = 600 },
-        new() { name = "The Hollow King", health = 6500, speed = 1.4f, damage = 40, scale = 3.6f, xp = 150, tint = new Color(0.62f, 0.58f, 0.8f), isBoss = true, startTime = 900 },
+        new() { name = "The Ash Warden", health = 900, speed = 1.3f, damage = 16, scale = 3f, xp = 40, tint = new Color(0.75f, 0.75f, 0.85f), isBoss = true, startTime = 300 },
+        new() { name = "The Rotting Matriarch", health = 2600, speed = 1.5f, damage = 20, scale = 3.2f, xp = 80, tint = new Color(0.85f, 0.7f, 0.9f), isBoss = true, startTime = 600 },
+        new() { name = "The Hollow King", health = 6500, speed = 1.4f, damage = 28, scale = 3.6f, xp = 150, tint = new Color(0.62f, 0.58f, 0.8f), isBoss = true, startTime = 900 },
     };
 
     [Tooltip("Enemies spawned per second over run time (seconds)")]
@@ -67,8 +67,13 @@ public class EnemySpawner : MonoBehaviour
 
         if (nextBoss < bosses.Length && t >= bosses[nextBoss].startTime)
         {
-            Spawn(bosses[nextBoss], hpMul);
-            run.OnBossSpawned();
+            var boss = Spawn(bosses[nextBoss], hpMul);
+            if (boss != null)
+            {
+                if (!boss.TryGetComponent(out BossAI ai)) ai = boss.gameObject.AddComponent<BossAI>();
+                ai.Begin(boss, nextBoss, RunSelection.Stage != null ? RunSelection.Stage.order : 0);
+                run.OnBossSpawned(boss, bosses[nextBoss].name);
+            }
             nextBoss++;
         }
     }
@@ -87,16 +92,29 @@ public class EnemySpawner : MonoBehaviour
         return types[0];
     }
 
-    void Spawn(EnemyType type, float hpScale)
+    /// <summary>Boss minions: a walker or hound right next to the boss.</summary>
+    public void SpawnMinion(Vector2 pos)
+    {
+        if (Enemy.Active.Count >= maxAlive + 60) return;
+        var type = types[Random.value < 0.6f ? 0 : Mathf.Min(1, types.Length - 1)];
+        var e = pool.Get();
+        e.Init(this, type, healthScale.Evaluate(run.RunTime) * hpMul, dmgMul, tint, pos);
+        if (e.TryGetComponent(out BossAI ai)) ai.enabled = false;
+    }
+
+    Enemy Spawn(EnemyType type, float hpScale)
     {
         var cam = Camera.main;
         var p = PlayerController.Instance;
-        if (cam == null || p == null) return;
+        if (cam == null || p == null) return null;
         float h = cam.orthographicSize, w = h * cam.aspect;
         float r = Mathf.Sqrt(w * w + h * h) + 1f;
         float a = Random.value * Mathf.PI * 2f;
         Vector2 pos = (Vector2)p.transform.position + new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * r;
-        pool.Get().Init(this, type, hpScale, dmgMul, tint, pos);
+        var e = pool.Get();
+        e.Init(this, type, hpScale, dmgMul, tint, pos);
+        if (!type.isBoss && e.TryGetComponent(out BossAI ai)) ai.enabled = false;
+        return e;
     }
 
     public void OnEnemyKilled(Enemy e, int xp)

@@ -51,6 +51,7 @@ public class UpgradesPanel : MonoBehaviour
 
             var buyImg = UI<Image>("Buy", row, new Vector2(1, 0.5f), new Vector2(-110, 0), new Vector2(190, 64));
             buyImg.sprite = panelSprite; buyImg.type = Image.Type.Sliced; buyImg.pixelsPerUnitMultiplier = 1.6f; buyImg.color = Palette.Accent;
+            buyImg.raycastTarget = true;   // the button needs a clickable graphic
             var buy = buyImg.gameObject.AddComponent<Button>(); buy.targetGraphic = buyImg;
             var price = UI<TextMeshProUGUI>("Price", buyImg.rectTransform, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(180, 60));
             price.font = boldFont; price.fontSize = 24; price.color = Palette.Outline; price.alignment = TextAlignmentOptions.Center;
