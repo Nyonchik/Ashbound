@@ -12,4 +12,7 @@ public class StageData : ScriptableObject
     public float enemyDamage = 1f;
     public float spawnRate = 1f;
     public float goldMultiplier = 1f;
+    [Tooltip("Optional art for this stage's walker, hound and brute (same order as the spawner's enemy types)")]
+    public Sprite[] enemySprites = new Sprite[3];
+    [Tooltip("Optional ground tile for this stage")] public Sprite groundTile;
 }

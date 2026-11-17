@@ -7,6 +7,8 @@ public class GameOverScreen : MonoBehaviour
 {
     [SerializeField] TMP_Text title, stats;
     [SerializeField] TMP_Text rewards;
+    [SerializeField] Image icon, frameRing;
+    [SerializeField] Sprite winIcon, loseIcon;
     [SerializeField] Button retryButton, menuButton;
 
     public bool IsOpen => gameObject.activeSelf;
@@ -24,6 +26,8 @@ public class GameOverScreen : MonoBehaviour
         int m = (int)(time / 60f), s = (int)(time % 60f);
         stats.text = $"Survived {m:00}:{s:00}\nLevel {level}  ·  {kills:N0} kills  ·  {gold:N0} gold";
         if (rewards != null) rewards.text = notes;
+        if (icon) { icon.sprite = won ? winIcon : loseIcon; icon.enabled = icon.sprite != null; icon.preserveAspect = true; }
+        if (frameRing) frameRing.color = won ? Palette.Gold : new Color(0.9f, 0.28f, 0.3f, 0.8f);
         gameObject.SetActive(true);
         Time.timeScale = 0f;
     }

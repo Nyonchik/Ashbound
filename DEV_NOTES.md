@@ -30,5 +30,21 @@
 - Ideas: more boss variety per stage, skill UI polish pass.
 - git-lfs isn't installed on the Mac: brew install git-lfs before pushing.
 
+## Done (late evening)
+- Stage enemies + ground: Hollow Forest (stump walker, wolf, mossy brute, forest floor) and Ruined Capital (undead soldier, ghoul, brick golem, cobblestones).
+- Boss spawn kills every regular mob (they drop XP) and pauses normal spawns until the boss dies. Boss intro card with name + title. Thin arena ring art.
+- Hit feedback: red screen edge on hits, pulsing red + heartbeat sound under 30% HP.
+- Boss chest opening animation (TREASURE! +25 gold +1 level up). Chest on the ground is bigger.
+- Victory/defeat screen: crown shard or skull icon, gold or red frame.
+- Settings: Damage numbers on/off, Screen shake on/off. Main menu: Unlocks screen (heroes, stages, paths, crown shards, x2 speed).
+- First-run tips (move, level-up, drops, evolve, boss, pause), each shown once per save.
+- Tidal Wave is now a real ring of rushing water expanding from the hero (+ trailing ripple).
+- Drops much rarer: ~0.26% per kill (meat > gold bag > magnet > medkit) and at least 15s apart; bosses drop meat instead of a medkit.
+- Upgrades buy verified (bought Magnet Lv 1 for 50 gold).
+- Editor-only test keys: F2 level-up, F3 max weapons+passives, F4 die, F5 next boss, C drop a chest.
+
+## Ideas for later
+- More boss variety per stage; a skill UI polish pass; balance after a few real runs (drop rates, boss damage).
+
 ## Note
 Test runs with F5 counted as real progress in the save (Berserker Beast path unlocked, stage 1 shows cleared). Settings > Reset progress clears it.

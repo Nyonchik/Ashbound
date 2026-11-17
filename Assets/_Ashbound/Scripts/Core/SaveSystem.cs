@@ -18,6 +18,9 @@ public class SaveData
     public float sfxVolume = 0.8f;
     public bool fullscreen = true;
     public int resolutionIndex = -1;
+    public bool showDamageNumbers = true;
+    public bool screenShake = true;
+    public List<string> seenTips = new();
 }
 
 /// <summary>Progress and settings, stored as JSON in PlayerPrefs.</summary>

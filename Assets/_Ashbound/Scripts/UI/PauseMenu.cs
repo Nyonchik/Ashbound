@@ -11,6 +11,7 @@ public class PauseMenu : MonoBehaviour
     [SerializeField] GameObject overlay;
     [SerializeField] GameObject levelUpScreen; // don't pause on top of a level-up
     [SerializeField] GameObject gameOverScreen;
+    [SerializeField] GameObject chestPopup;
 
     [Header("Loadout cards")]
     [SerializeField] RectTransform loadoutGrid;
@@ -54,6 +55,7 @@ public class PauseMenu : MonoBehaviour
     {
         if (levelUpScreen && levelUpScreen.activeSelf) return;
         if (gameOverScreen && gameOverScreen.activeSelf) return;
+        if (chestPopup && chestPopup.activeSelf) return;
         bool pause = !overlay.activeSelf;
         overlay.SetActive(pause);
         if (pause) { GameSpeed.Pause(); BuildLoadout(); }

@@ -480,18 +480,19 @@ public class Weapon : MonoBehaviour
         {
             Vector2 c = transform.position;
             float r = 2.3f * Area * (w == 1 ? 1.3f : 1f);
-            const int n = 10;
-            float off = Random.value * 36f;
-            for (int i = 0; i < n; i++)
-            {
-                float a = off + i * 360f / n;
-                Vector2 dir = new Vector2(Mathf.Cos(a * Mathf.Deg2Rad), Mathf.Sin(a * Mathf.Deg2Rad));
-                Run.Fx(Art.wave, c + dir * 0.4f, Color.white, 0.55f, 11).Move(c + dir * r, true).Rotate(a - 90f)
-                   .Scale(0.5f * Area, 1.15f * Area).FadeFrom(0.55f);
-            }
+            // a real wave: a ring of rushing water that bursts out from the hero, with a smaller trailing ripple
+            var ring = Art.waveRing != null ? Art.waveRing : Art.wave;
+            Run.Fx(ring, c, Color.white, 0.6f, -8).Scale(0.4f, r * 2.15f).Spin(-70f).FadeFrom(0.55f);
+            StartCoroutine(Ripple(ring, c, r));
             HitAll(c, r, Damage, Def.knockback, buffer);
             yield return new WaitForSeconds(0.35f);
         }
+    }
+
+    IEnumerator Ripple(Sprite ring, Vector2 c, float r)
+    {
+        yield return new WaitForSeconds(0.12f);
+        Run.Fx(ring, c, new Color(1f, 1f, 1f, 0.55f), 0.5f, -8).Scale(0.3f, r * 1.5f).Spin(90f).FadeFrom(0.4f);
     }
 
     // ---------------- Thunder Hammer: ground slam with cracks and lightning

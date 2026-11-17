@@ -16,7 +16,18 @@ public class HUD : MonoBehaviour
     [SerializeField] GameObject bossBar;
     [SerializeField] Image bossBarFill;
     [SerializeField] TMP_Text bossBarName;
+    [Header("Feedback")]
+    [SerializeField] Image hurtVignette;
+    [SerializeField] RectTransform bossIntro;
+    [SerializeField] TMP_Text bossIntroName, bossIntroTitle;
+    [SerializeField] RectTransform tipBanner;
+    [SerializeField] TMP_Text tipText;
+    [SerializeField] ChestPopup chestPopup;
     [SerializeField] Button speedButton;
+    float hurtFlash, heartTimer;
+    bool lowHealth;
+    readonly System.Collections.Generic.Queue<string> tips = new();
+    Coroutine tipRoutine;
     [SerializeField] TMP_Text speedLabel;
 
     float runTime;
@@ -34,6 +45,10 @@ public class HUD : MonoBehaviour
         foreach (var s in passiveSlots) s.Set(null, Color.white, 0);
         bossWarning.SetActive(false);
         if (bossBar) bossBar.SetActive(false);
+        if (bossIntro) bossIntro.gameObject.SetActive(false);
+        if (tipBanner) tipBanner.gameObject.SetActive(false);
+        if (chestPopup) chestPopup.gameObject.SetActive(false);
+        if (hurtVignette) hurtVignette.color = new Color(1f, 1f, 1f, 0f);
         SetXP(0, 100, 1);
         if (speedButton != null)
         {
@@ -49,6 +64,85 @@ public class HUD : MonoBehaviour
         runTime = run != null ? run.RunTime : runTime + Time.deltaTime; // stops while Time.timeScale = 0
         int m = (int)(runTime / 60), s = (int)(runTime % 60);
         timerText.text = $"{m:00}:{s:00}";
+        UpdateVignette();
+    }
+
+    // ---------------- hit feedback: red screen edge on hits, pulsing + heartbeat at low HP
+
+    public void Hurt() => hurtFlash = 1f;
+    public void SetLowHealth(bool low) => lowHealth = low;
+
+    void UpdateVignette()
+    {
+        if (!hurtVignette) return;
+        bool paused = Time.timeScale == 0f;
+        hurtFlash = Mathf.Max(0f, hurtFlash - Time.unscaledDeltaTime * 2.5f);
+        float pulse = 0f;
+        if (lowHealth)
+        {
+            pulse = 0.3f + 0.25f * Mathf.Pow(Mathf.Abs(Mathf.Sin(Time.unscaledTime * 3.4f)), 6f);
+            if (!paused)
+            {
+                heartTimer -= Time.unscaledDeltaTime;
+                if (heartTimer <= 0f) { heartTimer = 0.92f; AudioManager.Play("heartbeat", 0.8f); }
+            }
+        }
+        hurtVignette.color = new Color(1f, 1f, 1f, Mathf.Max(pulse, hurtFlash * 0.7f));
+    }
+
+    // ---------------- boss intro card
+
+    public void ShowBossIntro(string bossName, string bossTitle)
+    {
+        if (!bossIntro) return;
+        bossIntroName.text = bossName;
+        bossIntroTitle.text = string.IsNullOrEmpty(bossTitle) ? "" : bossTitle;
+        StartCoroutine(BossIntroRoutine());
+    }
+
+    System.Collections.IEnumerator BossIntroRoutine()
+    {
+        bossIntro.gameObject.SetActive(true);
+        float w = 1400f, t = 0f;
+        while (t < 1f) { t += Time.unscaledDeltaTime / 0.35f; float k = 1f - Mathf.Pow(1f - Mathf.Clamp01(t), 3f); bossIntro.anchoredPosition = new Vector2(Mathf.Lerp(-w, 0f, k), bossIntro.anchoredPosition.y); yield return null; }
+        yield return new WaitForSecondsRealtime(1.8f);
+        t = 0f;
+        while (t < 1f) { t += Time.unscaledDeltaTime / 0.3f; float k = Mathf.Clamp01(t) * Mathf.Clamp01(t); bossIntro.anchoredPosition = new Vector2(Mathf.Lerp(0f, w, k), bossIntro.anchoredPosition.y); yield return null; }
+        bossIntro.gameObject.SetActive(false);
+    }
+
+    // ---------------- first-run tips (queued, one at a time)
+
+    public void ShowTip(string text)
+    {
+        if (!tipBanner) return;
+        tips.Enqueue(text);
+        if (tipRoutine == null) tipRoutine = StartCoroutine(TipRoutine());
+    }
+
+    System.Collections.IEnumerator TipRoutine()
+    {
+        var group = tipBanner.GetComponent<CanvasGroup>();
+        while (tips.Count > 0)
+        {
+            tipText.text = tips.Dequeue();
+            tipBanner.gameObject.SetActive(true);
+            for (float t = 0f; t < 1f; t += Time.unscaledDeltaTime / 0.25f) { if (group) group.alpha = t; yield return null; }
+            if (group) group.alpha = 1f;
+            yield return new WaitForSecondsRealtime(5f);
+            for (float t = 1f; t > 0f; t -= Time.unscaledDeltaTime / 0.35f) { if (group) group.alpha = t; yield return null; }
+            tipBanner.gameObject.SetActive(false);
+        }
+        tipRoutine = null;
+    }
+
+    // ---------------- boss chest
+
+    public bool ChestOpen => chestPopup && chestPopup.IsOpen;
+    public void ShowChest(int gold, System.Action done)
+    {
+        if (chestPopup) chestPopup.Play(gold, done);
+        else done?.Invoke();
     }
 
     public void ToggleSpeed()

@@ -5,6 +5,7 @@ using UnityEngine;
 public class EnemyType
 {
     public string name = "Hollow Walker";
+    [Tooltip("Bosses: subtitle on the intro card")] public string title;
     public float health = 10f;
     public float speed = 1.5f;
     public float damage = 8f;
@@ -68,6 +69,9 @@ public class Enemy : MonoBehaviour
     public EnemySpawner Owner => owner;
     /// <summary>Set by boss attacks (charges, wind-ups). Null = normal chasing.</summary>
     public Vector2? ForcedVelocity;
+    /// <summary>Dies right away (gives XP and counts as a kill).</summary>
+    public void Kill() { if (dead) return; dead = true; owner.OnEnemyKilled(this, xp); }
+
     public void Teleport(Vector2 p) { rb.position = p; transform.position = p; knock = Vector2.zero; }
     public float FacingSign => visual != null ? Mathf.Sign(visual.localScale.x) : 1f;
 

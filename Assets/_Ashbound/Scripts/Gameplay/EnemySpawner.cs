@@ -15,9 +15,9 @@ public class EnemySpawner : MonoBehaviour
 
     [SerializeField] EnemyType[] bosses =
     {
-        new() { name = "The Ash Warden", health = 900, speed = 1.3f, damage = 16, scale = 3f, xp = 40, tint = new Color(0.75f, 0.75f, 0.85f), isBoss = true, startTime = 300 },
-        new() { name = "The Rotting Matriarch", health = 2600, speed = 1.5f, damage = 20, scale = 3.2f, xp = 80, tint = new Color(0.85f, 0.7f, 0.9f), isBoss = true, startTime = 600 },
-        new() { name = "The Hollow King", health = 6500, speed = 1.4f, damage = 28, scale = 3.6f, xp = 150, tint = new Color(0.62f, 0.58f, 0.8f), isBoss = true, startTime = 900 },
+        new() { name = "The Ash Warden", title = "Keeper of the Ember Gate", health = 900, speed = 1.3f, damage = 16, scale = 3f, xp = 40, tint = new Color(0.75f, 0.75f, 0.85f), isBoss = true, startTime = 300 },
+        new() { name = "The Rotting Matriarch", title = "Mother of the Rot", health = 2600, speed = 1.5f, damage = 20, scale = 3.2f, xp = 80, tint = new Color(0.85f, 0.7f, 0.9f), isBoss = true, startTime = 600 },
+        new() { name = "The Hollow King", title = "Lord of the Hollow", health = 6500, speed = 1.4f, damage = 28, scale = 3.6f, xp = 150, tint = new Color(0.62f, 0.58f, 0.8f), isBoss = true, startTime = 900 },
     };
 
     [Tooltip("Enemies spawned per second over run time (seconds)")]
@@ -40,6 +40,15 @@ public class EnemySpawner : MonoBehaviour
     {
         if (stage == null) return;
         hpMul = stage.enemyHealth; dmgMul = stage.enemyDamage; spawnMul = stage.spawnRate; tint = stage.enemyTint;
+        // Stage art: walker, hound and brute get this stage's own sprites (copies, so the scene data stays untouched)
+        if (stage.enemySprites != null)
+            for (int i = 0; i < types.Length && i < stage.enemySprites.Length; i++)
+                if (stage.enemySprites[i] != null)
+                {
+                    var t = types[i];
+                    types[i] = new EnemyType { name = t.name, health = t.health, speed = t.speed, damage = t.damage, scale = t.scale, xp = t.xp,
+                        tint = Color.white, startTime = t.startTime, weight = t.weight, sprite = stage.enemySprites[i] };
+                }
     }
 
     public void Init(RunManager manager)
@@ -58,7 +67,8 @@ public class EnemySpawner : MonoBehaviour
         if (run == null || run.IsOver) return;
         float t = run.RunTime;
 
-        accumulator += spawnsPerSecond.Evaluate(t) * spawnMul * Time.deltaTime;
+        // During a boss fight only the boss (and its own minions) are in the arena
+        if (!run.BossFight) accumulator += spawnsPerSecond.Evaluate(t) * spawnMul * Time.deltaTime;
         while (accumulator >= 1f)
         {
             accumulator -= 1f;
@@ -72,7 +82,7 @@ public class EnemySpawner : MonoBehaviour
             {
                 if (!boss.TryGetComponent(out BossAI ai)) ai = boss.gameObject.AddComponent<BossAI>();
                 ai.Begin(boss, nextBoss, RunSelection.Stage != null ? RunSelection.Stage.order : 0);
-                run.OnBossSpawned(boss, bosses[nextBoss].name);
+                run.OnBossSpawned(boss, bosses[nextBoss].name, bosses[nextBoss].title);
             }
             nextBoss++;
         }

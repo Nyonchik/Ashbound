@@ -21,3 +21,8 @@ MonoBehaviour:
   enemyDamage: 1
   spawnRate: 1
   goldMultiplier: 1
+  enemySprites:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  groundTile: {fileID: 0}

@@ -9,6 +9,7 @@ public class SettingsPanel : MonoBehaviour
     [SerializeField] Button fullscreenButton, resPrev, resNext, resetButton, closeButton;
     [SerializeField] TMP_Text fullscreenLabel, resolutionLabel, resetLabel;
     [SerializeField] MainMenu menu;
+    [SerializeField] Button damageNumbersButton, shakeButton;
 
     bool wired, confirmReset;
 
@@ -63,6 +64,8 @@ public class SettingsPanel : MonoBehaviour
             UpdateLabels();
             if (menu) menu.Refresh();
         });
+        if (damageNumbersButton) damageNumbersButton.onClick.AddListener(() => { SaveSystem.Data.showDamageNumbers = !SaveSystem.Data.showDamageNumbers; SaveSystem.Save(); UpdateLabels(); });
+        if (shakeButton) shakeButton.onClick.AddListener(() => { SaveSystem.Data.screenShake = !SaveSystem.Data.screenShake; SaveSystem.Save(); UpdateLabels(); });
         closeButton.onClick.AddListener(() => { if (menu) menu.ClosePanels(); else gameObject.SetActive(false); });
     }
 
@@ -89,6 +92,8 @@ public class SettingsPanel : MonoBehaviour
         var list = Resolutions();
         var r = d.resolutionIndex >= 0 && d.resolutionIndex < list.Count ? list[d.resolutionIndex] : new Vector2Int(Screen.width, Screen.height);
         resolutionLabel.text = $"{r.x} × {r.y}";
+        if (damageNumbersButton) damageNumbersButton.GetComponentInChildren<TMPro.TMP_Text>().text = d.showDamageNumbers ? "Damage numbers: On" : "Damage numbers: Off";
+        if (shakeButton) shakeButton.GetComponentInChildren<TMPro.TMP_Text>().text = d.screenShake ? "Screen shake: On" : "Screen shake: Off";
         resetLabel.text = confirmReset ? "Click again to erase all progress" : "Reset progress";
     }
 }

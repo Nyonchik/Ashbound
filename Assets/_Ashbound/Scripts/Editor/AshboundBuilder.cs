@@ -164,12 +164,28 @@ public static class AshboundBuilder
             EditorUtility.SetDirty(s);
             return s;
         }
+        Sprite En(string f) => ArtFile($"InGame/Enemies/{f}.png", 256, bottomPivot: true);
+        Sprite Gr(string f) => ArtFile($"World/{f}.png", 200, tiled: true);
         var list = new List<StageData>
         {
             St("Stage1_AshenFields", "Ashen Fields", "Where the Hollow first rose. A fair fight.", 0, "#FFFFFF", "#FFFFFF", 1f, 1f, 1f, 1f),
             St("Stage2_HollowForest", "Hollow Forest", "Tougher Hollow, more of them. Gold x1.3", 1, "#A8D49A", "#B7E3A4", 1.5f, 1.1f, 1.2f, 1.3f),
             St("Stage3_RuinedCapital", "Ruined Capital", "The Hollow King's streets. Gold x1.6", 2, "#9AA6C8", "#B4BEDD", 2.2f, 1.3f, 1.4f, 1.6f),
         };
+        void Art(StageData st, string ground, params string[] enemies)
+        {
+            var g = Gr(ground);
+            st.groundTile = g;
+            st.enemySprites = new Sprite[3];
+            bool any = false;
+            for (int i = 0; i < 3 && i < enemies.Length; i++) { st.enemySprites[i] = En(enemies[i]); any |= st.enemySprites[i] != null; }
+            if (g != null) st.groundTint = Color.white;
+            if (any) st.enemyTint = Color.white;
+            EditorUtility.SetDirty(st);
+        }
+        list[0].groundTile = null; list[0].enemySprites = new Sprite[3]; EditorUtility.SetDirty(list[0]);
+        Art(list[1], "ground_forest", "forest_walker", "forest_wolf", "forest_brute");
+        Art(list[2], "ground_capital", "capital_soldier", "capital_ghoul", "capital_golem");
         AssetDatabase.SaveAssets();
         return list;
     }
@@ -979,11 +995,12 @@ public static class AshboundBuilder
         var sub = Txt(canvas, "Subtitle", "Recover the Ember Crown. Survive the night.", fBold, 33, Palette.TextMuted);
         Place(sub.rectTransform, TopLeft, TopLeft, TopLeft, new Vector2(148, -300), new Vector2(1000, 50));
 
-        var menu = Node("MenuButtons", canvas); Place(menu, TopLeft, TopLeft, TopLeft, new Vector2(144, -420), new Vector2(450, 480));
-        var v = menu.gameObject.AddComponent<VerticalLayoutGroup>(); v.spacing = 21;
+        var menu = Node("MenuButtons", canvas); Place(menu, TopLeft, TopLeft, TopLeft, new Vector2(144, -400), new Vector2(450, 580));
+        var v = menu.gameObject.AddComponent<VerticalLayoutGroup>(); v.spacing = 14;
         v.childControlWidth = true; v.childControlHeight = true; v.childForceExpandWidth = true; v.childForceExpandHeight = false;
         var play = Btn(Inst(prefabsCache.primary, menu, "Play"), "Play");
         var heroes = Btn(Inst(prefabsCache.secondary, menu, "Heroes"), "Heroes");
+        var unlocks = Btn(Inst(prefabsCache.secondary, menu, "Unlocks"), "Unlocks");
         var upgrades = Btn(Inst(prefabsCache.secondary, menu, "Upgrades"), "Upgrades");
         var settings = Btn(Inst(prefabsCache.secondary, menu, "Settings"), "Settings");
         var quit = Btn(Inst(prefabsCache.secondary, menu, "Quit"), "Quit");
@@ -995,18 +1012,20 @@ public static class AshboundBuilder
         var goldVal = StatPill(stats, "Gold", "Gold", "0", Amber);
 
         var ver = Txt(canvas, "Version", "Prototype v0.1", fBold, 21, Palette.TextMuted);
-        Place(ver.rectTransform, new Vector2(0, 0), new Vector2(0, 0), new Vector2(0, 0), new Vector2(144, 40), new Vector2(400, 32));
+        Place(ver.rectTransform, new Vector2(1, 0), new Vector2(1, 0), new Vector2(1, 0), new Vector2(-40, 24), new Vector2(400, 32));
+        ver.alignment = TextAlignmentOptions.MidlineRight;
 
         var mm = canvas.gameObject.AddComponent<MainMenu>();
         UnityEventTools.AddPersistentListener(play.onClick, new UnityAction(mm.Play));
         UnityEventTools.AddPersistentListener(quit.onClick, new UnityAction(mm.Quit));
         UnityEventTools.AddPersistentListener(heroes.onClick, new UnityAction(mm.OpenHeroes));
+        UnityEventTools.AddPersistentListener(unlocks.onClick, new UnityAction(mm.OpenUnlocks));
         UnityEventTools.AddPersistentListener(upgrades.onClick, new UnityAction(mm.OpenUpgrades));
         UnityEventTools.AddPersistentListener(settings.onClick, new UnityAction(mm.OpenSettings));
         Set(mm, "goldText", goldVal); Set(mm, "crownText", crownVal);
 
         // ---- Settings
-        var (setRoot, setPanel) = MenuOverlay(canvas, "SettingsPanel", "SETTINGS", new Vector2(760, 740));
+        var (setRoot, setPanel) = MenuOverlay(canvas, "SettingsPanel", "SETTINGS", new Vector2(760, 920));
         var music = LabeledSlider(setPanel, "Music");
         var sfx = LabeledSlider(setPanel, "Sound effects");
         var fsBtn = Btn(Inst(prefabsCache.secondary, setPanel, "Fullscreen"), "Fullscreen: On");
@@ -1016,10 +1035,13 @@ public static class AshboundBuilder
         resLbl.gameObject.AddComponent<LayoutElement>().preferredWidth = 300;
         var resNext = Btn(Inst(prefabsCache.secondary, resRow, "Next"), ">", 78, 72);
         foreach (var b in new[] { resPrev, resNext }) { var l = b.GetComponentInChildren<TextMeshProUGUI>(); l.alignment = TextAlignmentOptions.Center; Stretch(l.rectTransform, 0, 0, 0, 0); }
+        var dmgBtn = Btn(Inst(prefabsCache.secondary, setPanel, "DamageNumbers"), "Damage numbers: On");
+        var shakeBtn = Btn(Inst(prefabsCache.secondary, setPanel, "ScreenShake"), "Screen shake: On");
         var resetBtn = Btn(Inst(prefabsCache.secondary, setPanel, "Reset"), "Reset progress");
         var setClose = Btn(Inst(prefabsCache.primary, setPanel, "Close"), "Close");
         var sp = setRoot.gameObject.AddComponent<SettingsPanel>();
         Set(sp, "musicSlider", music); Set(sp, "sfxSlider", sfx); Set(sp, "fullscreenButton", fsBtn); Set(sp, "resPrev", resPrev); Set(sp, "resNext", resNext);
+        Set(sp, "damageNumbersButton", dmgBtn); Set(sp, "shakeButton", shakeBtn);
         Set(sp, "resetButton", resetBtn); Set(sp, "closeButton", setClose); Set(sp, "menu", mm);
         Set(sp, "fullscreenLabel", fsBtn.GetComponentInChildren<TextMeshProUGUI>()); Set(sp, "resolutionLabel", resLbl); Set(sp, "resetLabel", resetBtn.GetComponentInChildren<TextMeshProUGUI>());
 
@@ -1051,6 +1073,23 @@ public static class AshboundBuilder
         var hp = heRoot.gameObject.AddComponent<HeroesPanel>();
         SetArr(hp, "classes", classesCache.ConvertAll(c => (Object)c)); SetArr(hp, "columns", cols);
         Set(hp, "summary", heSum); Set(hp, "closeButton", heClose); Set(hp, "menu", mm);
+
+        // ---- Unlocks
+        var (unRoot, unPanel) = MenuOverlay(canvas, "UnlocksPanel", "UNLOCKS", new Vector2(1640, 900));
+        var unRow = Row(unPanel, "Columns", 18);
+        var unCols = new List<Object>();
+        for (int i = 0; i < 3; i++)
+        {
+            var col = Node("Column" + (i + 1), unRow); Img(col, sFill, Palette.Void, 1.5f); Fixed(col, 500, 640);
+            var t = Txt(col, "Text", "", fBold, 21, Palette.Text, TextAlignmentOptions.TopLeft); Stretch(t.rectTransform, 22, 22, 20, 20);
+            t.textWrappingMode = TextWrappingModes.Normal; t.lineSpacing = 6; t.enableAutoSizing = true; t.fontSizeMin = 14; t.fontSizeMax = 21;
+            unCols.Add(t);
+        }
+        var unClose = Btn(Inst(prefabsCache.primary, unPanel, "Close"), "Close", 300, 84);
+        var unp = unRoot.gameObject.AddComponent<UnlocksPanel>();
+        SetArr(unp, "classes", classesCache.ConvertAll(c => (Object)c)); SetArr(unp, "stages", stagesCache.ConvertAll(c => (Object)c));
+        SetArr(unp, "columns", unCols); Set(unp, "closeButton", unClose); Set(unp, "menu", mm);
+        Set(mm, "unlocksPanel", unRoot.gameObject); unRoot.gameObject.SetActive(false);
 
         Set(mm, "settingsPanel", setRoot.gameObject); Set(mm, "upgradesPanel", upRoot.gameObject); Set(mm, "heroesPanel", heRoot.gameObject);
         setRoot.gameObject.SetActive(false); upRoot.gameObject.SetActive(false); heRoot.gameObject.SetActive(false);
@@ -1222,6 +1261,8 @@ public static class AshboundBuilder
         sso.ApplyModifiedPropertiesWithoutUndo();
 
         var canvas = MakeCanvas("HUD Canvas", 10);
+        var vig = Node("HurtVignette", canvas); Stretch(vig, 0, 0, 0, 0);
+        var vigImg = Img(vig, ImportSprite("ui_vignette.png", 0), new Color(1, 1, 1, 0));
 
         // XP bar
         var xp = Node("XPBar", canvas); Place(xp, new Vector2(0, 1), new Vector2(1, 1), new Vector2(0.5f, 1), Vector2.zero, new Vector2(0, 24)); Img(xp, null, Palette.Outline);
@@ -1378,6 +1419,53 @@ public static class AshboundBuilder
         Set(gos, "title", overTitle); Set(gos, "stats", overStats); Set(gos, "retryButton", retry); Set(gos, "menuButton", overMenu); Set(gos, "rewards", overRewards);
         Set(pm, "gameOverScreen", over.gameObject);
 
+        // Game over icon + colored frame (crown shard on victory, skull on defeat)
+        var overIcon = Node("Icon", op); overIcon.SetSiblingIndex(0); Fixed(overIcon, 110, 110);
+        var overIconImg = Img(overIcon, Icon("pickup_crown_shard"), Color.white); overIconImg.preserveAspect = true;
+        var overRing = Node("Ring", op); Stretch(overRing, -4, -4, -4, -4); overRing.gameObject.AddComponent<LayoutElement>().ignoreLayout = true;
+        var overRingImg = Img(overRing, sRing, Palette.Gold);
+        op.sizeDelta = new Vector2(760, 700);
+        Set(gos, "icon", overIconImg); Set(gos, "frameRing", overRingImg);
+        Set(gos, "winIcon", Icon("pickup_crown_shard")); Set(gos, "loseIcon", Icon("icon_skull"));
+
+        // Boss intro card (slides across)
+        var intro = Node("BossIntro", canvas); Place(intro, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Center, new Vector2(0, 170), new Vector2(1300, 190));
+        Img(intro, sPanel, new Color(0.12f, 0.07f, 0.09f, 0.95f));
+        var introRing = Node("Ring", intro); Stretch(introRing, -3, -3, -3, -3); Img(introRing, sRing, Palette.Health);
+        var introLbl = Txt(intro, "Label", "BOSS", fBlack, 24, Hex("#FFB3B5"), TextAlignmentOptions.Center); introLbl.characterSpacing = 18;
+        Place(introLbl.rectTransform, new Vector2(0, 1), new Vector2(1, 1), new Vector2(0.5f, 1), new Vector2(0, -14), new Vector2(0, 32));
+        var introName = Txt(intro, "Name", "The Ash Warden", fTitle, 66, Palette.Text, TextAlignmentOptions.Center); introName.fontSharedMaterial = mTitleGlow;
+        Place(introName.rectTransform, new Vector2(0, 0.5f), new Vector2(1, 0.5f), Center, new Vector2(0, -4), new Vector2(-40, 84));
+        var introTitle = Txt(intro, "Title", "Keeper of the Ember Gate", fBold, 26, Palette.TextMuted, TextAlignmentOptions.Center);
+        Place(introTitle.rectTransform, new Vector2(0, 0), new Vector2(1, 0), new Vector2(0.5f, 0), new Vector2(0, 14), new Vector2(0, 34));
+        Set(hud, "bossIntro", intro); Set(hud, "bossIntroName", introName); Set(hud, "bossIntroTitle", introTitle);
+        Set(hud, "hurtVignette", vigImg);
+
+        // Boss chest opening
+        var chestRoot = Node("ChestPopup", canvas); Stretch(chestRoot, 0, 0, 0, 0);
+        Img(chestRoot, null, new Color(0.04f, 0.04f, 0.06f, 0.82f)).raycastTarget = true;
+        var chestGroup = chestRoot.gameObject.AddComponent<CanvasGroup>();
+        var chestGlow = Node("Glow", chestRoot); Place(chestGlow, Center, Center, Center, new Vector2(0, 40), new Vector2(720, 720));
+        Img(chestGlow, sGlow, new Color(1f, 0.85f, 0.35f, 0.75f));
+        var chestImg = Node("Chest", chestRoot); Place(chestImg, Center, Center, Center, new Vector2(0, 40), new Vector2(300, 300));
+        Img(chestImg, Icon("pickup_chest"), Color.white).preserveAspect = true;
+        var chestTitle = Txt(chestRoot, "Title", "TREASURE!", fTitle, 72, Palette.Gold, TextAlignmentOptions.Center); chestTitle.fontSharedMaterial = mTitleGlow;
+        Place(chestTitle.rectTransform, Center, Center, Center, new Vector2(0, 300), new Vector2(1000, 100));
+        var chestReward = Txt(chestRoot, "Reward", "+25 gold", fBlack, 40, Palette.Text, TextAlignmentOptions.Center);
+        Place(chestReward.rectTransform, Center, Center, Center, new Vector2(0, -230), new Vector2(1000, 120));
+        var chest = chestRoot.gameObject.AddComponent<ChestPopup>();
+        Set(chest, "group", chestGroup); Set(chest, "chest", chestImg); Set(chest, "glow", chestGlow); Set(chest, "title", chestTitle); Set(chest, "reward", chestReward);
+        Set(hud, "chestPopup", chest); Set(pm, "chestPopup", chestRoot.gameObject);
+
+        // First-run tips (last = drawn above every overlay)
+        var tip = Node("TipBanner", canvas); Place(tip, new Vector2(0.5f, 0), new Vector2(0.5f, 0), new Vector2(0.5f, 0), new Vector2(200, 14), new Vector2(1000, 76));
+        Img(tip, sPanel, new Color(0.11f, 0.106f, 0.133f, 0.96f));
+        var tipRing = Node("Ring", tip); Stretch(tipRing, -2, -2, -2, -2); Img(tipRing, sRing, Palette.Accent);
+        tip.gameObject.AddComponent<CanvasGroup>();
+        var tipText = Txt(tip, "Text", "Tip", fBlack, 23, Palette.Text, TextAlignmentOptions.Center); Stretch(tipText.rectTransform, 24, 24, 6, 6);
+        tipText.enableAutoSizing = true; tipText.fontSizeMin = 14; tipText.fontSizeMax = 23;
+        Set(hud, "tipBanner", tip); Set(hud, "tipText", tipText);
+
         // Run manager
         var run = new GameObject("Run Manager").AddComponent<RunManager>();
         Set(run, "player", playerGo.GetComponent<PlayerController>()); Set(run, "spawner", spawner);
@@ -1398,7 +1486,7 @@ public static class AshboundBuilder
         foreach (var (field, file) in new[] {
             ("lightning", "fx_lightning"), ("blackHole", "fx_black_hole"), ("fallingStar", "fx_falling_star"), ("iceSpikes", "fx_ice_spikes"),
             ("tornado", "fx_tornado"), ("ghostDagger", "fx_ghost_dagger"), ("frostBurst", "fx_frost_burst"), ("starBurst", "fx_star_burst"),
-            ("wave", "fx_wave"), ("crater", "fx_crater"), ("fireBurst", "fx_fire_burst"), ("goldenArrow", "fx_golden_arrow"),
+            ("wave", "fx_wave"), ("waveRing", "fx_water_ring"), ("crater", "fx_crater"), ("fireBurst", "fx_fire_burst"), ("goldenArrow", "fx_golden_arrow"),
             ("firePatch", "fx_fire_patch"), ("poison", "fx_poison"), ("bossBullet", "fx_boss_bullet"), ("arenaRing", "fx_arena_ring") })
             fxp.FindPropertyRelative(field).objectReferenceValue = Fresh(FxArtFile(file));
         rso.ApplyModifiedPropertiesWithoutUndo();

@@ -31,7 +31,7 @@ public class RunManager : MonoBehaviour
     public class FxArt
     {
         public Sprite lightning, blackHole, fallingStar, iceSpikes, tornado, ghostDagger, frostBurst, starBurst;
-        public Sprite wave, crater, fireBurst, goldenArrow, firePatch, poison, bossBullet, arenaRing;
+        public Sprite wave, waveRing, crater, fireBurst, goldenArrow, firePatch, poison, bossBullet, arenaRing;
     }
     [Header("Effect art (skills, bosses)")]
     [SerializeField] FxArt fxArt = new();
@@ -148,7 +148,14 @@ public class RunManager : MonoBehaviour
         stats.moveMul += MetaUpgrades.Bonus("speed");
         stats.pickupMul += MetaUpgrades.Bonus("pickup");
 
-        stats.OnHealthChanged += (h, m) => hud.SetHealth(Mathf.CeilToInt(h), Mathf.CeilToInt(m));
+        float lastHealth = stats.Health;
+        stats.OnHealthChanged += (h, m) =>
+        {
+            hud.SetHealth(Mathf.CeilToInt(h), Mathf.CeilToInt(m));
+            if (h < lastHealth - 0.01f) hud.Hurt();
+            hud.SetLowHealth(h > 0f && h / m < 0.3f);
+            lastHealth = h;
+        };
         stats.OnDied += () => EndRun(false);
         hud.SetHealth(Mathf.CeilToInt(stats.Health), Mathf.CeilToInt(stats.MaxHealth));
 
@@ -160,7 +167,12 @@ public class RunManager : MonoBehaviour
         var stage = RunSelection.Stage != null ? RunSelection.Stage : (stages.Count > 0 ? stages[0] : null);
         RunSelection.Stage = stage;
         spawner.SetStage(stage);
-        if (ground != null && stage != null) ground.color = stage.groundTint;
+        if (ground != null && stage != null)
+        {
+            if (stage.groundTile != null) { ground.sprite = stage.groundTile; ground.color = Color.white; }
+            else ground.color = stage.groundTint;
+        }
+        ShowTip("move", "Move with WASD or the arrow keys. Your weapons attack on their own!");
 
         var cls = RunSelection.Class;
         var path = RunSelection.Path;
@@ -202,15 +214,32 @@ public class RunManager : MonoBehaviour
         else hud.HideBossWarning();
 
         UpdateBosses();
+        if (RunTime > 40f) ShowTip("pause", "Press Esc or the pause button to see your whole build.");
         if (RunTime >= runLength && spawner.AllBossesSpawned && bossesAlive <= 0) EndRun(true);
     }
 
     // ---------------- events from gameplay
 
-    public void OnBossSpawned(Enemy boss, string bossName)
+    public bool BossFight => liveBosses.Count > 0;
+
+    /// <summary>First-run hint: each tip shows once per save.</summary>
+    public void ShowTip(string id, string text)
+    {
+        var seen = SaveSystem.Data.seenTips;
+        if (seen.Contains(id)) return;
+        seen.Add(id);
+        SaveSystem.Save();
+        hud.ShowTip(text);
+    }
+
+    public void OnBossSpawned(Enemy boss, string bossName, string bossTitle)
     {
         bossesAlive++;
+        // Clear the arena: every regular mob dies (drops its XP), only the boss remains
+        foreach (var e in new List<Enemy>(Enemy.Active)) if (!e.IsBoss && e != boss) e.Kill();
         liveBosses.Add((boss, bossName));
+        hud.ShowBossIntro(bossName, bossTitle);
+        ShowTip("boss", "Boss fight! You're locked in the arena until it falls. Regular enemies stop coming.");
         if (arena == null)
         {
             Vector2 c = player.transform.position;
@@ -251,15 +280,19 @@ public class RunManager : MonoBehaviour
             gold += 50; hud.SetGold(gold);
             CameraFollow.Shake(0.4f, 0.5f);
             SpawnPickup(PickupKind.Chest, position + Vector2.left * 0.8f);
-            SpawnPickup(PickupKind.Medkit, position + Vector2.right * 0.8f);
+            SpawnPickup(PickupKind.Meat, position + Vector2.right * 0.8f);
             return;
         }
 
         float r = Random.value;
-        if (r < 0.010f) SpawnPickup(PickupKind.Meat, position);
-        else if (r < 0.014f) SpawnPickup(PickupKind.Magnet, position);
-        else if (r < 0.016f) SpawnPickup(PickupKind.Medkit, position);
-        else if (r < 0.022f) SpawnPickup(PickupKind.GoldBag, position);
+        // Random drops are rare (~0.26% per kill) and at least 15s apart, so healing stays precious
+        if (RunTime < nextDropTime) return;
+        PickupKind? drop = r < 0.0012f ? PickupKind.Meat
+                         : r < 0.0020f ? PickupKind.GoldBag
+                         : r < 0.0024f ? PickupKind.Magnet
+                         : r < 0.0026f ? PickupKind.Medkit
+                         : null;
+        if (drop.HasValue) { SpawnPickup(drop.Value, position); nextDropTime = RunTime + 15f; }
     }
 
     void SpawnGem(Vector2 position, int value)
@@ -268,11 +301,15 @@ public class RunManager : MonoBehaviour
         gems.Get().Init(this, gems, value, position);
     }
 
+    float nextDropTime = 20f;
+
     void SpawnPickup(PickupKind kind, Vector2 position)
     {
         if (pickupPrefab == null) return;
+        ShowTip("pickup", "Arrows at the screen edge point to drops: meat heals, medkit heals fully, magnet pulls in all XP.");
         var p = Instantiate(pickupPrefab, position, Quaternion.identity);
         p.Init(kind, pickupSprites != null && (int)kind < pickupSprites.Length ? pickupSprites[(int)kind] : null, position);
+        if (kind == PickupKind.Chest) p.transform.localScale = Vector3.one * 1.9f;
     }
 
     public void CollectPickup(Pickup p)
@@ -287,7 +324,11 @@ public class RunManager : MonoBehaviour
                 AudioManager.Play("magnet", 0.9f);
                 break;
             case PickupKind.GoldBag: gold += 15; hud.SetGold(gold); AudioManager.Play("coin", 0.9f); break;
-            case PickupKind.Chest: gold += 25; hud.SetGold(gold); AudioManager.Play("coin", 1f); QueueLevelUp(); break;
+            case PickupKind.Chest:
+                gold += 25; hud.SetGold(gold);
+                AudioManager.Play("coin", 1f);
+                hud.ShowChest(25, () => QueueLevelUp());
+                break;
         }
         SpawnVfx(p.transform.position, 0.8f, Palette.Gold, 0.3f);
     }
@@ -306,6 +347,7 @@ public class RunManager : MonoBehaviour
             }
         if (k != null && k.f4Key.wasPressedThisFrame && !IsOver) player.Stats.TakeDamage(99999f);
         if (k != null && k.f5Key.wasPressedThisFrame && !IsOver && spawner.NextBossTime > RunTime) RunTime = spawner.NextBossTime - 1f;
+        if (k != null && k.cKey.wasPressedThisFrame && !IsOver) SpawnPickup(PickupKind.Chest, (Vector2)player.transform.position + Vector2.right * 1.5f);
     }
 #endif
 
@@ -399,6 +441,10 @@ public class RunManager : MonoBehaviour
     void OfferLevelUp()
     {
         if (IsOver) return;
+        ShowTip("levelup", "Pick one card. Reroll shows new cards, Banish removes a card for the rest of the run.");
+        foreach (var w in weapons)
+            if (!w.IsPath && !w.IsEvolved && w.Level >= 5 && w.Def.evolvePassive != null)
+                ShowTip("evolve", $"{w.Def.weaponName} is maxed! Get {w.Def.evolvePassive.passiveName} to Lv 5 to evolve it.");
         var options = BuildOptions();
         if (options.Count == 0) { player.Stats.Heal(25f); return; }
         levelUp.Show(level, options);
@@ -592,7 +638,7 @@ public class RunManager : MonoBehaviour
 
     public void ShowDamage(Vector3 position, float amount, bool big)
     {
-        if (damageNumberPrefab == null || activeNumbers > 90 || amount < 1f) return;
+        if (damageNumberPrefab == null || activeNumbers > 90 || amount < 1f || !SaveSystem.Data.showDamageNumbers) return;
         activeNumbers++;
         var color = big ? Palette.Gold : amount >= 30f ? new Color(1f, 0.6f, 0.25f) : Color.white;
         numbers.Get().Play(position, Mathf.RoundToInt(amount), color, big || amount >= 30f ? 4.2f : 3.2f, n => { activeNumbers--; numbers.Release(n); });

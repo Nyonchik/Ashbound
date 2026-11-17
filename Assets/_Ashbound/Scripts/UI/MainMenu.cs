@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 public class MainMenu : MonoBehaviour
 {
     [SerializeField] TMP_Text goldText, crownText;
-    [SerializeField] GameObject settingsPanel, upgradesPanel, heroesPanel;
+    [SerializeField] GameObject settingsPanel, upgradesPanel, heroesPanel, unlocksPanel;
 
     void Start()
     {
@@ -26,6 +26,7 @@ public class MainMenu : MonoBehaviour
     public void Play() => SceneManager.LoadScene("ClassSelect");
     public void OpenSettings() { ClosePanels(); if (settingsPanel) settingsPanel.SetActive(true); }
     public void OpenUpgrades() { ClosePanels(); if (upgradesPanel) upgradesPanel.SetActive(true); }
+    public void OpenUnlocks() { ClosePanels(); if (unlocksPanel) unlocksPanel.SetActive(true); }
     public void OpenHeroes() { ClosePanels(); if (heroesPanel) heroesPanel.SetActive(true); }
 
     public void ClosePanels()
@@ -33,6 +34,7 @@ public class MainMenu : MonoBehaviour
         if (settingsPanel) settingsPanel.SetActive(false);
         if (upgradesPanel) upgradesPanel.SetActive(false);
         if (heroesPanel) heroesPanel.SetActive(false);
+        if (unlocksPanel) unlocksPanel.SetActive(false);
         Refresh();
     }
 
