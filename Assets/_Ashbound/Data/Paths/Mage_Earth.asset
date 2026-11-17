@@ -19,3 +19,4 @@ MonoBehaviour:
   ascension: 'Titan: become a stone golem; every step causes a quake'
   unlocked: 0
   weapon: {fileID: 0}
+  heroArt: {fileID: 21300000, guid: 3e2375b36343243dd961ab9bca1ea870, type: 3}

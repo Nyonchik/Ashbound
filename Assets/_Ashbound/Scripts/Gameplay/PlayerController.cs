@@ -46,7 +46,8 @@ public class PlayerController : MonoBehaviour
     {
         var cls = RunSelection.Class;
         if (cls == null) return;
-        if (heroSprite != null && cls.portrait != null) heroSprite.sprite = cls.portrait;
+        var art = RunSelection.Path != null && RunSelection.Path.heroArt != null ? RunSelection.Path.heroArt : cls.portrait;
+        if (heroSprite != null && art != null) heroSprite.sprite = art;
         if (classTinted != null)
             foreach (var r in classTinted) stats.SetBaseColor(r, cls.color);
     }

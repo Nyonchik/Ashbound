@@ -19,3 +19,4 @@ MonoBehaviour:
   ascension: 'Avatar of Rage: can''t die for 10s at 0 HP; kills extend it'
   unlocked: 1
   weapon: {fileID: 11400000, guid: 2d8a0e367c3014938907d817954ddeed, type: 2}
+  heroArt: {fileID: 21300000, guid: d977cf9dbb92c495baf2b3c3eb9e8750, type: 3}

@@ -19,3 +19,4 @@ MonoBehaviour:
   ascension: 'Winter Ranger: frozen enemies shatter into ice shards'
   unlocked: 0
   weapon: {fileID: 0}
+  heroArt: {fileID: 21300000, guid: d7568f71a49a0484590e24d69f4d4111, type: 3}

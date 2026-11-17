@@ -19,3 +19,4 @@ MonoBehaviour:
   ascension: 'Deadeye: arrows pierce infinitely and mark enemies for double damage'
   unlocked: 1
   weapon: {fileID: 11400000, guid: 13e44dddb846b4a30b18cd558b4cbf2c, type: 2}
+  heroArt: {fileID: 21300000, guid: 0ff55cfd36cca461b8d4085022c4c17a, type: 3}

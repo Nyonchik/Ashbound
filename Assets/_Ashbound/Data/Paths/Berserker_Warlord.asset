@@ -19,3 +19,4 @@ MonoBehaviour:
   ascension: 'Conqueror: chained enemies fight for you'
   unlocked: 0
   weapon: {fileID: 0}
+  heroArt: {fileID: 21300000, guid: 689dd9ffced4548b1a1afc815ac9a8c0, type: 3}

@@ -98,6 +98,9 @@ public class ClassSelectScreen : MonoBehaviour
         foreach (var card in cards) card.SetSelected(card == picked);
         currentPath = picked.Data;
         ascensionText.text = currentPath.ascension;
+        // show this Path's version of the hero
+        var art = currentPath.heroArt != null ? currentPath.heroArt : currentClass.portrait;
+        if (art != null) portrait.sprite = art;
         UpdateStart();
     }
 

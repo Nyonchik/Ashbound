@@ -348,6 +348,7 @@ public static class AshboundBuilder
         foreach (var p in paths)
         {
             var d = LoadOrCreate<PathData>($"{Root}/Data/Paths/{file}_{p.n.Replace(" ", "")}.asset");
+            d.heroArt = ArtFile($"InGame/Heroes/{file}_{p.n.Replace(" ", "")}.png", 220, bottomPivot: true);
             d.pathName = p.n; d.weapon = pathWeapons.TryGetValue(p.n, out var pw) ? pw : null; d.color = Hex(p.c); d.startingSkill = p.skill; d.playsLike = p.plays; d.ascension = p.asc; d.unlocked = unlocked && p.open;
             EditorUtility.SetDirty(d);
             c.paths.Add(d);

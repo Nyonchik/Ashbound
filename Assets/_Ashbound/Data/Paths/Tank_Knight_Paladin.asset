@@ -19,3 +19,4 @@ MonoBehaviour:
   ascension: 'Crusader: holy aura that burns enemies and heals you'
   unlocked: 0
   weapon: {fileID: 0}
+  heroArt: {fileID: 21300000, guid: 1d195d581b9be481fb302c0aec81d856, type: 3}

@@ -43,6 +43,10 @@
 - Upgrades buy verified (bought Magnet Lv 1 for 50 gold).
 - Editor-only test keys: F2 level-up, F3 max weapons+passives, F4 die, F5 next boss, C drop a chest.
 
+## Path looks
+- Every Path has its own hero art (26 variants in Art/InGame/Heroes, e.g. Mage_Fire.png, Tank_Knight_DeathKnight.png).
+  Shown on the hero screen when you pick a Path and used as the hero sprite in the run (PathData.heroArt).
+
 ## Ideas for later
 - More boss variety per stage; a skill UI polish pass; balance after a few real runs (drop rates, boss damage).
 

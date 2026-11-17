@@ -19,3 +19,4 @@ MonoBehaviour:
   ascension: 'Storm Lord: constant lightning strikes all over the screen'
   unlocked: 1
   weapon: {fileID: 11400000, guid: 06cee7eeebf244ab7ad362ca5c672633, type: 2}
+  heroArt: {fileID: 21300000, guid: 59bd57652dcbb4fc7868228bb6601dbd, type: 3}

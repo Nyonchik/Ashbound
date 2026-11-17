@@ -19,3 +19,4 @@ MonoBehaviour:
   ascension: 'Phoenix: once per run, revive in a fire nova; fireballs become meteors'
   unlocked: 1
   weapon: {fileID: 11400000, guid: 0fa2cc06a7439432eab5d173b7ff3ed0, type: 2}
+  heroArt: {fileID: 21300000, guid: 3b38c2a6ab4a9452aa1c1f1bc90baf9f, type: 3}

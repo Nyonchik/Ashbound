@@ -19,3 +19,4 @@ MonoBehaviour:
   ascension: 'Leviathan: a giant water serpent circles you and devours enemies'
   unlocked: 1
   weapon: {fileID: 11400000, guid: 4acf1d1420392425396aea9851a85734, type: 2}
+  heroArt: {fileID: 21300000, guid: 780af0811fc96449c92a0091e1cfd172, type: 3}

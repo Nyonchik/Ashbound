@@ -19,3 +19,4 @@ MonoBehaviour:
   ascension: 'Living Fortress: enemies touching you take damage; immune to knockback'
   unlocked: 0
   weapon: {fileID: 0}
+  heroArt: {fileID: 21300000, guid: 6702700ed89014c19b5d5f6a8d79b651, type: 3}
