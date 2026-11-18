@@ -12,9 +12,15 @@ public class FxSprite : MonoBehaviour
     bool moving, easeOutMove;
     Color color;
     Action<FxSprite> release;
+    Material normal;
+
+    /// <summary>Draw with additive blending (glows, light).</summary>
+    public FxSprite Additive() { if (FxParticles.AdditiveSprite != null) sr.sharedMaterial = FxParticles.AdditiveSprite; return this; }
 
     public FxSprite Setup(Sprite s, Vector2 pos, Color c, float seconds, Action<FxSprite> onDone, int order)
     {
+        if (normal == null) normal = sr.sharedMaterial;
+        sr.sharedMaterial = normal;
         sr.sprite = s; sr.sortingOrder = order; sr.flipX = sr.flipY = false;
         color = c; alpha = c.a; duration = Mathf.Max(0.01f, seconds); t = 0f; spin = 0f; fadeOutFrom = 0.6f;
         from = to = pos; moving = false;
@@ -31,12 +37,14 @@ public class FxSprite : MonoBehaviour
     public FxSprite Spin(float degreesPerSecond) { spin = degreesPerSecond; return this; }
     public FxSprite Move(Vector2 target, bool easeOut = false) { to = target; moving = true; easeOutMove = easeOut; return this; }
     /// <summary>When (0-1 of the lifetime) the fade-out starts. 1 = never fades.</summary>
+    /// <summary>Remove the effect right away.</summary>
+    public void End() { if (release != null) { var r = release; release = null; r(this); } }
     public FxSprite FadeFrom(float k) { fadeOutFrom = Mathf.Clamp01(k); return this; }
 
     void Update()
     {
         t += Time.deltaTime / duration;
-        if (t >= 1f) { release?.Invoke(this); return; }
+        if (t >= 1f) { var r = release; release = null; r?.Invoke(this); return; }
         if (spin != 0f) transform.Rotate(0f, 0f, spin * Time.deltaTime);
         Apply();
     }

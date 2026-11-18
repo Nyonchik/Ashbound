@@ -18,5 +18,5 @@ MonoBehaviour:
   playsLike: Speed melee, frenzy stacks
   ascension: 'Werewolf: transform, huge attack speed, howl that fears enemies'
   unlocked: 0
-  weapon: {fileID: 0}
+  weapon: {fileID: 11400000, guid: b69797e7797f444cc9914e066ae404f6, type: 2}
   heroArt: {fileID: 21300000, guid: a3c29634f334b4c14b15d1bdcdbe66d2, type: 3}

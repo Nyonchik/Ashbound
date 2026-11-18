@@ -3,7 +3,13 @@ using UnityEngine;
 public enum WeaponKind { Projectile, Orbit, Nova }
 
 /// <summary>How a weapon looks and behaves beyond its basic kind.</summary>
-public enum WeaponStyle { Default, Chain, BlackHole, Starfall, Glacier, Whirlwind, PhantomBlades, Wave, Hammer, Frost }
+public enum WeaponStyle
+{
+    Default, Chain, BlackHole, Starfall, Glacier, Whirlwind, PhantomBlades, Wave, Hammer, Frost,
+    // custom Path skills (keep StoneSpikes first: Weapon.IsCustomPath checks >= StoneSpikes)
+    StoneSpikes, ShadowBolt, HolyBeam, Claws, WarChains, Cleave, Traps, IceArrows, SpectralArrows,
+    PoisonDaggers, Shadowstep, Decoy, Hemorrhage, FanOfKnives, HolyAura, ShieldBash, Brambles, Charge, CursedBlade,
+}
 
 /// <summary>Bonus added at one upgrade step. Fractions: 0.25 = +25%. cooldown 0.2 = 20% faster.</summary>
 [System.Serializable]

@@ -5,7 +5,7 @@ using UnityEngine;
 using Random = UnityEngine.Random;
 
 /// <summary>One owned weapon or Path skill. Level 1-5, then 6 = Awakened (Path skills) or Evolved (class weapons).</summary>
-public class Weapon : MonoBehaviour
+public partial class Weapon : MonoBehaviour
 {
     public WeaponDef Def { get; private set; }
     public int Level { get; private set; }
@@ -127,6 +127,7 @@ public class Weapon : MonoBehaviour
     {
         var run = Run;
         if (Def == null || stats.IsDead || run == null || run.IsOver) return;
+        if (IsCustomPath) { UpdateCustomPath(); return; }
 
         switch (Def.style)
         {

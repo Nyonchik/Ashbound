@@ -55,6 +55,9 @@ public class PlayerStats : MonoBehaviour
         if (Health <= 0f) OnDied?.Invoke();
     }
 
+    /// <summary>Can't be hurt for a moment (dashes).</summary>
+    public void Invulnerable(float seconds) => invuln = Mathf.Max(invuln, seconds);
+
     public void Heal(float amount)
     {
         if (IsDead) return;

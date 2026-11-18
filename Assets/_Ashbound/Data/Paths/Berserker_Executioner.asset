@@ -18,5 +18,5 @@ MonoBehaviour:
   playsLike: Big single hits, executes
   ascension: 'Headsman: instantly kills any non-boss enemy under 25% HP'
   unlocked: 0
-  weapon: {fileID: 0}
+  weapon: {fileID: 11400000, guid: ad2af49e0cf4f4d93a58611b4894eb1f, type: 2}
   heroArt: {fileID: 21300000, guid: 76f4c6a2bb15a4be1bf776f08a64dfe4, type: 3}

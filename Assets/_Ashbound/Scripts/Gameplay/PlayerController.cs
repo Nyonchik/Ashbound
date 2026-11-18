@@ -22,6 +22,10 @@ public class PlayerController : MonoBehaviour
     float bobT, facingSign = 1f;
 
     public PlayerStats Stats => stats;
+    public Sprite HeroSprite => heroSprite != null ? heroSprite.sprite : null;
+    Vector2 dashVelocity; float dashTime;
+    /// <summary>Move at this velocity for a moment, ignoring input (Juggernaut charge).</summary>
+    public void Dash(Vector2 velocity, float seconds) { dashVelocity = velocity; dashTime = seconds; }
     public Vector2 Facing { get; private set; } = Vector2.right;
 
     void Awake()
@@ -95,6 +99,7 @@ public class PlayerController : MonoBehaviour
     void FixedUpdate()
     {
         Vector2 next = rb.position + input * stats.MoveSpeed * Time.fixedDeltaTime;
+        if (dashTime > 0f) { dashTime -= Time.fixedDeltaTime; next = rb.position + dashVelocity * Time.fixedDeltaTime; }
         if (ArenaCenter.HasValue)
         {
             Vector2 off = next - ArenaCenter.Value;

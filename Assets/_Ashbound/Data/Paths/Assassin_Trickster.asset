@@ -18,5 +18,5 @@ MonoBehaviour:
   playsLike: Distraction, chaos
   ascension: 'Mirror Master: up to 4 clones that copy your attacks'
   unlocked: 0
-  weapon: {fileID: 0}
+  weapon: {fileID: 11400000, guid: 2856f2279b356455285a436e30801070, type: 2}
   heroArt: {fileID: 21300000, guid: 6a9fe72448e524da1b6a87dd31010e83, type: 3}

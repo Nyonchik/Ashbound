@@ -37,6 +37,9 @@ public class RunManager : MonoBehaviour
     [SerializeField] FxArt fxArt = new();
     public FxArt Art => fxArt;
     [SerializeField] float arenaRadius = 6.5f;
+    [Header("Particle effects (Ashbound/Blend shader)")]
+    [SerializeField] Material additiveSprite, glowParticles, smokeParticles, debrisParticles;
+    [SerializeField] Sprite glowSprite;
 
     [Header("Content")]
     [SerializeField] WeaponDef fallbackPathWeapon;
@@ -75,6 +78,7 @@ public class RunManager : MonoBehaviour
         if (SaveSystem.Data.runsPlayed == 0) GameSpeed.Fast = false;
         GameSpeed.Resume();
         poolRoot = new GameObject("Pooled").transform;
+        FxParticles.Init(poolRoot, additiveSprite, glowParticles, smokeParticles, debrisParticles, glowSprite);
         projectiles = MakePool(projectilePrefab, 64, 2000);
         gems = MakePool(gemPrefab, 128, 2000);
         vfx = MakePool(vfxPrefab, 64, 1000);
@@ -353,7 +357,23 @@ public class RunManager : MonoBehaviour
         if (k != null && k.gKey.wasPressedThisFrame) { player.Stats.godMode = !player.Stats.godMode; Debug.Log("[Ashbound] God mode " + player.Stats.godMode); }
         if (k != null && k.bKey.wasPressedThisFrame && !IsOver) Debug.Log("[Ashbound] Boss set now starts with " + spawner.DebugNextBossSet());
         if (k != null && k.cKey.wasPressedThisFrame && !IsOver) SpawnPickup(PickupKind.Chest, (Vector2)player.transform.position + Vector2.right * 1.5f);
+        // K: try the next custom Path skill (replaces the last one tried). L: level it up (Lv 6 = awakened).
+        if (k != null && k.kKey.wasPressedThisFrame && !IsOver)
+        {
+            var all = new List<WeaponDef>();
+            foreach (var c in classes) if (c != null) foreach (var pd in c.paths) if (pd.weapon != null && pd.weapon.style >= WeaponStyle.StoneSpikes) all.Add(pd.weapon);
+            if (all.Count > 0)
+            {
+                if (testWeapon != null) { weapons.Remove(testWeapon); Destroy(testWeapon.gameObject); }
+                testIndex = (testIndex + 1) % all.Count;
+                testWeapon = AddWeapon(all[testIndex], true);
+                RefreshLoadout();
+                Debug.Log($"[Ashbound] Testing path skill {all[testIndex].weaponName}");
+            }
+        }
+        if (k != null && k.lKey.wasPressedThisFrame && testWeapon != null) { testWeapon.LevelUp(); RefreshLoadout(); }
     }
+    Weapon testWeapon; int testIndex = -1;
 #endif
 
     public void AddXP(int amount)

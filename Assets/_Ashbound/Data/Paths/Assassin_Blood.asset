@@ -18,5 +18,5 @@ MonoBehaviour:
   playsLike: Lifesteal duelist
   ascension: 'Vampire Lord: bat swarm form; overflow healing becomes a shield'
   unlocked: 0
-  weapon: {fileID: 0}
+  weapon: {fileID: 11400000, guid: e41c2f7225e4846679238a6439667ec2, type: 2}
   heroArt: {fileID: 21300000, guid: d3731ea6ecedc449a8c5ad9256428e92, type: 3}

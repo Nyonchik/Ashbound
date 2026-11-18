@@ -546,6 +546,83 @@ public static class AshboundBuilder
             new[] { B(count: 1), B(dmg: .25f), B(area: .2f), B(count: 1) }, B(dmg: .6f, count: 2, area: .3f),
             "Two shields circle you and slam enemies away", "+1 shield", "+25% damage", "Orbit 20% wider", "+1 shield",
             "Aegis Wall: +2 shields, +60% damage, wider orbit");
+        // ---- custom skills for every other Path
+        pathWeapons["Earth"] = Wpn("Path_StoneSpikes", "Stone Spikes", "Titan's Quake", "#B8A04A", WeaponKind.Nova,
+            16.0f, 1.6f, 0.0f, 1.0f, 0.0f, 0.5f, 1, 0, false,
+            new[] { B(count: 1), B(dmg: .25f), B(area: .25f), B(count: 1, dmg: .2f) }, B(dmg: .5f, count: 1, area: .2f),
+            "Stone spikes burst out of the ground in a line and slow what they hit", "+1 line of spikes", "+25% damage", "Spikes reach 25% farther", "+1 line, +20% damage", "Titan's Quake: every cast also shakes the ground around you, +1 line, +50% damage");
+        pathWeapons["Dark"] = Wpn("Path_ShadowBolt", "Shadow Bolt", "Lich's Hunger", "#9B5DE5", WeaponKind.Projectile,
+            13.0f, 1.0f, 9.0f, 1.0f, 2.0f, 0.5f, 1, 0, false,
+            new[] { B(count: 1), B(dmg: .25f), B(cd: .2f), B(count: 1, dmg: .2f) }, B(dmg: .5f, count: 1),
+            "A homing shadow bolt; kills send it on to another enemy and drain life", "+1 bolt", "+25% damage", "Casts 20% faster", "+1 bolt, +20% damage", "Lich's Hunger: kills split the bolt into 3, +1 bolt, +50% damage");
+        pathWeapons["Light"] = Wpn("Path_HolyBeam", "Holy Beam", "Seraph's Halo", "#FFD95A", WeaponKind.Projectile,
+            16.0f, 1.3f, 0.0f, 1.0f, 0.0f, 1.0f, 1, 0, false,
+            new[] { B(dmg: .25f), B(count: 1), B(area: .25f), B(dmg: .3f) }, B(dmg: .4f),
+            "A beam of light burns every enemy in a line and heals you a little", "+25% damage", "+1 beam", "Beams 25% longer and wider", "+30% damage", "Seraph's Halo: 2 more beams out to the sides, +40% damage");
+        pathWeapons["Beast"] = Wpn("Path_WolfClaws", "Wolf Claws", "Werewolf Frenzy", "#E5484D", WeaponKind.Nova,
+            7.0f, 0.6f, 0.0f, 1.0f, 0.0f, 1.0f, 1, 0, false,
+            new[] { B(dmg: .25f), B(area: .2f), B(count: 1), B(dmg: .3f) }, B(dmg: .5f, count: 1, area: .2f),
+            "Rapid claw slashes in front of you; each hit builds frenzy for faster attacks", "+25% damage", "Slashes reach 20% farther", "+1 slash", "+30% damage", "Werewolf Frenzy: every 4th attack is a howl that blasts enemies away, +1 slash, +50% damage");
+        pathWeapons["Warlord"] = Wpn("Path_WarChains", "War Chains", "Conqueror's Grip", "#E5484D", WeaponKind.Nova,
+            12.0f, 2.2f, 0.0f, 1.0f, 0.0f, 0.0f, 1, 0, false,
+            new[] { B(count: 1), B(dmg: .25f), B(area: .25f), B(count: 2, dmg: .2f) }, B(dmg: .5f, count: 2, cd: .2f),
+            "Chains drag 3 enemies to you, then you smash the ground", "+1 chain", "+25% damage", "Smash 25% wider", "+2 chains, +20% damage", "Conqueror's Grip: smash twice, +2 chains, +50% damage, 20% faster");
+        pathWeapons["Executioner"] = Wpn("Path_GreatAxe", "Great Axe", "Headsman", "#E5484D", WeaponKind.Nova,
+            30.0f, 1.5f, 0.0f, 1.0f, 0.0f, 3.0f, 1, 0, false,
+            new[] { B(dmg: .25f), B(area: .2f), B(cd: .15f), B(dmg: .3f) }, B(dmg: .5f, area: .25f),
+            "A huge cleave in front of you; finishes off enemies under 15% health", "+25% damage", "Cleave 20% bigger", "Swings 15% faster", "+30% damage, executes under 20%", "Headsman: swing front and back, execute under 25%, +50% damage");
+        pathWeapons["Hunter"] = Wpn("Path_WolfTraps", "Wolf & Traps", "Beastmaster", "#F2B33D", WeaponKind.Nova,
+            22.0f, 1.8f, 0.0f, 1.0f, 0.0f, 0.0f, 1, 0, false,
+            new[] { B(count: 1), B(dmg: .25f), B(cd: .2f), B(count: 1, dmg: .2f) }, B(dmg: .5f, count: 2),
+            "Sets 2 bear traps in the enemies' path and sends a spirit wolf to bite", "+1 trap", "+25% damage", "20% faster", "+1 trap, +20% damage", "Beastmaster: 2 wolves, exploding traps, +2 traps, +50% damage");
+        pathWeapons["Frost"] = Wpn("Path_IceArrows", "Ice Arrows", "Winter Ranger", "#3DA5F4", WeaponKind.Projectile,
+            12.0f, 0.9f, 14.0f, 1.0f, 1.5f, 0.5f, 1, 1, false,
+            new[] { B(count: 1), B(dmg: .25f), B(pierce: 1, cd: .15f), B(count: 1) }, B(dmg: .5f, count: 1),
+            "Icy arrows slow enemies; hitting a slowed enemy shatters it into ice shards", "+1 arrow", "+25% damage", "Pierce 1 more, 15% faster", "+1 arrow", "Winter Ranger: 6 shards, deeper slow, +1 arrow, +50% damage");
+        pathWeapons["Spirit"] = Wpn("Path_SpectralArrows", "Spectral Arrows", "Spirit Archer", "#9B5DE5", WeaponKind.Projectile,
+            11.0f, 1.0f, 10.0f, 1.0f, 2.2f, 0.0f, 2, 3, false,
+            new[] { B(count: 1), B(dmg: .25f), B(pierce: 2), B(count: 1, dmg: .2f) }, B(dmg: .4f, count: 3, pierce: 3),
+            "Ghostly arrows seek out enemies and pass through 3 of them", "+1 arrow", "+25% damage", "Pierce 2 more", "+1 arrow, +20% damage", "Spirit Archer: +3 bigger arrows, pierce 3 more, +40% damage");
+        pathWeapons["Venom"] = Wpn("Path_PoisonDaggers", "Poison Daggers", "Plaguebringer", "#4CC38A", WeaponKind.Projectile,
+            6.0f, 0.7f, 13.0f, 1.0f, 1.0f, 0.0f, 2, 0, false,
+            new[] { B(count: 1), B(dmg: .25f), B(cd: .15f), B(count: 1, dmg: .2f) }, B(dmg: .5f, count: 2),
+            "Daggers that poison; poison stacks up to 5 times", "+1 dagger", "+25% damage", "Throws 15% faster", "+1 dagger, +20% damage", "Plaguebringer: you leave a toxic cloud trail, stronger poison, +2 daggers, +50% damage");
+        pathWeapons["Shadow"] = Wpn("Path_Shadowstep", "Shadowstep", "Phantom", "#9B5DE5", WeaponKind.Nova,
+            20.0f, 1.4f, 0.0f, 1.0f, 0.0f, 1.0f, 1, 0, false,
+            new[] { B(count: 1), B(dmg: .25f), B(cd: .15f), B(count: 1, dmg: .2f) }, B(dmg: .5f, count: 2),
+            "Strike the 2 nearest enemies from the shadows; 25% chance to crit for double", "+1 target", "+25% damage", "15% faster", "+1 target, +20% damage", "Phantom: every 5th strike kills any non-boss, +2 targets, +50% damage");
+        pathWeapons["Trickster"] = Wpn("Path_DecoyClone", "Decoy Clone", "Mirror Master", "#4CC38A", WeaponKind.Nova,
+            25.0f, 4.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1, 0, false,
+            new[] { B(dmg: .25f), B(count: 1), B(cd: .2f), B(area: .25f, dmg: .2f) }, B(dmg: .5f, count: 2),
+            "Leave a clone that lures nearby enemies, then explodes", "+25% damage", "+1 clone", "Clones 20% more often", "Blast 25% bigger, +20% damage", "Mirror Master: clones throw daggers, +2 clones, +50% damage");
+        pathWeapons["Blood"] = Wpn("Path_Hemorrhage", "Hemorrhage Blade", "Vampire Lord", "#E5484D", WeaponKind.Nova,
+            14.0f, 1.1f, 0.0f, 1.0f, 0.0f, 1.5f, 1, 0, false,
+            new[] { B(dmg: .25f), B(area: .2f), B(cd: .15f), B(dmg: .3f) }, B(dmg: .4f, area: .2f),
+            "A spinning blood blade hits everything around you and heals you", "+25% damage", "20% wider", "15% faster", "+30% damage", "Vampire Lord: bats fly out to bite enemies and heal you, +40% damage");
+        pathWeapons["Wind"] = Wpn("Path_FanOfKnives", "Fan of Knives", "Tempest Blade", "#6FE3D1", WeaponKind.Projectile,
+            7.0f, 1.2f, 13.0f, 1.0f, 0.9f, 0.0f, 8, 1, false,
+            new[] { B(count: 2), B(dmg: .25f), B(cd: .15f), B(count: 2, pierce: 1) }, B(dmg: .4f, count: 4),
+            "Throws a ring of 8 knives in every direction", "+2 knives", "+25% damage", "15% faster", "+2 knives, pierce 1 more", "Tempest Blade: two rings per throw, +4 knives, +40% damage");
+        pathWeapons["Paladin"] = Wpn("Path_HolyShield", "Holy Shield", "Crusader", "#FFD95A", WeaponKind.Nova,
+            12.0f, 1.6f, 0.0f, 1.0f, 0.0f, 3.0f, 1, 0, false,
+            new[] { B(dmg: .25f), B(area: .2f), B(cd: .2f), B(dmg: .3f) }, B(dmg: .4f, area: .2f),
+            "A holy pulse hurts enemies around you and heals you", "+25% damage", "20% wider", "20% more often", "+30% damage", "Crusader: a burning holy aura surrounds you, bigger heals, +40% damage");
+        pathWeapons["Bulwark"] = Wpn("Path_ShieldBash", "Shield Bash", "Living Fortress", "#4A8FE7", WeaponKind.Nova,
+            16.0f, 1.3f, 0.0f, 1.0f, 0.0f, 9.0f, 1, 0, false,
+            new[] { B(dmg: .25f), B(area: .25f), B(cd: .15f), B(dmg: .3f) }, B(dmg: .5f, area: .2f),
+            "Bash the enemies in front of you far away and stun them", "+25% damage", "Bash 25% bigger", "15% faster", "+30% damage", "Living Fortress: bash in every direction, enemies touching you get hurt, +50% damage");
+        pathWeapons["Thorns"] = Wpn("Path_BrambleArmor", "Bramble Armor", "Ironwood", "#B8A04A", WeaponKind.Nova,
+            7.0f, 2.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1, 0, false,
+            new[] { B(dmg: .25f), B(area: .2f), B(dmg: .25f), B(area: .2f, dmg: .2f) }, B(dmg: .5f, area: .2f),
+            "Thorns hurt enemies next to you; getting hit releases a big thorn burst", "+25% damage", "Thorns 20% wider", "+25% damage", "20% wider, +20% damage", "Ironwood: roots erupt under enemies on screen every 2s, +50% damage");
+        pathWeapons["Juggernaut"] = Wpn("Path_Charge", "Charge", "Unstoppable", "#4A8FE7", WeaponKind.Nova,
+            22.0f, 3.0f, 0.0f, 1.0f, 0.0f, 8.0f, 1, 0, false,
+            new[] { B(dmg: .25f), B(area: .2f), B(cd: .2f), B(dmg: .3f) }, B(dmg: .5f, area: .2f, cd: .2f),
+            "Charge the way you're facing, smashing through enemies (you can't be hurt mid-charge)", "+25% damage", "Hits 20% wider", "Charges 20% more often", "+30% damage", "Unstoppable: the charge leaves shockwaves, kills halve the cooldown, +50% damage");
+        pathWeapons["Death Knight"] = Wpn("Path_CursedBlade", "Cursed Blade", "Dread Lord", "#9B5DE5", WeaponKind.Nova,
+            15.0f, 1.6f, 0.0f, 1.0f, 0.0f, 1.5f, 1, 0, false,
+            new[] { B(dmg: .25f), B(area: .2f), B(cd: .15f), B(dmg: .3f) }, B(dmg: .5f, count: 1),
+            "A cursed sword sweeps around you; cursed enemies take 25% more damage", "+25% damage", "Sweep 20% wider", "15% faster", "+30% damage", "Dread Lord: sweep twice, a frost aura slows enemies near you, kills heal you, +50% damage");
         c.fallback = pathWeapons["Fire"];
 
         // ---- weapons found in level-ups
@@ -628,6 +705,36 @@ public static class AshboundBuilder
         Look("Evo_Glacier", WeaponStyle.Glacier, "fx_frost_burst");
         Look("Evo_CrimsonWhirlwind", WeaponStyle.Whirlwind);
         Look("Evo_PhantomBlades", WeaponStyle.PhantomBlades);
+        void CustomLook(string file, WeaponStyle style, string main, string second, string icon, string awakenIcon)
+        {
+            if (!c.byFile.TryGetValue(file, out var w)) return;
+            w.style = style;
+            w.projectile = main != null ? FxArtFile(main) : null;
+            w.effect = second != null ? FxArtFile(second) : null;
+            var ic = Icon(icon); if (ic != null) w.icon = ic;
+            w.awakenIcon = Icon(awakenIcon);
+            EditorUtility.SetDirty(w);
+        }
+        // custom Path skills: style, main sprite, secondary sprite, icon, awakened icon
+        CustomLook("Path_StoneSpikes", WeaponStyle.StoneSpikes, "fx_rock_spike", null, "icon_stone_spikes", "awk_titans_quake");
+        CustomLook("Path_ShadowBolt", WeaponStyle.ShadowBolt, "fx_dark_bolt", null, "icon_shadow_bolt", "awk_lichs_hunger");
+        CustomLook("Path_HolyBeam", WeaponStyle.HolyBeam, "fx_holy_beam", null, "icon_holy_beam", "awk_seraphs_halo");
+        CustomLook("Path_WolfClaws", WeaponStyle.Claws, "fx_claw_slash", null, "icon_wolf_claws", "awk_werewolf_frenzy");
+        CustomLook("Path_WarChains", WeaponStyle.WarChains, "fx_chain", null, "icon_war_chains", "awk_conquerors_grip");
+        CustomLook("Path_GreatAxe", WeaponStyle.Cleave, "fx_axe_cleave", null, "icon_great_axe", "awk_headsman");
+        CustomLook("Path_WolfTraps", WeaponStyle.Traps, "fx_spirit_wolf", "fx_bear_trap", "icon_wolf_traps", "awk_beastmaster");
+        CustomLook("Path_IceArrows", WeaponStyle.IceArrows, "fx_ice_arrow", null, "icon_ice_arrows", "awk_winter_ranger");
+        CustomLook("Path_SpectralArrows", WeaponStyle.SpectralArrows, "fx_spectral_arrow", null, "icon_spectral_arrows", "awk_spirit_archer");
+        CustomLook("Path_PoisonDaggers", WeaponStyle.PoisonDaggers, "fx_poison_dagger", null, "icon_poison_daggers", "awk_plaguebringer");
+        CustomLook("Path_Shadowstep", WeaponStyle.Shadowstep, null, "fx_shadow_slash", "icon_shadowstep", "awk_phantom");
+        CustomLook("Path_DecoyClone", WeaponStyle.Decoy, null, null, "icon_decoy_clone", "awk_mirror_master");
+        CustomLook("Path_Hemorrhage", WeaponStyle.Hemorrhage, "fx_bat", "fx_blood_ring", "icon_hemorrhage_blade", "awk_vampire_lord");
+        CustomLook("Path_FanOfKnives", WeaponStyle.FanOfKnives, "fx_wind_knife", null, "icon_fan_of_knives", "awk_tempest_blade");
+        CustomLook("Path_HolyShield", WeaponStyle.HolyAura, "fx_holy_ring", null, "icon_holy_shield", "awk_crusader");
+        CustomLook("Path_ShieldBash", WeaponStyle.ShieldBash, "fx_shield_arc", null, "icon_shield_bash", "awk_living_fortress");
+        CustomLook("Path_BrambleArmor", WeaponStyle.Brambles, "fx_bramble_ring", null, "icon_bramble_armor", "awk_ironwood");
+        CustomLook("Path_Charge", WeaponStyle.Charge, null, null, "icon_charge", "awk_unstoppable");
+        CustomLook("Path_CursedBlade", WeaponStyle.CursedBlade, "fx_cursed_sword", "fx_dark_sweep", "icon_cursed_blade", "awk_dread_lord");
         contentBuilding = null;
 
         AssetDatabase.SaveAssets();
@@ -1131,6 +1238,23 @@ public static class AshboundBuilder
 
     static Prefabs prefabsCache;
 
+    // Unlit material on the Ashbound/Blend shader: additive (glows) or normal alpha blend (smoke, debris).
+    static Material BlendMat(string name, bool additive, Texture tex)
+    {
+        string path = $"{Root}/Art/World/{name}.mat";
+        var shader = Shader.Find("Ashbound/Blend");
+        if (shader == null) { Debug.LogWarning("[Ashbound] Ashbound/Blend shader missing"); return null; }
+        var m = AssetDatabase.LoadAssetAtPath<Material>(path);
+        if (m == null) { m = new Material(shader); AssetDatabase.CreateAsset(m, path); }
+        m.shader = shader;
+        m.SetFloat("_SrcBlend", (float)UnityEngine.Rendering.BlendMode.SrcAlpha);
+        m.SetFloat("_DstBlend", (float)(additive ? UnityEngine.Rendering.BlendMode.One : UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha));
+        m.mainTexture = tex;
+        m.renderQueue = 3000;
+        EditorUtility.SetDirty(m);
+        return m;
+    }
+
     // Gear, chest and gem icons live in Resources/Gear so the game can load them by id.
     static void ImportGearArt()
     {
@@ -1536,6 +1660,16 @@ public static class AshboundBuilder
         SetArr(run, "pickupSprites", new List<Object> { Icon("pickup_meat"), Icon("pickup_medkit"), Icon("icon_magnet"), Icon("pickup_gold_bag"), Icon("pickup_chest") });
         SetArr(run, "classes", classesCache.ConvertAll(c => (Object)c));
         SetArr(run, "stages", stagesCache.ConvertAll(c => (Object)c));
+        // particle / glow materials
+        {
+            var glowTex = AssetDatabase.LoadAssetAtPath<Texture2D>($"{Root}/Art/UI/ui_glow.png");
+            var dotTex = AssetDatabase.LoadAssetAtPath<Texture2D>($"{Root}/Art/World/spr_dot.png");
+            Set(run, "additiveSprite", BlendMat("Fx Additive Sprite", true, null));
+            Set(run, "glowParticles", BlendMat("Fx Glow", true, glowTex));
+            Set(run, "smokeParticles", BlendMat("Fx Smoke", false, glowTex));
+            Set(run, "debrisParticles", BlendMat("Fx Debris", false, dotTex));
+            Set(run, "glowSprite", sGlow);
+        }
         var rso = new SerializedObject(run);
         var fxp = rso.FindProperty("fxArt");
         foreach (var (field, file) in new[] {

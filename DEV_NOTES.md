@@ -75,3 +75,14 @@ Test runs with F5 counted as real progress in the save (Berserker Beast path unl
 - Store (UI/StorePanel.cs): daily free Wooden Chest (every 20h), Wooden 200 gold, Silver 40 gems, Royal 120 gems; chest opening animation.
 - Gems: +3 per boss, +5 for reaching 10:00, +20 per win, +30 first win on a stage. Existing saves got 40 gems.
 - Icons in Resources/Gear (made in ChatGPT). UI is built at runtime with UI/UIKit.cs.
+
+## Custom skills for every Path + real effects
+- All 26 Paths now have their own skill. New: Stone Spikes, Shadow Bolt, Holy Beam, Wolf Claws, War Chains, Great Axe, Wolf & Traps,
+  Ice Arrows, Spectral Arrows, Poison Daggers, Shadowstep, Decoy Clone, Hemorrhage Blade, Fan of Knives, Holy Shield, Shield Bash,
+  Bramble Armor, Charge, Cursed Blade - each with an awakened version (Titan's Quake, Lich's Hunger, Seraph's Halo, ...).
+  Code: Gameplay/WeaponPaths.cs (partial Weapon). Data + balance: AshboundBuilder BuildContent ("custom skills for every other Path").
+- New enemy states: poison (stacks to 5), curse (+25% damage taken), decoys (enemies chase Trickster clones). Projectiles: homing, on-hit hooks.
+- Effects layer (Gameplay/FxParticles.cs + Shaders/AshboundBlend.shader): glowing sparks, smoke, debris, floating motes, additive glows,
+  glowing trails on every projectile, impact sparks on every hit. Materials "Fx *.mat" in Art/World are made by Build Everything.
+- Art: 20 effect sprites (Art/InGame/Effects/fx_*), 19 icons + 19 awakened icons (Art/InGame/Icons), made in ChatGPT.
+- Editor test keys: K = try the next new Path skill, L = level it (5x = awakened).

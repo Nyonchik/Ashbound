@@ -34,8 +34,27 @@ public class Enemy : MonoBehaviour
     Vector2 knock, pull;
     Color baseColor;
     float slowTimer, slowMul = 1f;
+    float poisonTimer, poisonDps, poisonTick, curseTimer;
+    int poisonStacks;
+    static readonly Color PoisonTint = new(0.6f, 1f, 0.5f);
+    static readonly Color CurseTint = new(0.75f, 0.55f, 0.95f);
+    /// <summary>Trickster decoys: regular enemies close to one chase it instead of the player.</summary>
+    public static readonly List<Vector2> Decoys = new();
+    public bool IsSlowed => slowTimer > 0f;
+
+    /// <summary>Damage over time, stacks up to 5. dps is per stack.</summary>
+    public void Poison(float dps, float seconds)
+    {
+        if (dead) return;
+        poisonDps = Mathf.Max(poisonDps * 0.5f, dps);
+        poisonStacks = Mathf.Min(5, poisonStacks + 1);
+        poisonTimer = Mathf.Max(poisonTimer, seconds);
+    }
+
+    /// <summary>Cursed enemies take 25% more damage.</summary>
+    public void Curse(float seconds) { if (!dead) curseTimer = Mathf.Max(curseTimer, seconds); }
     static readonly Color FrozenTint = new(0.55f, 0.85f, 1f);
-    Color CurrentColor => slowTimer > 0f ? baseColor * FrozenTint : baseColor;
+    Color CurrentColor => slowTimer > 0f ? baseColor * FrozenTint : poisonTimer > 0f ? baseColor * PoisonTint : curseTimer > 0f ? baseColor * CurseTint : baseColor;
 
     /// <summary>Slow (mul 0.25 = 75% slower) for a while; tints the enemy icy.</summary>
     public void Slow(float seconds, float mul)
@@ -92,6 +111,7 @@ public class Enemy : MonoBehaviour
         baseColor = type.tint * stageTint;
         body.color = baseColor;
         knock = Vector2.zero; pull = Vector2.zero; slowTimer = 0f; slowMul = 1f; ForcedVelocity = null;
+        poisonTimer = poisonDps = curseTimer = 0f; poisonStacks = 0;
         flash = 0f;
         dead = false;
         bob = Random.value * 10f;
@@ -102,7 +122,13 @@ public class Enemy : MonoBehaviour
     {
         var p = PlayerController.Instance;
         if (p == null || dead) return;
-        Vector2 dir = ((Vector2)p.transform.position - rb.position).normalized;
+        Vector2 goal = p.transform.position;
+        if (!IsBoss && Decoys.Count > 0)
+        {
+            float best = 49f;
+            foreach (var d in Decoys) { float dd = (d - rb.position).sqrMagnitude; if (dd < best) { best = dd; goal = d; } }
+        }
+        Vector2 dir = (goal - rb.position).normalized;
         if (ForcedVelocity.HasValue) { rb.linearVelocity = ForcedVelocity.Value * (slowTimer > 0f ? Mathf.Max(slowMul, 0.6f) : 1f); pull = Vector2.zero; return; }
         float sp = slowTimer > 0f ? speed * slowMul : speed;
         rb.linearVelocity = dir * sp + knock + pull;
@@ -127,6 +153,13 @@ public class Enemy : MonoBehaviour
             }
         }
 
+        if (curseTimer > 0f) { curseTimer -= Time.deltaTime; if (curseTimer <= 0f && flash <= 0f) body.color = CurrentColor; }
+        if (poisonTimer > 0f)
+        {
+            poisonTimer -= Time.deltaTime; poisonTick -= Time.deltaTime;
+            if (poisonTick <= 0f) { poisonTick = 0.5f; FxParticles.Smoke((Vector2)transform.position + Vector2.up * radius, new Color(0.45f, 0.9f, 0.3f, 0.5f), 1, 0.15f, 0.5f, 0.6f, 0.4f); TakeDamage(poisonDps * poisonStacks * 0.5f, Vector2.zero, 0f); if (dead) return; }
+            if (poisonTimer <= 0f) { poisonStacks = 0; if (flash <= 0f) body.color = CurrentColor; }
+        }
         if (slowTimer > 0f)
         {
             slowTimer -= Time.deltaTime;
@@ -139,9 +172,11 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    public void TakeDamage(float amount, Vector2 knockDir, float knockForce)
+    /// <summary>Returns true if this hit killed the enemy.</summary>
+    public bool TakeDamage(float amount, Vector2 knockDir, float knockForce)
     {
-        if (dead) return;
+        if (dead) return false;
+        if (curseTimer > 0f) amount *= 1.25f;
         hp -= amount;
         RunManager.Instance?.ShowDamage(transform.position + Vector3.up * (radius * 2.2f), amount, IsBoss);
         flash = 0.08f;
@@ -151,7 +186,9 @@ public class Enemy : MonoBehaviour
         {
             dead = true;
             owner.OnEnemyKilled(this, xp);
+            return true;
         }
+        return false;
     }
 
     // ---- queries (fill a list first, then damage, so kills don't break iteration)

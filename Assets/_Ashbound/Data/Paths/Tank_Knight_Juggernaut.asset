@@ -18,5 +18,5 @@ MonoBehaviour:
   playsLike: Fast, aggressive tank
   ascension: 'Unstoppable: charge leaves a shockwave trail; cooldown resets on kills'
   unlocked: 0
-  weapon: {fileID: 0}
+  weapon: {fileID: 11400000, guid: d0632afe2080a4e5a84c423577524078, type: 2}
   heroArt: {fileID: 21300000, guid: 02e5b3511f89c4ed29d0b4581b72c706, type: 3}

@@ -18,5 +18,5 @@ MonoBehaviour:
   playsLike: Healing, precision
   ascension: 'Seraph: wings plus a rotating ring of holy lasers'
   unlocked: 0
-  weapon: {fileID: 0}
+  weapon: {fileID: 11400000, guid: 402019bcea6064a80adf04e3b1bbcc40, type: 2}
   heroArt: {fileID: 21300000, guid: 52a359fed662c40edbd52294649e5891, type: 3}

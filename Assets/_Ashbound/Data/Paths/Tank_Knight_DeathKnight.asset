@@ -18,5 +18,5 @@ MonoBehaviour:
   playsLike: Dark tank, summons
   ascension: 'Dread Lord: frost aura + skeletal horse; your kills become shields'
   unlocked: 0
-  weapon: {fileID: 0}
+  weapon: {fileID: 11400000, guid: 03186a7fa33d24e7ca62d526d3164c87, type: 2}
   heroArt: {fileID: 21300000, guid: ee7d371a190fa439eac47f7b4ddcb6e9, type: 3}

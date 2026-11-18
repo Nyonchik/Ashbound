@@ -18,5 +18,5 @@ MonoBehaviour:
   playsLike: Hit and run, stack poison
   ascension: 'Plaguebringer: toxic cloud trail; poisoned enemies spread it'
   unlocked: 0
-  weapon: {fileID: 0}
+  weapon: {fileID: 11400000, guid: bf84b0a285d4d4abcbeb915375c5afcb, type: 2}
   heroArt: {fileID: 21300000, guid: ace9d50c1e2954b4290d91f1986f75bd, type: 3}

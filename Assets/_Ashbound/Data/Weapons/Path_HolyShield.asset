@@ -1,0 +1,75 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc975138bf0f04bc5a32c7f80bfc4f06, type: 3}
+  m_Name: Path_HolyShield
+  m_EditorClassIdentifier: Assembly-CSharp::WeaponDef
+  weaponName: Holy Shield
+  awakeningName: Crusader
+  color: {r: 1, g: 0.8509804, b: 0.3529412, a: 1}
+  kind: 2
+  icon: {fileID: 21300000, guid: 7f7b68395a5424259a5ae64ff4c626b1, type: 3}
+  projectile: {fileID: 21300000, guid: 1be83823201ea4cf5afa951ee46a3213, type: 3}
+  damage: 12
+  cooldown: 1.6
+  speed: 0
+  area: 1
+  lifetime: 0
+  knockback: 3
+  count: 1
+  pierce: 0
+  explode: 0
+  levels:
+  - damage: 0.25
+    count: 0
+    cooldown: 0
+    area: 0
+    pierce: 0
+    explode: 0
+  - damage: 0
+    count: 0
+    cooldown: 0
+    area: 0.2
+    pierce: 0
+    explode: 0
+  - damage: 0
+    count: 0
+    cooldown: 0.2
+    area: 0
+    pierce: 0
+    explode: 0
+  - damage: 0.3
+    count: 0
+    cooldown: 0
+    area: 0
+    pierce: 0
+    explode: 0
+  awakening:
+    damage: 0.4
+    count: 0
+    cooldown: 0
+    area: 0.2
+    pierce: 0
+    explode: 0
+  style: 24
+  effect: {fileID: 0}
+  awakenIcon: {fileID: 21300000, guid: 347e7022edeab458d952e71a0758813a, type: 3}
+  awakenProjectile: {fileID: 0}
+  evolvePassive: {fileID: 0}
+  evolvesInto: {fileID: 0}
+  isEvolution: 0
+  levelText:
+  - A holy pulse hurts enemies around you and heals you
+  - +25% damage
+  - 20% wider
+  - 20% more often
+  - +30% damage
+  - 'Crusader: a burning holy aura surrounds you, bigger heals, +40% damage'

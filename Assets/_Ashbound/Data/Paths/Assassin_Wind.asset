@@ -18,5 +18,5 @@ MonoBehaviour:
   playsLike: Speed, many projectiles
   ascension: 'Tempest Blade: blades orbit you as a whirling storm'
   unlocked: 0
-  weapon: {fileID: 0}
+  weapon: {fileID: 11400000, guid: 0db1f629f3e3c4cf8a857bd3950d188a, type: 2}
   heroArt: {fileID: 21300000, guid: 980fa5999f74a42dba64ebc6f27f9fb5, type: 3}

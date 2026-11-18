@@ -18,5 +18,5 @@ MonoBehaviour:
   playsLike: Pure defense
   ascension: 'Living Fortress: enemies touching you take damage; immune to knockback'
   unlocked: 0
-  weapon: {fileID: 0}
+  weapon: {fileID: 11400000, guid: bb809f297db0a4865818832e01f47ede, type: 2}
   heroArt: {fileID: 21300000, guid: 6702700ed89014c19b5d5f6a8d79b651, type: 3}

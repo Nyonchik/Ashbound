@@ -18,5 +18,5 @@ MonoBehaviour:
   playsLike: Easy aim, magic hybrid
   ascension: 'Spirit Archer: a ghostly giant copy of you fires alongside you'
   unlocked: 0
-  weapon: {fileID: 0}
+  weapon: {fileID: 11400000, guid: 8664c057fcc8845ceb1598f2aa4bb7dc, type: 2}
   heroArt: {fileID: 21300000, guid: 8562b77fce05840b7809fca9c64383c2, type: 3}

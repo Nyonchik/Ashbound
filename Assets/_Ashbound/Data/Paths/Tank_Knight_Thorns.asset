@@ -18,5 +18,5 @@ MonoBehaviour:
   playsLike: Take hits on purpose
   ascension: 'Ironwood: roots erupt around you; reflected damage grows huge'
   unlocked: 0
-  weapon: {fileID: 0}
+  weapon: {fileID: 11400000, guid: 06a8870998ca345cd8d7ba0d38981a14, type: 2}
   heroArt: {fileID: 21300000, guid: c75d9b3906f7a40b7a4a4d27cb48c36f, type: 3}

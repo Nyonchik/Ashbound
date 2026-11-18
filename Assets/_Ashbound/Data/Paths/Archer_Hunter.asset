@@ -18,5 +18,5 @@ MonoBehaviour:
   playsLike: Pet and trap control
   ascension: 'Beastmaster: a pack of wolves and a hawk fight alongside you'
   unlocked: 0
-  weapon: {fileID: 0}
+  weapon: {fileID: 11400000, guid: 99e775560bb714dc4b4dc685caa3d691, type: 2}
   heroArt: {fileID: 21300000, guid: fd7b370ab1ed24c849ff56cdc0ebbef3, type: 3}
