@@ -43,12 +43,16 @@ public class Enemy : MonoBehaviour
     public static readonly List<Vector2> Decoys = new();
     /// <summary>Chance that a hit deals double damage (Assassin). Set every frame by the hero's mechanic.</summary>
     public static float CritChance;
+    /// <summary>The weapon dealing the current hit (for the run summary). Set around TakeDamage calls.</summary>
+    public static Weapon Source;
+    Weapon poisonSource;
     public bool IsSlowed => slowTimer > 0f;
 
     /// <summary>Damage over time, stacks up to 5. dps is per stack.</summary>
     public void Poison(float dps, float seconds)
     {
         if (dead) return;
+        if (Source != null) poisonSource = Source;
         poisonDps = Mathf.Max(poisonDps * 0.5f, dps);
         poisonStacks = Mathf.Min(5, poisonStacks + 1);
         poisonTimer = Mathf.Max(poisonTimer, seconds);
@@ -116,7 +120,7 @@ public class Enemy : MonoBehaviour
         baseColor = type.tint * stageTint;
         body.color = baseColor;
         knock = Vector2.zero; pull = Vector2.zero; slowTimer = 0f; slowMul = 1f; ForcedVelocity = null;
-        poisonTimer = poisonDps = curseTimer = 0f; poisonStacks = 0;
+        poisonTimer = poisonDps = curseTimer = 0f; poisonStacks = 0; poisonSource = null;
         flash = 0f;
         dead = false;
         bob = Random.value * 10f;
@@ -162,7 +166,7 @@ public class Enemy : MonoBehaviour
         if (poisonTimer > 0f)
         {
             poisonTimer -= Time.deltaTime; poisonTick -= Time.deltaTime;
-            if (poisonTick <= 0f) { poisonTick = 0.5f; FxParticles.Smoke((Vector2)transform.position + Vector2.up * radius, new Color(0.45f, 0.9f, 0.3f, 0.5f), 1, 0.15f, 0.5f, 0.6f, 0.4f); TakeDamage(poisonDps * poisonStacks * 0.5f, Vector2.zero, 0f); if (dead) return; }
+            if (poisonTick <= 0f) { poisonTick = 0.5f; FxParticles.Smoke((Vector2)transform.position + Vector2.up * radius, new Color(0.45f, 0.9f, 0.3f, 0.5f), 1, 0.15f, 0.5f, 0.6f, 0.4f); var prevSrc = Source; Source = poisonSource; TakeDamage(poisonDps * poisonStacks * 0.5f, Vector2.zero, 0f); Source = prevSrc; if (dead) return; }
             if (poisonTimer <= 0f) { poisonStacks = 0; if (flash <= 0f) body.color = CurrentColor; }
         }
         if (slowTimer > 0f)
@@ -184,8 +188,9 @@ public class Enemy : MonoBehaviour
         if (curseTimer > 0f) amount *= 1.25f;
         bool crit = CritChance > 0f && Random.value < CritChance;
         if (crit) amount *= 2f;
+        if (Source != null) Source.TotalDamage += Mathf.Min(amount, Mathf.Max(0f, hp));
         hp -= amount;
-        RunManager.Instance?.ShowDamage(transform.position + Vector3.up * (radius * 2.2f), amount, IsBoss || crit);
+        RunManager.Instance?.ShowDamage(transform.position + Vector3.up * (radius * 2.2f), amount, IsBoss, crit);
         flash = 0.08f;
         body.color = HitColor;
         if (!IsBoss) knock += knockDir * knockForce;

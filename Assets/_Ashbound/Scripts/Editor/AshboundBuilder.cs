@@ -1504,6 +1504,7 @@ public static class AshboundBuilder
         // Off-screen pickup trackers
         var tracker = Node("PickupTrackers", canvas); Stretch(tracker, 0, 0, 0, 0);
         var trk = tracker.gameObject.AddComponent<PickupTracker>();
+        Set(trk, "eliteIcon", Icon("icon_skull")); Set(trk, "bossIcon", Icon("icon_skull"));
         Set(trk, "container", tracker); Set(trk, "backgroundSprite", sCircle); Set(trk, "arrowSprite", ImportSprite("ui_arrow.png", 0));
 
         // Loadout (bottom-left)
@@ -1586,16 +1587,22 @@ public static class AshboundBuilder
         // Game over overlay
         var over = Node("GameOverScreen", canvas); Stretch(over, 0, 0, 0, 0);
         Img(over, null, new Color(0.04f, 0.04f, 0.06f, 0.88f)).raycastTarget = true;
-        var op = Node("Panel", over); Place(op, Center, Center, Center, Vector2.zero, new Vector2(760, 600)); Img(op, sPanel, Palette.Panel);
-        var opv = op.gameObject.AddComponent<VerticalLayoutGroup>(); opv.padding = new RectOffset(48, 48, 45, 45); opv.spacing = 24; opv.childAlignment = TextAnchor.UpperCenter;
+        var op = Node("Panel", over); Place(op, Center, Center, Center, Vector2.zero, new Vector2(1000, 980)); Img(op, sPanel, Palette.Panel);
+        var opv = op.gameObject.AddComponent<VerticalLayoutGroup>(); opv.padding = new RectOffset(48, 48, 36, 36); opv.spacing = 12; opv.childAlignment = TextAnchor.UpperCenter;
         opv.childControlWidth = true; opv.childControlHeight = true; opv.childForceExpandWidth = true; opv.childForceExpandHeight = false;
         var overTitle = Txt(op, "Title", "YOU FELL", fTitle, 72, Palette.Health, TextAlignmentOptions.Center); overTitle.fontSharedMaterial = mTitleGlow;
         var overStats = Txt(op, "Stats", "Survived 00:00", fBold, 27, Palette.Text, TextAlignmentOptions.Center); overStats.lineSpacing = 20;
         var overRewards = Txt(op, "Rewards", "", fBlack, 24, Palette.Gold, TextAlignmentOptions.Center);
+        var overBreak = Txt(op, "Breakdown", "", fBold, 20, Palette.Text, TextAlignmentOptions.Center);
+        overBreak.enableAutoSizing = true; overBreak.fontSizeMin = 13; overBreak.fontSizeMax = 20; overBreak.lineSpacing = 6;
+        { var le = overBreak.gameObject.AddComponent<LayoutElement>(); le.minHeight = le.preferredHeight = 270; }
+        void MinH(Component c, float h) { var le = c.GetComponent<LayoutElement>() ?? c.gameObject.AddComponent<LayoutElement>(); le.minHeight = Mathf.Max(le.minHeight, h); le.preferredHeight = Mathf.Max(le.preferredHeight, h); }
+        MinH(overTitle, 84); MinH(overStats, 76); MinH(overRewards, 96);
         var retry = Btn(Inst(prefabs.primary, op, "Retry"), "Try again");
         var overMenu = Btn(Inst(prefabs.secondary, op, "MainMenu"), "Main menu");
+        MinH(retry, 84); MinH(overMenu, 76);
         var gos = over.gameObject.AddComponent<GameOverScreen>();
-        Set(gos, "title", overTitle); Set(gos, "stats", overStats); Set(gos, "retryButton", retry); Set(gos, "menuButton", overMenu); Set(gos, "rewards", overRewards);
+        Set(gos, "title", overTitle); Set(gos, "stats", overStats); Set(gos, "retryButton", retry); Set(gos, "menuButton", overMenu); Set(gos, "rewards", overRewards); Set(gos, "breakdown", overBreak);
         Set(pm, "gameOverScreen", over.gameObject);
 
         // Game over icon + colored frame (crown shard on victory, skull on defeat)

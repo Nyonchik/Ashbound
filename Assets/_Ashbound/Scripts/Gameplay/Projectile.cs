@@ -114,7 +114,9 @@ public class Projectile : MonoBehaviour
         {
             if (alreadyHit.Contains(e)) continue;
             alreadyHit.Add(e);
+            var prevSrc = Enemy.Source; Enemy.Source = owner;
             bool killed = e.TakeDamage(damage, velocity.normalized, knockback);
+            Enemy.Source = prevSrc;
             onHit?.Invoke(e, killed);
             FxParticles.Sparks(transform.position, trailColor, 5, 3.5f, 0.16f, 0.25f, -velocity.normalized, 140f);
             if (explode && owner != null) owner.Explode(transform.position, damage * 0.6f);

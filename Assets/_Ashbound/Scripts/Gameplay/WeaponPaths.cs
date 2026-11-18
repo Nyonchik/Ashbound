@@ -64,6 +64,15 @@ public partial class Weapon
         }
     }
 
+    /// <summary>Damage an enemy and credit this weapon in the run summary.</summary>
+    bool Hit(Enemy e, float amount, Vector2 dir, float knock)
+    {
+        var prev = Enemy.Source; Enemy.Source = this;
+        bool killed = e.TakeDamage(amount, dir, knock);
+        Enemy.Source = prev;
+        return killed;
+    }
+
     void Heal(float hp) { if (hp > 0f) stats.Heal(Mathf.Min(hp, HealCap)); }
 
     /// <summary>Instant kill with a blood burst (executions).</summary>
@@ -143,7 +152,7 @@ public partial class Weapon
         {
             Run.Fx(Art.crater, c, Color.white, 0.9f, -10).Scale(1.2f, 2.6f * Area * 1.4f).FadeFrom(0.5f);
             Enemy.CollectInRadius(c, 2.6f * Area, buffer3);
-            foreach (var e in buffer3) e.TakeDamage(Damage * 0.8f, ((Vector2)e.transform.position - c).normalized, 4f);
+            foreach (var e in buffer3) Hit(e, Damage * 0.8f, ((Vector2)e.transform.position - c).normalized, 4f);
             FxParticles.Glow(c, new Color(1f, 0.6f, 0.25f, 0.7f), 5f * Area, 0.4f, -9);
             FxParticles.Debris(c, new Color(0.5f, 0.38f, 0.25f), 24, 7f, 0.16f, 0.6f);
             FxParticles.Smoke(c, new Color(0.55f, 0.45f, 0.35f, 0.6f), 10, 1.4f * Area, 1.3f, 0.9f, 1.5f);
@@ -164,7 +173,7 @@ public partial class Weapon
                 foreach (var e in buffer3)
                 {
                     if (!hitOnce.Add(e)) continue;
-                    e.TakeDamage(Damage, Vector2.up, 0.5f);
+                    Hit(e, Damage, Vector2.up, 0.5f);
                     e.Slow(1.2f, 0.5f);
                     FxParticles.Sparks(e.transform.position, new Color(1f, 0.75f, 0.4f), 4, 3f, 0.16f, 0.25f);
                 }
@@ -237,7 +246,7 @@ public partial class Weapon
             foreach (var e in buffer3)
             {
                 if (!hitOnce.Add(e)) continue;
-                e.TakeDamage(Damage, d, Def.knockback);
+                Hit(e, Damage, d, Def.knockback);
                 FxParticles.Sparks(e.transform.position, new Color(1f, 0.9f, 0.5f), 4, 3f, 0.15f, 0.25f);
                 hits++;
             }
@@ -254,7 +263,7 @@ public partial class Weapon
         {
             Vector2 c = transform.position;
             Enemy.CollectInRadius(c, 3.5f * Area, buffer3);
-            foreach (var e in buffer3) { e.TakeDamage(Damage, ((Vector2)e.transform.position - c).normalized, 9f); e.Slow(1.5f, 0.5f); }
+            foreach (var e in buffer3) { Hit(e, Damage, ((Vector2)e.transform.position - c).normalized, 9f); e.Slow(1.5f, 0.5f); }
             var howlRing = Art.waveRing != null ? Art.waveRing : Art.frostBurst;
             Run.Fx(howlRing, c, new Color(1f, 0.55f, 0.5f, 0.6f), 0.45f, -8).Scale(Fit(howlRing, 1f), Fit(howlRing, 7f * Area)).FadeFrom(0.4f);
             FxParticles.Glow(c, new Color(1f, 0.3f, 0.2f, 0.6f), 6f * Area, 0.45f, -9);
@@ -267,7 +276,7 @@ public partial class Weapon
             Vector2 dir = AimDir(4.5f);
             float range = 1.9f * Area;
             CollectCone(c, dir, range, 120f, buffer3);
-            foreach (var e in buffer3) { e.TakeDamage(Damage, dir, Def.knockback); FxParticles.Debris(e.transform.position, new Color(0.7f, 0.08f, 0.1f), 3, 3f, 0.1f, 0.4f, dir, 70f); }
+            foreach (var e in buffer3) { Hit(e, Damage, dir, Def.knockback); FxParticles.Debris(e.transform.position, new Color(0.7f, 0.08f, 0.1f), 3, 3f, 0.1f, 0.4f, dir, 70f); }
             if (buffer3.Count > 0) { frenzyStacks = Mathf.Min(10, frenzyStacks + 1); frenzyTimer = 2.5f; }
             FxParticles.Sparks(c + dir * range * 0.6f + Vector2.up * 0.3f, new Color(1f, 0.35f, 0.25f), 8 + frenzyStacks, 5f, 0.17f, 0.25f, dir, 90f, 0.5f);
             if (frenzyStacks >= 6) FxParticles.Motes(c, new Color(1f, 0.3f, 0.2f), 2, 0.4f, 0.15f, 0.5f);
@@ -311,11 +320,11 @@ public partial class Weapon
                 }
                 yield return null;
             }
-            foreach (var e in targets) if (e != null && e.isActiveAndEnabled) e.TakeDamage(Damage * 0.5f, Vector2.zero, 0f);
+            foreach (var e in targets) if (e != null && e.isActiveAndEnabled) Hit(e, Damage * 0.5f, Vector2.zero, 0f);
             float r = 2.0f * Area;
             Run.Fx(Art.crater, c, Color.white, 0.9f, -10).Scale(r * 1.2f, r * 1.8f).FadeFrom(0.5f);
             Enemy.CollectInRadius(c, r, buffer3);
-            foreach (var e in buffer3) e.TakeDamage(Damage * 1.6f, ((Vector2)e.transform.position - c).normalized, 5f);
+            foreach (var e in buffer3) Hit(e, Damage * 1.6f, ((Vector2)e.transform.position - c).normalized, 5f);
             FxParticles.Glow(c, new Color(1f, 0.55f, 0.25f, 0.7f), r * 2.4f, 0.35f, -9);
             FxParticles.Debris(c, new Color(0.45f, 0.38f, 0.32f), 18, 6f, 0.15f, 0.5f);
             FxParticles.Smoke(c, new Color(0.5f, 0.45f, 0.4f, 0.55f), 8, r * 0.6f, 1.2f, 0.8f, 2f);
@@ -341,7 +350,7 @@ public partial class Weapon
             {
                 if (e == null || !e.isActiveAndEnabled) continue;
                 if (!e.IsBoss && e.HealthFraction <= exec) { Execute(e); continue; }
-                bool killed = e.TakeDamage(Damage, dir, Def.knockback);
+                bool killed = Hit(e, Damage, dir, Def.knockback);
                 if (!killed && !e.IsBoss && e.HealthFraction <= exec) Execute(e);
                 else FxParticles.Sparks(e.transform.position, new Color(1f, 0.85f, 0.7f), 3, 3f, 0.14f, 0.2f, dir, 80f);
             }
@@ -394,7 +403,7 @@ public partial class Weapon
                 fx.End();
                 float boom = Awakened ? 1.5f * Area : 0f;
                 if (boom > 0f) { Enemy.CollectInRadius(p, boom, buffer3); Run.Fx(Art.fireBurst, p, Color.white, 0.3f, 16).Scale(0.4f, Fit(Art.fireBurst, boom * 2f)).FadeFrom(0.4f); }
-                foreach (var e in buffer3) { e.Slow(1.6f, 0.05f); e.TakeDamage(Damage, Vector2.zero, 0f); FxParticles.Debris(e.transform.position, new Color(0.7f, 0.08f, 0.1f), 4, 2.5f, 0.1f, 0.4f); }
+                foreach (var e in buffer3) { e.Slow(1.6f, 0.05f); Hit(e, Damage, Vector2.zero, 0f); FxParticles.Debris(e.transform.position, new Color(0.7f, 0.08f, 0.1f), 4, 2.5f, 0.1f, 0.4f); }
                 FxParticles.Sparks(p, new Color(1f, 0.9f, 0.6f), 10, 4f, 0.15f, 0.25f);
                 if (boom > 0f) { FxParticles.Glow(p, new Color(1f, 0.6f, 0.25f), boom * 2f, 0.3f); FxParticles.Smoke(p, new Color(0.35f, 0.3f, 0.3f, 0.6f), 6, 0.6f, 1f, 0.7f, 1.5f); }
                 Run.SpawnVfx(p, 0.8f, new Color(0.8f, 0.8f, 0.85f), 0.2f);
@@ -424,7 +433,7 @@ public partial class Weapon
         FxParticles.Glow(to, new Color(0.5f, 0.85f, 1f, 0.8f), 2f, 0.3f);
         FxParticles.Sparks(to, new Color(0.6f, 0.9f, 1f), 12, 4f, 0.18f, 0.35f);
         Enemy.CollectInRadius(to, 1.0f * Area, buffer3);
-        foreach (var e in buffer3) e.TakeDamage(Damage * 0.8f, (to - from).normalized, 3f);
+        foreach (var e in buffer3) Hit(e, Damage * 0.8f, (to - from).normalized, 3f);
         Run.SpawnVfx(to, 1f, new Color(0.5f, 0.8f, 1f), 0.25f);
     }
 
@@ -536,7 +545,7 @@ public partial class Weapon
             Run.Fx(spr, p + Vector2.up * 0.3f, Color.white, 0.25f, 17).Scale(Fit(spr, 0.6f), Fit(spr, 1.3f)).Spin(200f).FadeFrom(0.45f);
             if (Awakened && castCounter % 5 == 0 && !e.IsBoss) { Execute(e); continue; }
             bool crit = Random.value < 0.25f;
-            e.TakeDamage(crit ? Damage * 2f : Damage, (p - c).normalized, Def.knockback);
+            Hit(e, crit ? Damage * 2f : Damage, (p - c).normalized, Def.knockback);
             FxParticles.Sparks(p + Vector2.up * 0.3f, crit ? new Color(1f, 0.85f, 0.4f) : new Color(0.75f, 0.45f, 1f), crit ? 14 : 7, crit ? 5f : 3.5f, 0.18f, 0.3f);
         }
     }
@@ -576,7 +585,7 @@ public partial class Weapon
         Enemy.Decoys.Remove(p);
         float r = 2.2f * Area;
         Enemy.CollectInRadius(p, r, buffer3);
-        foreach (var e in buffer3) e.TakeDamage(Damage, ((Vector2)e.transform.position - p).normalized, 6f);
+        foreach (var e in buffer3) Hit(e, Damage, ((Vector2)e.transform.position - p).normalized, 6f);
         Run.Fx(Art.starBurst, p, new Color(0.8f, 0.6f, 1f), 0.4f, 16).Scale(0.4f, Fit(Art.starBurst, r * 2f)).FadeFrom(0.35f);
         FxParticles.Glow(p, new Color(0.8f, 0.5f, 1f), r * 2.2f, 0.35f);
         FxParticles.Sparks(p, new Color(0.85f, 0.6f, 1f), 24, 7f, 0.2f, 0.45f);
@@ -600,7 +609,7 @@ public partial class Weapon
             FxParticles.Debris(c + Vector2.up * 0.3f + d * r * 0.85f, new Color(0.65f, 0.05f, 0.08f), 1, 3f, 0.12f, 0.45f, d, 40f);
         }
         float dealt = 0f;
-        foreach (var e in buffer3) { e.TakeDamage(Damage, ((Vector2)e.transform.position - c).normalized, Def.knockback); dealt += Damage; FxParticles.Debris(e.transform.position, new Color(0.7f, 0.05f, 0.08f), 3, 2.5f, 0.1f, 0.4f); }
+        foreach (var e in buffer3) { Hit(e, Damage, ((Vector2)e.transform.position - c).normalized, Def.knockback); dealt += Damage; FxParticles.Debris(e.transform.position, new Color(0.7f, 0.05f, 0.08f), 3, 2.5f, 0.1f, 0.4f); }
         Heal(dealt * 0.02f);
         if (dealt > 0f) FxParticles.Line((Vector2)transform.position + Vector2.up * 0.4f, (Vector2)transform.position + Vector2.up * 1.1f, new Color(1f, 0.25f, 0.3f), 6f, 0.14f, 0.8f, 0.5f);
         if (Awakened)
@@ -619,7 +628,7 @@ public partial class Weapon
         var fx = Run.Fx(spr, from, Color.white, 0.3f, 18).Move(to).Scale(Fit(spr, 0.6f), Fit(spr, 0.7f)).FadeFrom(0.9f);
         if (to.x < from.x) fx.sr.flipX = true;
         yield return new WaitForSeconds(0.3f);
-        if (target != null && target.isActiveAndEnabled) { target.TakeDamage(Damage * 0.6f, Vector2.zero, 0f); stats.Heal(0.15f); FxParticles.Debris(to, new Color(0.7f, 0.05f, 0.08f), 5, 3f, 0.1f, 0.4f); FxParticles.Sparks(to, new Color(1f, 0.3f, 0.3f), 5, 3f, 0.14f, 0.25f); }
+        if (target != null && target.isActiveAndEnabled) { Hit(target, Damage * 0.6f, Vector2.zero, 0f); stats.Heal(0.15f); FxParticles.Debris(to, new Color(0.7f, 0.05f, 0.08f), 5, 3f, 0.1f, 0.4f); FxParticles.Sparks(to, new Color(1f, 0.3f, 0.3f), 5, 3f, 0.14f, 0.25f); }
     }
 
     // ---------------------------------------------------------------- Wind: Fan of Knives / Tempest Blade
@@ -652,7 +661,7 @@ public partial class Weapon
         var spr = Main != null ? Main : Art.waveRing;
         Run.Fx(spr, c + Vector2.up * 0.2f, Color.white, 0.5f, -8).Scale(Fit(spr, 0.6f), Fit(spr, r * 2.1f)).FadeFrom(0.4f);
         Enemy.CollectInRadius(c, r, buffer3);
-        foreach (var e in buffer3) { e.TakeDamage(Damage, ((Vector2)e.transform.position - c).normalized, Def.knockback); FxParticles.Sparks(e.transform.position, new Color(1f, 0.9f, 0.5f), 3, 2.5f, 0.15f, 0.3f); }
+        foreach (var e in buffer3) { Hit(e, Damage, ((Vector2)e.transform.position - c).normalized, Def.knockback); FxParticles.Sparks(e.transform.position, new Color(1f, 0.9f, 0.5f), 3, 2.5f, 0.15f, 0.3f); }
         stats.Heal(Awakened ? 1.2f : 0.6f);
         FxParticles.Glow(c, new Color(1f, 0.85f, 0.4f, 0.6f), r * 2.4f, 0.45f, -9);
         FxParticles.Motes(c, new Color(1f, 0.92f, 0.55f), 14, r * 0.8f, 0.17f, 0.9f);
@@ -669,7 +678,7 @@ public partial class Weapon
         Run.Fx(Main != null ? Main : Art.waveRing, c + Vector2.up * 0.2f, new Color(1f, 0.9f, 0.5f, 0.35f), 0.4f, -9)
            .Scale(Fit(Main != null ? Main : Art.waveRing, r * 2f), Fit(Main != null ? Main : Art.waveRing, r * 2.05f)).Spin(40f);
         Enemy.CollectInRadius(c, r, buffer3);
-        foreach (var e in buffer3) { e.TakeDamage(Damage * 0.35f, Vector2.zero, 0f); FxParticles.Motes(e.transform.position, new Color(1f, 0.7f, 0.3f), 1, 0.2f, 0.14f, 0.5f); }
+        foreach (var e in buffer3) { Hit(e, Damage * 0.35f, Vector2.zero, 0f); FxParticles.Motes(e.transform.position, new Color(1f, 0.7f, 0.3f), 1, 0.2f, 0.14f, 0.5f); }
         FxParticles.Motes(c, new Color(1f, 0.9f, 0.55f), 3, r * 0.9f, 0.14f, 0.7f);
     }
 
@@ -684,7 +693,7 @@ public partial class Weapon
         else CollectCone(c, dir, range, 120f, buffer3);
         foreach (var e in buffer3)
         {
-            e.TakeDamage(Damage, ((Vector2)e.transform.position - c).normalized, 9f);
+            Hit(e, Damage, ((Vector2)e.transform.position - c).normalized, 9f);
             e.Slow(1f, 0.1f);
             FxParticles.Sparks(e.transform.position + Vector3.up * 0.3f, new Color(1f, 0.95f, 0.6f), 5, 4f, 0.15f, 0.25f, ((Vector2)e.transform.position - c).normalized, 80f);
         }
@@ -707,7 +716,7 @@ public partial class Weapon
         if (contactTick > 0f) return;
         contactTick = 0.3f;
         Enemy.CollectInRadius(transform.position, 0.95f, buffer3);
-        foreach (var e in buffer3) { e.TakeDamage(Damage * 0.4f, ((Vector2)e.transform.position - (Vector2)transform.position).normalized, 4f); FxParticles.Sparks(e.transform.position, new Color(0.6f, 0.8f, 1f), 3, 3f, 0.13f, 0.2f); }
+        foreach (var e in buffer3) { Hit(e, Damage * 0.4f, ((Vector2)e.transform.position - (Vector2)transform.position).normalized, 4f); FxParticles.Sparks(e.transform.position, new Color(0.6f, 0.8f, 1f), 3, 3f, 0.13f, 0.2f); }
     }
 
     // ---------------------------------------------------------------- Thorns: Bramble Armor / Ironwood
@@ -722,7 +731,7 @@ public partial class Weapon
         {
             auraTick = 0.5f;
             Enemy.CollectInRadius(c, r, buffer3);
-            foreach (var e in buffer3) { e.TakeDamage(Damage, ((Vector2)e.transform.position - c).normalized, 1f); FxParticles.Debris(e.transform.position, new Color(0.4f, 0.6f, 0.25f), 2, 2f, 0.1f, 0.35f); }
+            foreach (var e in buffer3) { Hit(e, Damage, ((Vector2)e.transform.position - c).normalized, 1f); FxParticles.Debris(e.transform.position, new Color(0.4f, 0.6f, 0.25f), 2, 2f, 0.1f, 0.35f); }
             var spr = Main != null ? Main : Art.waveRing;
             Run.Fx(spr, c + Vector2.up * 0.15f, new Color(1f, 1f, 1f, 0.8f), 0.5f, -9).Scale(Fit(spr, r * 2f), Fit(spr, r * 2.1f)).Spin(30f).FadeFrom(0.7f);
         }
@@ -734,7 +743,7 @@ public partial class Weapon
             thornsReady = 0.5f;
             float br = 3f * Area;
             Enemy.CollectInRadius(c, br, buffer3);
-            foreach (var e in buffer3) e.TakeDamage(Damage * 3f, ((Vector2)e.transform.position - c).normalized, 4f);
+            foreach (var e in buffer3) Hit(e, Damage * 3f, ((Vector2)e.transform.position - c).normalized, 4f);
             FxParticles.Debris(c, new Color(0.35f, 0.55f, 0.2f), 22, 7f, 0.15f, 0.55f);
             FxParticles.Debris(c, new Color(0.45f, 0.32f, 0.18f), 12, 6f, 0.11f, 0.5f);
             FxParticles.Glow(c, new Color(0.6f, 1f, 0.35f, 0.5f), br * 2f, 0.3f, -9);
@@ -754,7 +763,7 @@ public partial class Weapon
             Vector2 p = list[k].transform.position; list.RemoveAt(k);
             Run.Fx(Art.iceSpikes, p + Vector2.up * 0.25f, new Color(0.55f, 0.75f, 0.35f), 0.8f, 11).Scale(0.15f, Fit(Art.iceSpikes, 1.1f)).FadeFrom(0.65f);
             Enemy.CollectInRadius(p, 0.8f * Area, buffer3);
-            foreach (var e in buffer3) { e.TakeDamage(Damage * 2f, Vector2.up, 0f); e.Slow(1.2f, 0.1f); }
+            foreach (var e in buffer3) { Hit(e, Damage * 2f, Vector2.up, 0f); e.Slow(1.2f, 0.1f); }
             FxParticles.Debris(p, new Color(0.45f, 0.32f, 0.18f), 8, 4f, 0.13f, 0.5f, Vector2.up, 120f);
             FxParticles.Debris(p, new Color(0.35f, 0.6f, 0.2f), 5, 3f, 0.12f, 0.6f, Vector2.up, 160f);
         }
@@ -776,13 +785,13 @@ public partial class Weapon
             t += Time.deltaTime; trail -= Time.deltaTime;
             Vector2 c = transform.position;
             Enemy.CollectInRadius(c, 1.1f * Area, buffer3);
-            foreach (var e in buffer3) if (hitOnce.Add(e)) killed |= e.TakeDamage(Damage, dir, 8f);
+            foreach (var e in buffer3) if (hitOnce.Add(e)) killed |= Hit(e, Damage, dir, 8f);
             if (Awakened && trail <= 0f)
             {
                 trail = 0.06f;
                 Run.Fx(Art.crater, c, Color.white, 0.6f, -10).Scale(0.6f, Fit(Art.crater, 1.8f * Area)).FadeFrom(0.4f);
                 Enemy.CollectInRadius(c, 1.4f * Area, buffer3);
-                foreach (var e in buffer3) killed |= e.TakeDamage(Damage * 0.5f, Vector2.zero, 0f);
+                foreach (var e in buffer3) killed |= Hit(e, Damage * 0.5f, Vector2.zero, 0f);
             }
             Run.Fx(Player.HeroSprite != null ? Player.HeroSprite : Art.ghostDagger, c + Vector2.up * 0.1f, new Color(0.5f, 0.7f, 1f, 0.45f), 0.25f, 8).Additive();
             FxParticles.Smoke(c, new Color(0.55f, 0.5f, 0.45f, 0.5f), 1, 0.3f, 0.8f, 0.6f, 0.8f);
@@ -792,7 +801,7 @@ public partial class Weapon
         Vector2 end = transform.position;
         float r = 1.8f * Area;
         Enemy.CollectInRadius(end, r, buffer3);
-        foreach (var e in buffer3) killed |= e.TakeDamage(Damage * 0.8f, ((Vector2)e.transform.position - end).normalized, 6f);
+        foreach (var e in buffer3) killed |= Hit(e, Damage * 0.8f, ((Vector2)e.transform.position - end).normalized, 6f);
         var spr = Main != null ? Main : Art.waveRing;
         Run.Fx(spr, end, Color.white, 0.35f, -8).Scale(0.4f, Fit(spr, r * 2f)).FadeFrom(0.4f);
         FxParticles.Glow(end, new Color(0.45f, 0.65f, 1f, 0.7f), r * 2.2f, 0.3f, -9);
@@ -829,7 +838,7 @@ public partial class Weapon
             {
                 e.Curse(3f);
                 FxParticles.Motes(e.transform.position, new Color(0.65f, 0.3f, 0.95f), 2, 0.2f, 0.13f, 0.6f);
-                if (e.TakeDamage(Damage, ((Vector2)e.transform.position - c).normalized, Def.knockback) && Awakened && heals < 3) { heals++; stats.Heal(0.5f); }
+                if (Hit(e, Damage, ((Vector2)e.transform.position - c).normalized, Def.knockback) && Awakened && heals < 3) { heals++; stats.Heal(0.5f); }
             }
             yield return new WaitForSeconds(0.3f);
         }

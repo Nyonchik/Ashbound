@@ -33,6 +33,51 @@ public class HUD : MonoBehaviour
     float runTime;
     public float RunTime => runTime;
 
+    // kill streak counter (built in code under the HUD canvas)
+    TextMeshProUGUI streakText, streakLabel;
+    float streakPulse;
+
+    void BuildStreak()
+    {
+        var parent = killsText != null ? killsText.canvas.transform : transform;
+        var root = new GameObject("KillStreak", typeof(RectTransform)).GetComponent<RectTransform>();
+        root.SetParent(parent, false);
+        root.anchorMin = root.anchorMax = root.pivot = new Vector2(1f, 1f);
+        root.anchoredPosition = new Vector2(-64f, -230f); root.sizeDelta = new Vector2(320f, 110f);
+        streakText = MakeText(root, "Count", 64f, new Vector2(0, 0), TextAlignmentOptions.TopRight);
+        streakLabel = MakeText(root, "Label", 22f, new Vector2(0, -70f), TextAlignmentOptions.TopRight);
+        streakLabel.text = "KILL STREAK"; streakLabel.characterSpacing = 6;
+        root.gameObject.SetActive(false);
+    }
+
+    TextMeshProUGUI MakeText(RectTransform parent, string name, float size, Vector2 pos, TextAlignmentOptions align)
+    {
+        var t = new GameObject(name, typeof(RectTransform), typeof(TextMeshProUGUI)).GetComponent<TextMeshProUGUI>();
+        t.rectTransform.SetParent(parent, false);
+        t.rectTransform.anchorMin = t.rectTransform.anchorMax = t.rectTransform.pivot = new Vector2(1f, 1f);
+        t.rectTransform.anchoredPosition = pos; t.rectTransform.sizeDelta = new Vector2(320f, size * 1.2f);
+        t.font = killsText != null ? killsText.font : null; t.fontSize = size; t.alignment = align; t.raycastTarget = false;
+        t.color = Palette.Gold; t.outlineWidth = 0.22f; t.outlineColor = Palette.Outline;
+        return t;
+    }
+
+    public void SetStreak(int n)
+    {
+        if (streakText == null) return;
+        var root = streakText.rectTransform.parent.gameObject;
+        if (n <= 0) { root.SetActive(false); return; }
+        root.SetActive(true);
+        streakText.text = $"x{n:N0}";
+        streakText.color = n >= 500 ? new Color(1f, 0.35f, 0.3f) : n >= 100 ? new Color(1f, 0.6f, 0.25f) : Palette.Gold;
+        streakPulse = 1f;
+    }
+
+    public void StreakMilestone(int m, int bonusGold)
+    {
+        ShowTip($"{m} kill streak!  +{bonusGold} gold");
+        streakPulse = 2.2f;
+    }
+
     void Awake()
     {
         var cls = RunSelection.Class;
@@ -49,6 +94,7 @@ public class HUD : MonoBehaviour
         if (tipBanner) tipBanner.gameObject.SetActive(false);
         if (chestPopup) chestPopup.gameObject.SetActive(false);
         if (hurtVignette) hurtVignette.color = new Color(1f, 1f, 1f, 0f);
+        BuildStreak();
         SetXP(0, 100, 1);
         if (speedButton != null)
         {
@@ -65,6 +111,11 @@ public class HUD : MonoBehaviour
         int m = (int)(runTime / 60), s = (int)(runTime % 60);
         timerText.text = $"{m:00}:{s:00}";
         UpdateVignette();
+        if (streakText != null && streakPulse > 0f)
+        {
+            streakPulse = Mathf.Max(0f, streakPulse - Time.unscaledDeltaTime * 6f);
+            streakText.rectTransform.localScale = Vector3.one * (1f + 0.12f * Mathf.Min(streakPulse, 1.5f));
+        }
     }
 
     // ---------------- hit feedback: red screen edge on hits, pulsing + heartbeat at low HP

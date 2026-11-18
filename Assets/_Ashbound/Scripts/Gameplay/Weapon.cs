@@ -46,9 +46,13 @@ public partial class Weapon : MonoBehaviour
     Sprite ProjArt => Awakened && Def.awakenProjectile != null ? Def.awakenProjectile : Def.projectile;
     Color AwakeTint => Awakened ? Color.Lerp(Def.color, Palette.Gold, 0.45f) : Def.color;
 
+    /// <summary>Damage dealt this run (run summary) and when the weapon was picked up.</summary>
+    public float TotalDamage, AddedAt;
+
     public void Setup(WeaponDef def, PlayerStats owner, bool isPath)
     {
         Def = def; stats = owner; IsPath = isPath; Level = 1;
+        AddedAt = RunManager.Instance != null ? RunManager.Instance.RunTime : 0f;
         timer = 0.4f;
         Refresh();
     }
@@ -161,7 +165,7 @@ public partial class Weapon : MonoBehaviour
     void HitAll(Vector2 c, float r, float dmg, float knock, List<Enemy> list)
     {
         Enemy.CollectInRadius(c, r, list);
-        foreach (var e in list) e.TakeDamage(dmg, ((Vector2)e.transform.position - c).normalized, knock);
+        foreach (var e in list) Hit(e, dmg, ((Vector2)e.transform.position - c).normalized, knock);
     }
 
     static Enemy NearestExcluding(Vector2 p, float maxDist, HashSet<Enemy> exclude)
@@ -239,7 +243,7 @@ public partial class Weapon : MonoBehaviour
         Enemy.CollectInRadius(c, r, buffer);
         foreach (var e in buffer)
         {
-            e.TakeDamage(Damage, ((Vector2)e.transform.position - c).normalized, Def.knockback);
+            Hit(e, Damage, ((Vector2)e.transform.position - c).normalized, Def.knockback);
             if (slowSeconds > 0f) e.Slow(slowSeconds, slowMul);
         }
         if (Def.effect != null) Run.Fx(Def.effect, c, new Color(1f, 1f, 1f, 0.8f), 0.45f, -9).Scale(Mathf.Min(r * 0.6f, 2f), Mathf.Min(r * 2f, 6f)).FadeFrom(0.35f);
@@ -272,7 +276,7 @@ public partial class Weapon : MonoBehaviour
                 Vector2 to = (Vector2)cur.transform.position + Vector2.up * (cur.Radius * 1.2f);
                 Bolt(from, to, col, width);
                 Run.SpawnVfx(to, 0.4f, col, 0.15f);
-                cur.TakeDamage(dmg, (to - from).normalized, Def.knockback);
+                Hit(cur, dmg, (to - from).normalized, Def.knockback);
                 from = to;
                 dmg *= 0.8f;
                 cur = NearestExcluding(from, range, chainHit);
@@ -389,7 +393,7 @@ public partial class Weapon : MonoBehaviour
         Enemy.CollectInRadius(c, r, buffer);
         foreach (var e in buffer)
         {
-            e.TakeDamage(Damage, ((Vector2)e.transform.position - c).normalized, Def.knockback);
+            Hit(e, Damage, ((Vector2)e.transform.position - c).normalized, Def.knockback);
             e.Slow(2.2f, 0.25f);
         }
     }
@@ -466,7 +470,7 @@ public partial class Weapon : MonoBehaviour
             {
                 if (orbHitTimes.TryGetValue(e, out float next) && now < next) continue;
                 orbHitTimes[e] = now + 0.35f;
-                e.TakeDamage(Damage, ((Vector2)e.transform.position - (Vector2)transform.position).normalized, Def.knockback);
+                Hit(e, Damage, ((Vector2)e.transform.position - (Vector2)transform.position).normalized, Def.knockback);
             }
         }
         if (orbHitTimes.Count > 600) orbHitTimes.Clear();
@@ -511,12 +515,12 @@ public partial class Weapon : MonoBehaviour
             foreach (var e in buffer)
             {
                 Vector2 p = e.transform.position;
-                e.TakeDamage(Damage, (p - c).normalized, Def.knockback);
+                Hit(e, Damage, (p - c).normalized, Def.knockback);
                 if (strikes < (Awakened ? 6 : 3) && e.isActiveAndEnabled)
                 {
                     strikes++;
                     Bolt(p + new Vector2(Random.Range(-0.5f, 0.5f), 6f), p, new Color(0.6f, 0.95f, 1f), 0.7f, 0.2f);
-                    e.TakeDamage(Damage * 0.5f, Vector2.zero, 0f);
+                    Hit(e, Damage * 0.5f, Vector2.zero, 0f);
                 }
             }
             if (Explodes && buffer.Count > 0 && buffer[0] != null) Explode(buffer[0].transform.position, Damage * 0.5f);

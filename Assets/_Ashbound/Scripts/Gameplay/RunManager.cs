@@ -170,7 +170,7 @@ public class RunManager : MonoBehaviour
             hud.SetLowHealth(h > 0f && h / m < 0.3f);
             lastHealth = h;
         };
-        stats.OnDied += () => EndRun(false);
+        stats.OnDied += () => StartCoroutine(DeathMoment());
         hud.SetHealth(Mathf.CeilToInt(stats.Health), Mathf.CeilToInt(stats.MaxHealth));
 
         xpNeeded = XpFor(level);
@@ -211,8 +211,10 @@ public class RunManager : MonoBehaviour
 
         spawner.Init(this);
         RefreshLoadout();
-        AudioManager.PlayMusic("music_run");
+        AudioManager.PlayMusic(StageMusic);
     }
+
+    static string StageMusic => RunSelection.Stage == null ? "music_stage_ashen" : RunSelection.Stage.order switch { 1 => "music_stage_forest", 2 => "music_stage_capital", _ => "music_stage_ashen" };
 
     void Update()
     {
@@ -228,8 +230,11 @@ public class RunManager : MonoBehaviour
         else hud.HideBossWarning();
 
         UpdateBosses();
+        if (streakTimer > 0f) { streakTimer -= Time.deltaTime; if (streakTimer <= 0f) { streak = 0; hud.SetStreak(0); } }
+        // music: boss theme while a boss is alive
+        AudioManager.PlayMusic(BossFight ? "music_boss" : StageMusic);
         if (RunTime > 40f) ShowTip("pause", "Press Esc or the pause button to see your whole build.");
-        if (RunTime >= runLength && spawner.AllBossesSpawned && bossesAlive <= 0) EndRun(true);
+        if (RunTime >= runLength && spawner.AllBossesSpawned && bossesAlive <= 0 && !ending) StartCoroutine(VictoryMoment());
     }
 
     // ---------------- events from gameplay
@@ -286,6 +291,7 @@ public class RunManager : MonoBehaviour
     /// <summary>Golden elite: glow, a tip the first time.</summary>
     public void OnEliteSpawned(Enemy e)
     {
+        AudioManager.Play("elite", 0.7f);
         EliteAura.Attach(e, glowSprite, FxParticles.AdditiveSprite);
         ShowTip("elite", "A golden elite appeared! Much tougher than normal Hollow, but it drops a big XP gem and gold.");
     }
@@ -294,6 +300,7 @@ public class RunManager : MonoBehaviour
     {
         Vector2 position = e.transform.position;
         kills++;
+        CountStreak();
         hud.SetKills(kills);
         AudioManager.Play("death", 0.35f, 0.9f + Random.value * 0.25f, 0.05f);
         if (e.Body != null)
@@ -312,6 +319,7 @@ public class RunManager : MonoBehaviour
             FxParticles.Sparks(position, new Color(1f, 0.85f, 0.35f), 24, 6f, 0.22f, 0.5f);
             FxParticles.Glow(position, new Color(1f, 0.8f, 0.3f), 2.5f, 0.35f);
             CameraFollow.Shake(0.1f, 0.15f);
+            HitStop(0.06f);
         }
 
         if (e.IsBoss)
@@ -319,6 +327,10 @@ public class RunManager : MonoBehaviour
             bossesAlive--; bossesKilled++;
             gold += 50; hud.SetGold(gold);
             CameraFollow.Shake(0.4f, 0.5f);
+            HitStop(0.22f);
+            FxParticles.Glow(position, new Color(1f, 0.75f, 0.35f), 7f, 0.6f, -9);
+            FxParticles.Sparks(position, new Color(1f, 0.8f, 0.4f), 60, 9f, 0.25f, 0.7f);
+            FxParticles.Debris(position, new Color(0.35f, 0.32f, 0.3f), 30, 7f, 0.18f, 0.7f);
             SpawnPickup(PickupKind.Chest, position + Vector2.left * 0.8f);
             SpawnPickup(PickupKind.Meat, position + Vector2.right * 0.8f);
             return;
@@ -431,6 +443,7 @@ public class RunManager : MonoBehaviour
             level++;
             xpNeeded = XpFor(level);
             pendingLevelUps++;
+            LevelBurst();
         }
         hud.SetXP(xp, xpNeeded, level);
         if (pendingLevelUps > 0 && !levelUp.IsOpen) { pendingLevelUps--; OfferLevelUp(); }
@@ -498,6 +511,66 @@ public class RunManager : MonoBehaviour
 
     // ---------------- end of run, rewards and unlocks
 
+    bool ending;
+
+    // slow-motion fall before the game-over screen
+    System.Collections.IEnumerator DeathMoment()
+    {
+        if (ending || IsOver) yield break;
+        ending = true;
+        Vector2 p = player.transform.position;
+        AudioManager.Play("death", 1f, 0.6f);
+        CameraFollow.Shake(0.35f, 0.4f);
+        FxParticles.Glow(p, new Color(1f, 0.2f, 0.15f, 0.9f), 4f, 1.2f, 20);
+        FxParticles.Debris(p, new Color(0.6f, 0.05f, 0.08f), 30, 5f, 0.16f, 0.9f);
+        FxParticles.Smoke(p, new Color(0.15f, 0.12f, 0.14f, 0.7f), 12, 0.5f, 1.4f, 1.2f, 2f);
+        Time.timeScale = 0.2f;
+        yield return new WaitForSecondsRealtime(1.3f);
+        EndRun(false);
+    }
+
+    // a short celebration before the victory screen
+    System.Collections.IEnumerator VictoryMoment()
+    {
+        ending = true;
+        Vector2 p = player.transform.position;
+        AudioManager.Play("victory", 0.9f);
+        foreach (var e in new List<Enemy>(Enemy.Active)) if (!e.IsBoss) e.Kill();
+        for (int i = 0; i < 6; i++)
+        {
+            FxParticles.Sparks(p + Random.insideUnitCircle * 3f, Color.HSVToRGB(Random.value, 0.5f, 1f), 24, 7f, 0.22f, 0.8f);
+            FxParticles.Glow(p, new Color(1f, 0.85f, 0.4f, 0.6f), 6f, 0.5f, -9);
+            yield return new WaitForSecondsRealtime(0.2f);
+        }
+        EndRun(true);
+    }
+
+    /// <summary>Damage per skill, best streak and the hero's gear, for the end screen.</summary>
+    string Breakdown()
+    {
+        var all = new List<Weapon>(weapons);
+        all.Sort((a, b) => b.TotalDamage.CompareTo(a.TotalDamage));
+        float total = 0f; foreach (var w in all) total += w.TotalDamage;
+        var sb = new System.Text.StringBuilder();
+        sb.Append("<b>DAMAGE</b>\n");
+        foreach (var w in all)
+        {
+            if (w.TotalDamage < 1f) continue;
+            float secs = Mathf.Max(1f, RunTime - w.AddedAt);
+            string col = ColorUtility.ToHtmlStringRGB(Color.Lerp(w.Def.color, Color.white, 0.35f));
+            sb.Append($"<color=#{col}>{w.DisplayName}</color>  {w.TotalDamage:N0}  <color=#B9B1C2>{(total > 0 ? w.TotalDamage / total * 100f : 0):0}%  ·  {w.TotalDamage / secs:N0}/s</color>\n");
+        }
+        sb.Append($"\nBest kill streak: <b>{bestStreak:N0}</b>");
+        var cls = RunSelection.Class;
+        if (cls != null)
+        {
+            var worn = new List<string>();
+            foreach (var g in SaveSystem.Data.gear) if (g.equippedBy == cls.className) { var d = Gear.Get(g.id); if (d != null) worn.Add($"<color=#{ColorUtility.ToHtmlStringRGB(Gear.RarityColors[g.rarity])}>{d.name}</color>"); }
+            if (worn.Count > 0) sb.Append("\nGear: " + string.Join(", ", worn));
+        }
+        return sb.ToString();
+    }
+
     void EndRun(bool won)
     {
         if (IsOver) return;
@@ -549,7 +622,7 @@ public class RunManager : MonoBehaviour
 
         SaveSystem.Save();
         AudioManager.Play(won ? "victory" : "gameover", 0.9f);
-        gameOver.Show(won, RunTime, level, kills, gold, string.Join("\n", notes));
+        gameOver.Show(won, RunTime, level, kills, gold, string.Join("\n", notes), Breakdown());
     }
 
     void UnlockClass(string className, bool condition, List<string> notes)
@@ -759,13 +832,75 @@ public class RunManager : MonoBehaviour
         vfx.Get().Play(position, radius, color, seconds, v => vfx.Release(v));
     }
 
-    public void ShowDamage(Vector3 position, float amount, bool big)
+    public static readonly Color CritColor = new(1f, 0.32f, 0.28f);
+
+    public void ShowDamage(Vector3 position, float amount, bool big, bool crit = false)
     {
+        if (crit) AudioManager.Play("crit", 0.35f, 0.9f + Random.value * 0.3f, 0.06f);
         if (damageNumberPrefab == null || activeNumbers > 90 || amount < 1f || !SaveSystem.Data.showDamageNumbers) return;
         activeNumbers++;
-        var color = big ? Palette.Gold : amount >= 30f ? new Color(1f, 0.6f, 0.25f) : Color.white;
-        numbers.Get().Play(position, Mathf.RoundToInt(amount), color, big || amount >= 30f ? 4.2f : 3.2f, n => { activeNumbers--; numbers.Release(n); });
+        var color = crit ? CritColor : big ? Palette.Gold : amount >= 30f ? new Color(1f, 0.6f, 0.25f) : Color.white;
+        float size = crit ? 4.8f : big || amount >= 30f ? 4.2f : 3.2f;
+        numbers.Get().Play(position, Mathf.RoundToInt(amount), color, size, n => { activeNumbers--; numbers.Release(n); });
     }
+
+    // ---------------- juice: hit-stop, kill streak, level-up burst
+
+    Coroutine hitStop;
+    /// <summary>Freeze the game for a split second so big moments land.</summary>
+    public void HitStop(float realSeconds)
+    {
+        if (IsOver || Time.timeScale <= 0.001f || hitStop != null) return;
+        hitStop = StartCoroutine(HitStopRoutine(realSeconds));
+    }
+
+    System.Collections.IEnumerator HitStopRoutine(float s)
+    {
+        const float slow = 0.04f;
+        Time.timeScale = slow;
+        yield return new WaitForSecondsRealtime(s);
+        if (Mathf.Approximately(Time.timeScale, slow)) GameSpeed.Resume();
+        hitStop = null;
+    }
+
+    int streak, bestStreak;
+    float streakTimer;
+    static readonly int[] StreakMilestones = { 100, 250, 500, 1000, 2000 };
+
+    void CountStreak()
+    {
+        streak++; streakTimer = 2.5f;
+        if (streak > bestStreak) bestStreak = streak;
+        if (streak >= 25) hud.SetStreak(streak);
+        foreach (var m in StreakMilestones)
+            if (streak == m)
+            {
+                int bonus = m / 25;
+                gold += bonus; hud.SetGold(gold);
+                AudioManager.Play("streak", 0.8f);
+                Vector2 p = player.transform.position;
+                FxParticles.Sparks(p + Vector2.up * 0.5f, new Color(1f, 0.85f, 0.35f), 26, 6f, 0.2f, 0.5f);
+                hud.StreakMilestone(m, bonus);
+            }
+    }
+
+    void LevelBurst()
+    {
+        Vector2 p = player.transform.position;
+        AudioManager.Play("burst", 0.6f);
+        FxParticles.Glow(p, new Color(0.4f, 0.8f, 1f, 0.8f), 4f, 0.45f, -9);
+        FxParticles.Sparks(p + Vector2.up * 0.4f, new Color(0.5f, 0.85f, 1f), 30, 6f, 0.2f, 0.5f);
+        FxParticles.Motes(p, new Color(0.7f, 0.95f, 1f), 12, 0.6f, 0.16f, 0.9f);
+        if (Art.waveRing != null)
+        {
+            float w = Art.waveRing.bounds.size.x;
+            Fx(Art.waveRing, p, new Color(0.6f, 0.9f, 1f, 0.8f), 0.45f, -8).Scale(0.4f / w, 5f / w).FadeFrom(0.3f);
+        }
+        // a gentle push so you get a breath while choosing
+        Enemy.CollectInRadius(p, 2.6f, burstBuffer);
+        foreach (var e in burstBuffer) if (!e.IsBoss) e.Pull(((Vector2)e.transform.position - p).normalized * 10f);
+    }
+    static readonly List<Enemy> burstBuffer = new();
 
     public SpriteRenderer CreateOrb(Transform parent, Color color, Sprite art = null)
     {
