@@ -19,7 +19,7 @@ public partial class Weapon
 
     Sprite Main => ProjArt;
     Sprite Second => Def.effect;
-    float HealCap => Awakened ? 4f : 2f;
+    float HealCap => Awakened ? 2f : 1f;
     PlayerController Player => PlayerController.Instance;
 
     static float Fit(Sprite s, float size) => s == null ? size : size / Mathf.Max(0.01f, Mathf.Max(s.bounds.size.x, s.bounds.size.y));
@@ -198,11 +198,11 @@ public partial class Weapon
             FxParticles.Glow(e.transform.position, new Color(0.65f, 0.3f, 1f, 0.8f), 1.6f, 0.3f);
             FxParticles.Sparks(e.transform.position, new Color(0.7f, 0.35f, 1f), 10, 4f, 0.2f, 0.4f);
             FxParticles.Line(e.transform.position, (Vector2)transform.position + Vector2.up * 0.5f, new Color(0.8f, 0.2f, 0.4f), 1.2f, 0.12f, 0.3f, 0.4f);
-            if (healed < 1.5f) { healed += 0.5f; stats.Heal(0.5f); }   // life drain
+            if (healed < 0.9f) { healed += 0.3f; stats.Heal(0.3f); }   // life drain
             if (chainsLeft <= 0) return;
             Vector2 at = e.transform.position;
             Run.SpawnVfx(at, 0.7f, new Color(0.6f, 0.3f, 0.9f), 0.25f);
-            int splits = Awakened ? 3 : 1;
+            int splits = Awakened ? 2 : 1;
             for (int s = 0; s < splits; s++)
             {
                 var next = Enemy.Nearest(at, 6f);
@@ -242,7 +242,7 @@ public partial class Weapon
                 hits++;
             }
         }
-        if (hits > 0) { Heal(0.5f * Mathf.Min(hits, 4)); FxParticles.Motes(transform.position, new Color(0.6f, 1f, 0.6f), 3, 0.4f); }
+        if (hits > 0) { Heal(0.3f * Mathf.Min(hits, 3)); FxParticles.Motes(transform.position, new Color(0.6f, 1f, 0.6f), 3, 0.4f); }
     }
 
     // ---------------------------------------------------------------- Beast: Wolf Claws / Werewolf Frenzy
@@ -450,7 +450,7 @@ public partial class Weapon
                 for (int s = 0; s < shards; s++)
                 {
                     Vector2 sd = Quaternion.Euler(0, 0, off + s * 360f / shards) * Vector2.right;
-                    Shoot(Main, at + sd * 0.4f, sd, 11f, Damage * 0.4f, Area * 0.55f, 0, 0.45f).Trail(new Color(0.6f, 0.9f, 1f), 0.15f, 0.12f);
+                    Shoot(Main, at + sd * 0.4f, sd, 11f, Damage * 0.3f, Area * 0.55f, 0, 0.45f).Trail(new Color(0.6f, 0.9f, 1f), 0.15f, 0.12f);
                 }
                 Run.Fx(Art.frostBurst, at, new Color(1, 1, 1, 0.8f), 0.3f, 15).Scale(0.3f, Fit(Art.frostBurst, 1.4f)).FadeFrom(0.4f);
                 FxParticles.Glow(at, new Color(0.5f, 0.85f, 1f, 0.8f), 1.8f, 0.3f);
@@ -601,7 +601,7 @@ public partial class Weapon
         }
         float dealt = 0f;
         foreach (var e in buffer3) { e.TakeDamage(Damage, ((Vector2)e.transform.position - c).normalized, Def.knockback); dealt += Damage; FxParticles.Debris(e.transform.position, new Color(0.7f, 0.05f, 0.08f), 3, 2.5f, 0.1f, 0.4f); }
-        Heal(dealt * 0.03f);
+        Heal(dealt * 0.02f);
         if (dealt > 0f) FxParticles.Line((Vector2)transform.position + Vector2.up * 0.4f, (Vector2)transform.position + Vector2.up * 1.1f, new Color(1f, 0.25f, 0.3f), 6f, 0.14f, 0.8f, 0.5f);
         if (Awakened)
         {
@@ -619,7 +619,7 @@ public partial class Weapon
         var fx = Run.Fx(spr, from, Color.white, 0.3f, 18).Move(to).Scale(Fit(spr, 0.6f), Fit(spr, 0.7f)).FadeFrom(0.9f);
         if (to.x < from.x) fx.sr.flipX = true;
         yield return new WaitForSeconds(0.3f);
-        if (target != null && target.isActiveAndEnabled) { target.TakeDamage(Damage * 0.6f, Vector2.zero, 0f); stats.Heal(0.25f); FxParticles.Debris(to, new Color(0.7f, 0.05f, 0.08f), 5, 3f, 0.1f, 0.4f); FxParticles.Sparks(to, new Color(1f, 0.3f, 0.3f), 5, 3f, 0.14f, 0.25f); }
+        if (target != null && target.isActiveAndEnabled) { target.TakeDamage(Damage * 0.6f, Vector2.zero, 0f); stats.Heal(0.15f); FxParticles.Debris(to, new Color(0.7f, 0.05f, 0.08f), 5, 3f, 0.1f, 0.4f); FxParticles.Sparks(to, new Color(1f, 0.3f, 0.3f), 5, 3f, 0.14f, 0.25f); }
     }
 
     // ---------------------------------------------------------------- Wind: Fan of Knives / Tempest Blade
@@ -653,7 +653,7 @@ public partial class Weapon
         Run.Fx(spr, c + Vector2.up * 0.2f, Color.white, 0.5f, -8).Scale(Fit(spr, 0.6f), Fit(spr, r * 2.1f)).FadeFrom(0.4f);
         Enemy.CollectInRadius(c, r, buffer3);
         foreach (var e in buffer3) { e.TakeDamage(Damage, ((Vector2)e.transform.position - c).normalized, Def.knockback); FxParticles.Sparks(e.transform.position, new Color(1f, 0.9f, 0.5f), 3, 2.5f, 0.15f, 0.3f); }
-        stats.Heal(Awakened ? 2f : 1f);
+        stats.Heal(Awakened ? 1.2f : 0.6f);
         FxParticles.Glow(c, new Color(1f, 0.85f, 0.4f, 0.6f), r * 2.4f, 0.45f, -9);
         FxParticles.Motes(c, new Color(1f, 0.92f, 0.55f), 14, r * 0.8f, 0.17f, 0.9f);
         FxParticles.Motes(c + Vector2.up * 0.4f, new Color(0.6f, 1f, 0.6f), 4, 0.4f, 0.14f, 0.7f);
@@ -829,7 +829,7 @@ public partial class Weapon
             {
                 e.Curse(3f);
                 FxParticles.Motes(e.transform.position, new Color(0.65f, 0.3f, 0.95f), 2, 0.2f, 0.13f, 0.6f);
-                if (e.TakeDamage(Damage, ((Vector2)e.transform.position - c).normalized, Def.knockback) && Awakened && heals < 4) { heals++; stats.Heal(1f); }
+                if (e.TakeDamage(Damage, ((Vector2)e.transform.position - c).normalized, Def.knockback) && Awakened && heals < 3) { heals++; stats.Heal(0.5f); }
             }
             yield return new WaitForSeconds(0.3f);
         }

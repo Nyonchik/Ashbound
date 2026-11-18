@@ -8,9 +8,9 @@ public class EnemySpawner : MonoBehaviour
 
     [SerializeField] EnemyType[] types =
     {
-        new() { name = "Hollow Walker", health = 10, speed = 1.4f, damage = 3, scale = 1f, xp = 1, tint = Color.white, startTime = 0, weight = 10 },
-        new() { name = "Hollow Hound", health = 6, speed = 2.5f, damage = 3, scale = 0.8f, xp = 2, tint = new Color(1f, 0.88f, 0.75f), startTime = 60, weight = 5 },
-        new() { name = "Hollow Brute", health = 45, speed = 1.0f, damage = 7, scale = 1.6f, xp = 5, tint = new Color(0.78f, 0.84f, 0.78f), startTime = 150, weight = 2 },
+        new() { name = "Hollow Walker", health = 10, speed = 1.4f, damage = 4, scale = 1f, xp = 1, tint = Color.white, startTime = 0, weight = 10 },
+        new() { name = "Hollow Hound", health = 6, speed = 2.5f, damage = 4, scale = 0.8f, xp = 2, tint = new Color(1f, 0.88f, 0.75f), startTime = 60, weight = 5 },
+        new() { name = "Hollow Brute", health = 45, speed = 1.0f, damage = 9, scale = 1.6f, xp = 5, tint = new Color(0.78f, 0.84f, 0.78f), startTime = 150, weight = 2 },
     };
 
     [Tooltip("3 bosses per stage, in stage order: Ashen Fields, Hollow Forest, Ruined Capital")]
@@ -33,7 +33,14 @@ public class EnemySpawner : MonoBehaviour
     [Tooltip("Enemies spawned per second over run time (seconds)")]
     [SerializeField] AnimationCurve spawnsPerSecond = new(new Keyframe(0, 1.0f), new Keyframe(60, 2f), new Keyframe(120, 3.5f), new Keyframe(300, 7f), new Keyframe(600, 12f), new Keyframe(900, 18f));
     [Tooltip("Enemy health multiplier over run time (seconds)")]
-    [SerializeField] AnimationCurve healthScale = new(new Keyframe(0, 1f), new Keyframe(300, 2.5f), new Keyframe(600, 5f), new Keyframe(900, 9f));
+    [SerializeField] AnimationCurve healthScale = new(new Keyframe(0, 1f), new Keyframe(120, 1.7f), new Keyframe(300, 3.2f), new Keyframe(600, 7f), new Keyframe(900, 13f));
+    [Tooltip("Enemy damage multiplier over run time (seconds)")]
+    [SerializeField] AnimationCurve damageScale = new(new Keyframe(0, 1f), new Keyframe(300, 1.6f), new Keyframe(600, 2.4f), new Keyframe(900, 3.3f));
+    [Header("Elites")]
+    [SerializeField] float eliteStart = 90f, eliteEvery = 50f, eliteHealth = 10f, eliteDamage = 2f, eliteScale = 1.45f;
+    [SerializeField] int eliteXp = 12;
+    float nextElite = -1f;
+    EnemyType[] eliteTypes;
 
     ObjectPool<Enemy> pool;
     float hpMul = 1f, dmgMul = 1f, spawnMul = 1f;
@@ -92,6 +99,16 @@ public class EnemySpawner : MonoBehaviour
             if (Enemy.Active.Count < maxAlive) Spawn(Pick(t), healthScale.Evaluate(t) * hpMul);
         }
 
+        // a golden elite every ~50s (not during boss fights)
+        if (nextElite < 0f) nextElite = eliteStart;
+        if (!run.BossFight && t >= nextElite)
+        {
+            nextElite = t + eliteEvery;
+            var et = Elite(Pick(t));
+            var el = Spawn(et, healthScale.Evaluate(t) * hpMul);
+            if (el != null) { el.Body.color = et.tint; RunManager.Instance.OnEliteSpawned(el); }
+        }
+
         if (nextBoss < 3 && t >= Boss(nextBoss).startTime)
         {
             var def = Boss(nextBoss);
@@ -120,13 +137,28 @@ public class EnemySpawner : MonoBehaviour
         return types[0];
     }
 
+    EnemyType Elite(EnemyType basic)
+    {
+        eliteTypes ??= new EnemyType[types.Length];
+        int i = System.Array.IndexOf(types, basic); if (i < 0) i = 0;
+        if (eliteTypes[i] == null)
+            eliteTypes[i] = new EnemyType
+            {
+                name = "Elite " + basic.name, health = basic.health * eliteHealth, speed = basic.speed * 1.05f, damage = basic.damage * eliteDamage,
+                scale = basic.scale * eliteScale, xp = basic.xp * eliteXp, tint = new Color(1f, 0.82f, 0.35f), sprite = basic.sprite,
+                startTime = 0f, weight = 0f, isElite = true,
+            };
+        else eliteTypes[i].sprite = basic.sprite;
+        return eliteTypes[i];
+    }
+
     /// <summary>Boss minions: a walker or hound right next to the boss.</summary>
     public void SpawnMinion(Vector2 pos, int typeIndex = 0)
     {
         if (Enemy.Active.Count >= maxAlive + 60) return;
         var type = types[Mathf.Clamp(typeIndex, 0, types.Length - 1)];
         var e = pool.Get();
-        e.Init(this, type, healthScale.Evaluate(run.RunTime) * hpMul, dmgMul, tint, pos);
+        e.Init(this, type, healthScale.Evaluate(run.RunTime) * hpMul, dmgMul * damageScale.Evaluate(run.RunTime), tint, pos);
         if (e.TryGetComponent(out BossAI ai)) ai.enabled = false;
     }
 
@@ -140,7 +172,7 @@ public class EnemySpawner : MonoBehaviour
         float a = Random.value * Mathf.PI * 2f;
         Vector2 pos = (Vector2)p.transform.position + new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * r;
         var e = pool.Get();
-        e.Init(this, type, hpScale, dmgMul, tint, pos);
+        e.Init(this, type, hpScale, type.isBoss ? dmgMul : dmgMul * damageScale.Evaluate(run.RunTime), type.isElite ? Color.white : tint, pos);
         if (!type.isBoss && e.TryGetComponent(out BossAI ai)) ai.enabled = false;
         return e;
     }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public enum GearSlot { Weapon, Helmet, Armor, Gloves, Boots, Amulet }
-public enum GearStat { Damage, Health, Armor, Cooldown, Speed, Area, Pickup, Gold }
+public enum GearStat { Damage, Health, Armor, Cooldown, Speed, Area, Pickup, Gold, Mechanic }
 
 /// <summary>One piece of gear in the shared bag.</summary>
 [Serializable]
@@ -24,7 +24,7 @@ public static class Gear
 {
     public class Def
     {
-        public string id, name, classLock;   // classLock only for weapons
+        public string id, name, classLock;   // empty = every hero; otherwise comma-separated class names
         public GearSlot slot;
         public GearStat main, second;
         public float mainMax, secondMax;      // value at Legendary Lv 50
@@ -40,16 +40,22 @@ public static class Gear
         D("longbow",   "Ashwood Longbow",   GearSlot.Weapon, GearStat.Damage, 0.50f, GearStat.Cooldown, 0.09f, "Archer"),
         D("daggers",   "Twin Fangs",        GearSlot.Weapon, GearStat.Damage, 0.50f, GearStat.Speed, 0.10f, "Assassin"),
         D("mace",      "Bulwark Mace",      GearSlot.Weapon, GearStat.Damage, 0.42f, GearStat.Armor, 0.08f, "Tank (Knight)"),
+        // one item per slot for every hero, one for certain heroes, plus one hero-only piece that boosts that hero's mechanic
         D("helm",      "Iron Helm",         GearSlot.Helmet, GearStat.Armor, 0.15f),
-        D("circlet",   "Seer's Circlet",    GearSlot.Helmet, GearStat.Armor, 0.09f, GearStat.Pickup, 0.45f),
+        D("circlet",   "Seer's Circlet",    GearSlot.Helmet, GearStat.Armor, 0.09f, GearStat.Pickup, 0.45f, "Mage,Archer"),
         D("plate",     "Ashen Plate",       GearSlot.Armor,  GearStat.Health, 150f),
-        D("cloak",     "Shadow Cloak",      GearSlot.Armor,  GearStat.Health, 90f, GearStat.Speed, 0.09f),
+        D("cloak",     "Shadow Cloak",      GearSlot.Armor,  GearStat.Health, 90f, GearStat.Speed, 0.09f, "Assassin,Archer"),
         D("gauntlets", "Swift Gauntlets",   GearSlot.Gloves, GearStat.Cooldown, 0.15f),
-        D("wraps",     "Brawler Wraps",     GearSlot.Gloves, GearStat.Cooldown, 0.09f, GearStat.Damage, 0.15f),
+        D("wraps",     "Brawler Wraps",     GearSlot.Gloves, GearStat.Cooldown, 0.09f, GearStat.Damage, 0.15f, "Berserker,Tank (Knight)"),
         D("striders",  "Wind Striders",     GearSlot.Boots,  GearStat.Speed, 0.15f),
-        D("treads",    "Ember Treads",      GearSlot.Boots,  GearStat.Speed, 0.09f, GearStat.Area, 0.12f),
-        D("amulet",    "Arcane Amulet",     GearSlot.Amulet, GearStat.Area, 0.25f),
+        D("treads",    "Ember Treads",      GearSlot.Boots,  GearStat.Speed, 0.09f, GearStat.Area, 0.12f, "Mage,Berserker"),
         D("charm",     "Lucky Charm",       GearSlot.Amulet, GearStat.Area, 0.13f, GearStat.Gold, 0.35f),
+        D("amulet",    "Arcane Amulet",     GearSlot.Amulet, GearStat.Area, 0.25f, GearStat.Damage, 0f, "Mage"),
+        D("archhood",  "Archmage Hood",     GearSlot.Helmet, GearStat.Mechanic, 0.8f, GearStat.Area, 0.12f, "Mage"),
+        D("harness",   "Bloodrage Harness", GearSlot.Armor,  GearStat.Mechanic, 0.8f, GearStat.Health, 70f, "Berserker"),
+        D("bracers",   "Hawkeye Bracers",   GearSlot.Gloves, GearStat.Mechanic, 0.8f, GearStat.Cooldown, 0.08f, "Archer"),
+        D("shadowboots","Shadowstep Boots", GearSlot.Boots,  GearStat.Mechanic, 0.8f, GearStat.Speed, 0.08f, "Assassin"),
+        D("bastion",   "Bastion Amulet",    GearSlot.Amulet, GearStat.Mechanic, 0.8f, GearStat.Armor, 0.06f, "Tank (Knight)"),
     };
 
     public static readonly string[] RarityNames = { "Common", "Uncommon", "Rare", "Epic", "Legendary" };
@@ -64,6 +70,17 @@ public static class Gear
     public const int MaxRarity = 4;
 
     static Color Hex(string h) { ColorUtility.TryParseHtmlString(h, out var c); return c; }
+
+    /// <summary>Can this hero wear this item? Empty lock = everyone.</summary>
+    public static bool Allows(Def d, string className)
+    {
+        if (string.IsNullOrEmpty(d.classLock)) return true;
+        foreach (var c in d.classLock.Split(',')) if (c.Trim() == className) return true;
+        return false;
+    }
+
+    /// <summary>"Mage, Archer only" style label, empty for everyone.</summary>
+    public static string LockLabel(Def d) => string.IsNullOrEmpty(d.classLock) ? "" : d.classLock.Replace(",", ", ").Replace("Tank (Knight)", "Tank") + " only";
 
     public static Def Get(string id) { foreach (var d in All) if (d.id == id) return d; return null; }
     public static int Cap(GearItem it) => LevelCap[Mathf.Clamp(it.rarity, 0, MaxRarity)];
@@ -98,6 +115,7 @@ public static class Gear
         GearStat.Area => $"+{v * 100f:0.#}% weapon area",
         GearStat.Pickup => $"+{v * 100f:0.#}% pickup range",
         GearStat.Gold => $"+{v * 100f:0.#}% gold",
+        GearStat.Mechanic => $"+{v * 100f:0.#}% hero mechanic power",
         _ => $"+{v * 100f:0.#}% damage",
     };
 
@@ -117,7 +135,7 @@ public static class Gear
         foreach (var it in SaveSystem.Data.gear)
         {
             if (it.equippedBy != className) continue;
-            var d = Get(it.id); if (d == null) continue;
+            var d = Get(it.id); if (d == null || !CanWear(it, className)) continue;
             t[d.main] = (t.TryGetValue(d.main, out var a) ? a : 0f) + Main(it);
             if (d.secondMax > 0f) t[d.second] = (t.TryGetValue(d.second, out var b) ? b : 0f) + Second(it);
         }
@@ -140,10 +158,13 @@ public static class Gear
                 case GearStat.Area: s.areaMul += kv.Value; break;
                 case GearStat.Pickup: s.pickupMul += kv.Value; break;
                 case GearStat.Gold: gold += kv.Value; break;
+                case GearStat.Mechanic: break;   // read by HeroMechanic through MechanicBoost
             }
         }
         return gold;
     }
+
+    public static float MechanicBoost(string className) => Totals(className).TryGetValue(GearStat.Mechanic, out var m) ? m : 0f;
 
     public static float GoldBonus(string className) => Totals(className).TryGetValue(GearStat.Gold, out var g) ? g : 0f;
 
@@ -156,7 +177,7 @@ public static class Gear
     public static bool CanWear(GearItem it, string className)
     {
         var d = Get(it.id);
-        return d != null && (string.IsNullOrEmpty(d.classLock) || d.classLock == className);
+        return d != null && Allows(d, className);
     }
 
     public static void Equip(GearItem it, string className)
@@ -278,15 +299,20 @@ public static class Gear
         for (int i = 0; i < c.odds.Length; i++) { acc += c.odds[i]; if (r <= acc) { rarity = i; break; } rarity = i; }
         while (rarity < MaxRarity && c.odds[rarity] <= 0f) rarity++;
 
-        // pick a slot evenly, then an item in it (weapons only for heroes you have)
+        var item = Grant(rarity, unlockedClasses);
+        SaveSystem.Save();
+        return item;
+    }
+
+    /// <summary>Adds a random item of this rarity to the bag: a slot evenly, then an item in it (weapons only for heroes you have).</summary>
+    public static GearItem Grant(int rarity, List<string> unlockedClasses)
+    {
         var slot = (GearSlot)UnityEngine.Random.Range(0, 6);
         var pool = new List<Def>();
         foreach (var def in All)
-            if (def.slot == slot && (string.IsNullOrEmpty(def.classLock) || unlockedClasses == null || unlockedClasses.Contains(def.classLock)))
+            if (def.slot == slot && (unlockedClasses == null || unlockedClasses.Exists(c => Allows(def, c))))
                 pool.Add(def);
         if (pool.Count == 0) foreach (var def in All) if (def.slot != GearSlot.Weapon) pool.Add(def);
-        var item = Add(pool[UnityEngine.Random.Range(0, pool.Count)].id, rarity);
-        SaveSystem.Save();
-        return item;
+        return Add(pool[UnityEngine.Random.Range(0, pool.Count)].id, rarity);
     }
 }

@@ -13,6 +13,7 @@ public class EnemyType
     public int xp = 1;
     public Color tint = new(0.43f, 0.46f, 0.41f);
     public bool isBoss;
+    [Tooltip("Golden elite: much more health, bigger, more XP")] public bool isElite;
     [Tooltip("Optional art that replaces the default enemy sprite")] public Sprite sprite;
     [Tooltip("Seconds into the run when this type starts appearing (bosses: when they spawn)")] public float startTime;
     [Tooltip("Relative spawn chance")] public float weight = 1f;
@@ -40,6 +41,8 @@ public class Enemy : MonoBehaviour
     static readonly Color CurseTint = new(0.75f, 0.55f, 0.95f);
     /// <summary>Trickster decoys: regular enemies close to one chase it instead of the player.</summary>
     public static readonly List<Vector2> Decoys = new();
+    /// <summary>Chance that a hit deals double damage (Assassin). Set every frame by the hero's mechanic.</summary>
+    public static float CritChance;
     public bool IsSlowed => slowTimer > 0f;
 
     /// <summary>Damage over time, stacks up to 5. dps is per stack.</summary>
@@ -70,6 +73,7 @@ public class Enemy : MonoBehaviour
     bool dead;
 
     public bool IsBoss { get; private set; }
+    public bool IsElite { get; private set; }
     public float Radius => radius;
     public float HealthFraction => hp <= 0 ? 0 : hp / maxHp;
     float maxHp;
@@ -96,6 +100,7 @@ public class Enemy : MonoBehaviour
 
     public void Init(EnemySpawner spawner, EnemyType type, float healthScale, float damageScale, Color stageTint, Vector2 position)
     {
+        IsElite = type.isElite;
         owner = spawner;
         maxHp = hp = type.health * healthScale;
         speed = type.speed;
@@ -177,8 +182,10 @@ public class Enemy : MonoBehaviour
     {
         if (dead) return false;
         if (curseTimer > 0f) amount *= 1.25f;
+        bool crit = CritChance > 0f && Random.value < CritChance;
+        if (crit) amount *= 2f;
         hp -= amount;
-        RunManager.Instance?.ShowDamage(transform.position + Vector3.up * (radius * 2.2f), amount, IsBoss);
+        RunManager.Instance?.ShowDamage(transform.position + Vector3.up * (radius * 2.2f), amount, IsBoss || crit);
         flash = 0.08f;
         body.color = HitColor;
         if (!IsBoss) knock += knockDir * knockForce;

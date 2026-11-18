@@ -243,7 +243,7 @@ public class GearPanel : MonoBehaviour
 
         var name = UIKit.Text(detail, "Name", d != null ? d.name : it.id, true, 30, Palette.Text);
         UIKit.At(name.rectTransform, 190, -16, 600, 40);
-        string lock_ = d != null && !string.IsNullOrEmpty(d.classLock) ? $"  ·  {d.classLock} only" : "";
+        string lock_ = d != null && !string.IsNullOrEmpty(d.classLock) ? $"  ·  {Gear.LockLabel(d)}" : "";
         var rar = UIKit.Text(detail, "Rarity",
             $"<color=#{ColorUtility.ToHtmlStringRGB(Gear.RarityColors[it.rarity])}>{Gear.RarityNames[it.rarity]}</color>  ·  {SlotNames[(int)d.slot]}  ·  Lv {it.level} / {Gear.Cap(it)}{lock_}",
             false, 20, Palette.TextMuted);

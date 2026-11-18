@@ -14,14 +14,15 @@ public class ChestPopup : MonoBehaviour
 
     public bool IsOpen => gameObject.activeSelf;
 
-    public void Play(int gold, Action done)
+    /// <summary>rewards: the reward lines to show once the chest bursts open.</summary>
+    public void Play(string rewards, Action done)
     {
         gameObject.SetActive(true);
         StopAllCoroutines();
-        StartCoroutine(Run(gold, done));
+        StartCoroutine(Run(rewards, done));
     }
 
-    IEnumerator Run(int gold, Action done)
+    IEnumerator Run(string rewards, Action done)
     {
         GameSpeed.Pause();
         group.alpha = 0f;
@@ -58,7 +59,7 @@ public class ChestPopup : MonoBehaviour
         // burst open
         AudioManager.Play("evolve", 0.8f);
         AudioManager.Play("coin", 1f);
-        reward.text = $"<color=#F2B33D>+{gold} gold</color>\n+1 level up";
+        reward.text = rewards;
         t = 0f;
         while (t < 1.1f)
         {

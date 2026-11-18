@@ -548,13 +548,13 @@ public static class AshboundBuilder
             "Aegis Wall: +2 shields, +60% damage, wider orbit");
         // ---- custom skills for every other Path
         pathWeapons["Earth"] = Wpn("Path_StoneSpikes", "Stone Spikes", "Titan's Quake", "#B8A04A", WeaponKind.Nova,
-            16.0f, 1.6f, 0.0f, 1.0f, 0.0f, 0.5f, 1, 0, false,
-            new[] { B(count: 1), B(dmg: .25f), B(area: .25f), B(count: 1, dmg: .2f) }, B(dmg: .5f, count: 1, area: .2f),
-            "Stone spikes burst out of the ground in a line and slow what they hit", "+1 line of spikes", "+25% damage", "Spikes reach 25% farther", "+1 line, +20% damage", "Titan's Quake: every cast also shakes the ground around you, +1 line, +50% damage");
+            16.0f, 1.7f, 0.0f, 1.0f, 0.0f, 0.5f, 1, 0, false,
+            new[] { B(count: 1), B(dmg: .25f), B(area: .25f), B(count: 1, dmg: .2f) }, B(dmg: .3f, area: .2f),
+            "Stone spikes burst out of the ground in a line and slow what they hit", "+1 line of spikes", "+25% damage", "Spikes reach 25% farther", "+1 line, +20% damage", "Titan's Quake: every cast also shakes the ground around you, +30% damage");
         pathWeapons["Dark"] = Wpn("Path_ShadowBolt", "Shadow Bolt", "Lich's Hunger", "#9B5DE5", WeaponKind.Projectile,
             13.0f, 1.0f, 9.0f, 1.0f, 2.0f, 0.5f, 1, 0, false,
             new[] { B(count: 1), B(dmg: .25f), B(cd: .2f), B(count: 1, dmg: .2f) }, B(dmg: .5f, count: 1),
-            "A homing shadow bolt; kills send it on to another enemy and drain life", "+1 bolt", "+25% damage", "Casts 20% faster", "+1 bolt, +20% damage", "Lich's Hunger: kills split the bolt into 3, +1 bolt, +50% damage");
+            "A homing shadow bolt; kills send it on to another enemy and drain life", "+1 bolt", "+25% damage", "Casts 20% faster", "+1 bolt, +20% damage", "Lich's Hunger: kills split the bolt in two, +1 bolt, +50% damage");
         pathWeapons["Light"] = Wpn("Path_HolyBeam", "Holy Beam", "Seraph's Halo", "#FFD95A", WeaponKind.Projectile,
             16.0f, 1.3f, 0.0f, 1.0f, 0.0f, 1.0f, 1, 0, false,
             new[] { B(dmg: .25f), B(count: 1), B(area: .25f), B(dmg: .3f) }, B(dmg: .4f),
@@ -580,9 +580,9 @@ public static class AshboundBuilder
             new[] { B(count: 1), B(dmg: .25f), B(pierce: 1, cd: .15f), B(count: 1) }, B(dmg: .5f, count: 1),
             "Icy arrows slow enemies; hitting a slowed enemy shatters it into ice shards", "+1 arrow", "+25% damage", "Pierce 1 more, 15% faster", "+1 arrow", "Winter Ranger: 6 shards, deeper slow, +1 arrow, +50% damage");
         pathWeapons["Spirit"] = Wpn("Path_SpectralArrows", "Spectral Arrows", "Spirit Archer", "#9B5DE5", WeaponKind.Projectile,
-            11.0f, 1.0f, 10.0f, 1.0f, 2.2f, 0.0f, 2, 3, false,
-            new[] { B(count: 1), B(dmg: .25f), B(pierce: 2), B(count: 1, dmg: .2f) }, B(dmg: .4f, count: 3, pierce: 3),
-            "Ghostly arrows seek out enemies and pass through 3 of them", "+1 arrow", "+25% damage", "Pierce 2 more", "+1 arrow, +20% damage", "Spirit Archer: +3 bigger arrows, pierce 3 more, +40% damage");
+            10.0f, 1.1f, 10.0f, 1.0f, 2.2f, 0.0f, 2, 1, false,
+            new[] { B(count: 1), B(dmg: .25f), B(pierce: 1), B(count: 1, dmg: .2f) }, B(dmg: .3f, count: 2, pierce: 1),
+            "Ghostly arrows seek out enemies and pass through 1 of them", "+1 arrow", "+25% damage", "Pierce 1 more", "+1 arrow, +20% damage", "Spirit Archer: +2 bigger arrows, pierce 1 more, +30% damage");
         pathWeapons["Venom"] = Wpn("Path_PoisonDaggers", "Poison Daggers", "Plaguebringer", "#4CC38A", WeaponKind.Projectile,
             6.0f, 0.7f, 13.0f, 1.0f, 1.0f, 0.0f, 2, 0, false,
             new[] { B(count: 1), B(dmg: .25f), B(cd: .15f), B(count: 1, dmg: .2f) }, B(dmg: .5f, count: 2),
@@ -600,9 +600,9 @@ public static class AshboundBuilder
             new[] { B(dmg: .25f), B(area: .2f), B(cd: .15f), B(dmg: .3f) }, B(dmg: .4f, area: .2f),
             "A spinning blood blade hits everything around you and heals you", "+25% damage", "20% wider", "15% faster", "+30% damage", "Vampire Lord: bats fly out to bite enemies and heal you, +40% damage");
         pathWeapons["Wind"] = Wpn("Path_FanOfKnives", "Fan of Knives", "Tempest Blade", "#6FE3D1", WeaponKind.Projectile,
-            7.0f, 1.2f, 13.0f, 1.0f, 0.9f, 0.0f, 8, 1, false,
-            new[] { B(count: 2), B(dmg: .25f), B(cd: .15f), B(count: 2, pierce: 1) }, B(dmg: .4f, count: 4),
-            "Throws a ring of 8 knives in every direction", "+2 knives", "+25% damage", "15% faster", "+2 knives, pierce 1 more", "Tempest Blade: two rings per throw, +4 knives, +40% damage");
+            5.0f, 1.4f, 13.0f, 1.0f, 0.9f, 0.0f, 8, 1, false,
+            new[] { B(count: 2), B(dmg: .25f), B(cd: .15f), B(count: 2, pierce: 1) }, B(dmg: .3f),
+            "Throws a ring of 8 knives in every direction", "+2 knives", "+25% damage", "15% faster", "+2 knives, pierce 1 more", "Tempest Blade: two rings per throw, +30% damage");
         pathWeapons["Paladin"] = Wpn("Path_HolyShield", "Holy Shield", "Crusader", "#FFD95A", WeaponKind.Nova,
             12.0f, 1.6f, 0.0f, 1.0f, 0.0f, 3.0f, 1, 0, false,
             new[] { B(dmg: .25f), B(area: .2f), B(cd: .2f), B(dmg: .3f) }, B(dmg: .4f, area: .2f),
@@ -620,9 +620,9 @@ public static class AshboundBuilder
             new[] { B(dmg: .25f), B(area: .2f), B(cd: .2f), B(dmg: .3f) }, B(dmg: .5f, area: .2f, cd: .2f),
             "Charge the way you're facing, smashing through enemies (you can't be hurt mid-charge)", "+25% damage", "Hits 20% wider", "Charges 20% more often", "+30% damage", "Unstoppable: the charge leaves shockwaves, kills halve the cooldown, +50% damage");
         pathWeapons["Death Knight"] = Wpn("Path_CursedBlade", "Cursed Blade", "Dread Lord", "#9B5DE5", WeaponKind.Nova,
-            15.0f, 1.6f, 0.0f, 1.0f, 0.0f, 1.5f, 1, 0, false,
-            new[] { B(dmg: .25f), B(area: .2f), B(cd: .15f), B(dmg: .3f) }, B(dmg: .5f, count: 1),
-            "A cursed sword sweeps around you; cursed enemies take 25% more damage", "+25% damage", "Sweep 20% wider", "15% faster", "+30% damage", "Dread Lord: sweep twice, a frost aura slows enemies near you, kills heal you, +50% damage");
+            15.0f, 1.8f, 0.0f, 1.0f, 0.0f, 1.5f, 1, 0, false,
+            new[] { B(dmg: .25f), B(area: .2f), B(cd: .15f), B(dmg: .3f) }, B(dmg: .3f, count: 1),
+            "A cursed sword sweeps around you; cursed enemies take 25% more damage", "+25% damage", "Sweep 20% wider", "15% faster", "+30% damage", "Dread Lord: sweep twice, a frost aura slows enemies near you, kills heal you, +30% damage");
         c.fallback = pathWeapons["Fire"];
 
         // ---- weapons found in level-ups
@@ -670,7 +670,7 @@ public static class AshboundBuilder
         {
             var w = c.byFile[baseFile]; w.evolvePassive = passiveByName[passive]; w.evolvesInto = evo; EditorUtility.SetDirty(w);
         }
-        Pair("ArcaneOrb", "Reach", Evo("Evo_BlackHole", "Black Hole", "#9B5DE5", WeaponKind.Nova, 22, 3.6f, 0, 1.2f, 0, 0f, 1, 0, false,
+        Pair("ArcaneOrb", "Reach", Evo("Evo_BlackHole", "Black Hole", "#9B5DE5", WeaponKind.Nova, 18, 4.5f, 0, 1.2f, 0, 0f, 1, 0, false,
             "EVOLVED: opens on the biggest crowd, pulls everything in, then explodes"));
         Pair("MagicMissile", "Haste", Evo("Evo_Starfall", "Starfall", "#C9B8FF", WeaponKind.Projectile, 26, 1.5f, 0, 1f, 0, 3f, 6, 0, false,
             "EVOLVED: volleys of 6 stars fall on enemies all over the screen"));
@@ -1669,6 +1669,7 @@ public static class AshboundBuilder
             Set(run, "smokeParticles", BlendMat("Fx Smoke", false, glowTex));
             Set(run, "debrisParticles", BlendMat("Fx Debris", false, dotTex));
             Set(run, "glowSprite", sGlow);
+            Set(run, "barSprite", sSquare);
         }
         var rso = new SerializedObject(run);
         var fxp = rso.FindProperty("fxArt");

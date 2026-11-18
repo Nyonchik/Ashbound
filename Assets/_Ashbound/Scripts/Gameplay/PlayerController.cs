@@ -23,6 +23,8 @@ public class PlayerController : MonoBehaviour
 
     public PlayerStats Stats => stats;
     public Sprite HeroSprite => heroSprite != null ? heroSprite.sprite : null;
+    public SpriteRenderer HeroRenderer => heroSprite;
+    public bool IsMoving => input.sqrMagnitude > 0.01f || dashTime > 0f;
     Vector2 dashVelocity; float dashTime;
     /// <summary>Move at this velocity for a moment, ignoring input (Juggernaut charge).</summary>
     public void Dash(Vector2 velocity, float seconds) { dashVelocity = velocity; dashTime = seconds; }

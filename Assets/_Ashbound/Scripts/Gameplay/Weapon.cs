@@ -323,8 +323,8 @@ public partial class Weapon : MonoBehaviour
 
     IEnumerator BlackHole(Vector2 c)
     {
-        const float life = 2.1f;
-        float r = 1.3f * Area, pullR = 3.8f * Area, size = 2.6f * Area, t = 0f, dmgTick = 0f;
+        const float life = 1.6f;
+        float r = 1.2f * Area, pullR = 2.8f * Area, size = 2.4f * Area, t = 0f, dmgTick = 0f;
         Run.Fx(Art.blackHole, c, Color.white, life, 13).Scale(0.2f, size).Spin(-280f).FadeFrom(1f);
         while (t < life)
         {
@@ -334,13 +334,13 @@ public partial class Weapon : MonoBehaviour
             {
                 Vector2 d = c - (Vector2)e.transform.position;
                 float dist = d.magnitude;
-                if (dist > 0.2f) e.Pull(d / dist * Mathf.Lerp(8f, 3f, dist / pullR));
+                if (dist > 0.2f) e.Pull(d / dist * Mathf.Lerp(5f, 1.5f, dist / pullR));
             }
-            if (dmgTick <= 0f) { dmgTick = 0.25f; HitAll(c, r, Damage * 0.3f, 0f, buffer2); }
+            if (dmgTick <= 0f) { dmgTick = 0.25f; HitAll(c, r, Damage * 0.2f, 0f, buffer2); }
             yield return null;
         }
-        float boom = 3f * Area;
-        HitAll(c, boom, Damage * 2.5f, 7f, buffer2);
+        float boom = 2.4f * Area;
+        HitAll(c, boom, Damage * 2f, 6f, buffer2);
         Run.Fx(Art.blackHole, c, Color.white, 0.25f, 13).Scale(size, 0.1f).Spin(-600f);
         Run.Fx(Art.starBurst, c, new Color(0.75f, 0.5f, 1f), 0.45f, 15).Scale(boom * 0.5f, boom * 2.2f).FadeFrom(0.3f);
         CameraFollow.Shake(0.12f, 0.2f);

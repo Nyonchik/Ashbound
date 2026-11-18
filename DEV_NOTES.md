@@ -86,3 +86,17 @@ Test runs with F5 counted as real progress in the save (Berserker Beast path unl
   glowing trails on every projectile, impact sparks on every hit. Materials "Fx *.mat" in Art/World are made by Build Everything.
 - Art: 20 effect sprites (Art/InGame/Effects/fx_*), 19 icons + 19 awakened icons (Art/InGame/Icons), made in ChatGPT.
 - Editor test keys: K = try the next new Path skill, L = level it (5x = awakened).
+
+## Harder game + balance + hero mechanics (latest)
+- Enemies: damage now grows over time (x1.6 at 5:00, x2.4 at 10:00, x3.3 at 15:00), health curve steeper (x13 at 15:00), base hits 4/4/9.
+- Golden elites from 1:30, every 50s: 10x health, 2x damage, bigger, glow; drop a big XP gem and 8 gold.
+- Heals cut (meat 20, Holy Beam/Shield, Hemorrhage, Shadow Bolt, Cursed Blade). Black Hole cut down (smaller/weaker pull, 18 dmg, 4.5s).
+  Nerfed: Spectral Arrows, Fan of Knives (awakened), Cursed Blade, Lich's Hunger (splits in 2), Titan's Quake.
+- Level-ups only offer your hero's class weapons + passives (Path skills are individual).
+- Boss chest: 1-3 random rewards (gold, gems, level-ups, 40% heal, XP pull) + ~15% gear piece; Fortune improves the odds.
+- Magnet drop 1.8x bigger with a blue glow.
+- Hero mechanics (Gameplay/HeroMechanic.cs, bar under the hero): Mage Mana, Berserker Rage, Archer Focus,
+  Assassin Shadowstep (SPACE dash, invisible, crits), Tank Fortify (-10% damage taken, damage charges a shockwave).
+- Gear: weapons hero-locked; each slot has one item for everyone and one for certain heroes; 5 new hero-only items boost the
+  hero mechanic (Archmage Hood, Bloodrage Harness, Hawkeye Bracers, Shadowstep Boots, Bastion Amulet). Chests only drop wearable gear.
+- Editor: Ashbound > Save > Back Up Save / Restore Save (Logs/save_backup.json). Your pre-test save is also in Logs/save_backup_before_balance.json.

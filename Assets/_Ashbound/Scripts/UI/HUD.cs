@@ -139,9 +139,9 @@ public class HUD : MonoBehaviour
     // ---------------- boss chest
 
     public bool ChestOpen => chestPopup && chestPopup.IsOpen;
-    public void ShowChest(int gold, System.Action done)
+    public void ShowChest(string rewards, System.Action done)
     {
-        if (chestPopup) chestPopup.Play(gold, done);
+        if (chestPopup) chestPopup.Play(rewards, done);
         else done?.Invoke();
     }
 

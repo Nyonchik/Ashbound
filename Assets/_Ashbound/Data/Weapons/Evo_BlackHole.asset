@@ -18,8 +18,8 @@ MonoBehaviour:
   kind: 2
   icon: {fileID: 21300000, guid: 258f98ae3c1984444b9caf05921d840c, type: 3}
   projectile: {fileID: 21300000, guid: 9a89bd2ea80fc41338c6bd998d66bd87, type: 3}
-  damage: 22
-  cooldown: 3.6
+  damage: 18
+  cooldown: 4.5
   speed: 0
   area: 1.2
   lifetime: 0

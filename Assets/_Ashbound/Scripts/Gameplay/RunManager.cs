@@ -40,6 +40,7 @@ public class RunManager : MonoBehaviour
     [Header("Particle effects (Ashbound/Blend shader)")]
     [SerializeField] Material additiveSprite, glowParticles, smokeParticles, debrisParticles;
     [SerializeField] Sprite glowSprite;
+    [Tooltip("Plain square, used for the hero mechanic bar")] [SerializeField] Sprite barSprite;
 
     [Header("Content")]
     [SerializeField] WeaponDef fallbackPathWeapon;
@@ -153,7 +154,13 @@ public class RunManager : MonoBehaviour
         stats.moveMul += MetaUpgrades.Bonus("speed");
         stats.pickupMul += MetaUpgrades.Bonus("pickup");
         // the hero's equipment
-        if (RunSelection.Class != null) gearGold = Gear.ApplyTo(stats, RunSelection.Class.className);
+        if (RunSelection.Class != null)
+        {
+            gearGold = Gear.ApplyTo(stats, RunSelection.Class.className);
+            // the hero's own mechanic (Mana, Rage, Focus, Shadowstep, Fortify)
+            player.gameObject.AddComponent<HeroMechanic>().Setup(RunSelection.Class.className, Gear.MechanicBoost(RunSelection.Class.className), barSprite);
+            ShowTip("mechanic_" + RunSelection.Class.className, MechanicTip(RunSelection.Class.className));
+        }
 
         float lastHealth = stats.Health;
         stats.OnHealthChanged += (h, m) =>
@@ -232,6 +239,7 @@ public class RunManager : MonoBehaviour
     /// <summary>First-run hint: each tip shows once per save.</summary>
     public void ShowTip(string id, string text)
     {
+        if (string.IsNullOrEmpty(text)) return;
         var seen = SaveSystem.Data.seenTips;
         if (seen.Contains(id)) return;
         seen.Add(id);
@@ -265,6 +273,23 @@ public class RunManager : MonoBehaviour
         AudioManager.Play("boss", 1f);
     }
 
+    static string MechanicTip(string cls) => HeroMechanic.KindFor(cls) switch
+    {
+        HeroMechanic.Kind.Mana => "Mana (purple bar): your damage keeps growing while you avoid getting hit. Getting hit empties it.",
+        HeroMechanic.Kind.Rage => "Rage (red bar): the lower your health, the more damage you deal and the faster you attack.",
+        HeroMechanic.Kind.Focus => "Focus (gold bar): stand still to charge it; full Focus means +50% damage. Moving drains it.",
+        HeroMechanic.Kind.Shadowstep => "Shadowstep: press SPACE to dash. You turn invisible for a moment and your next hits always crit.",
+        HeroMechanic.Kind.Fortify => "Fortify (blue bar): you take 10% less damage, and damage you take charges a shockwave that releases on its own.",
+        _ => "",
+    };
+
+    /// <summary>Golden elite: glow, a tip the first time.</summary>
+    public void OnEliteSpawned(Enemy e)
+    {
+        EliteAura.Attach(e, glowSprite, FxParticles.AdditiveSprite);
+        ShowTip("elite", "A golden elite appeared! Much tougher than normal Hollow, but it drops a big XP gem and gold.");
+    }
+
     public void OnEnemyKilled(Enemy e, int xpValue)
     {
         Vector2 position = e.transform.position;
@@ -280,6 +305,14 @@ public class RunManager : MonoBehaviour
 
         if (Random.value < 0.1f) { gold++; hud.SetGold(gold); }
         SpawnGem(position, xpValue);
+        if (e.IsElite)
+        {
+            gold += 8; hud.SetGold(gold);
+            AudioManager.Play("coin", 0.9f);
+            FxParticles.Sparks(position, new Color(1f, 0.85f, 0.35f), 24, 6f, 0.22f, 0.5f);
+            FxParticles.Glow(position, new Color(1f, 0.8f, 0.3f), 2.5f, 0.35f);
+            CameraFollow.Shake(0.1f, 0.15f);
+        }
 
         if (e.IsBoss)
         {
@@ -317,6 +350,19 @@ public class RunManager : MonoBehaviour
         var p = Instantiate(pickupPrefab, position, Quaternion.identity);
         p.Init(kind, pickupSprites != null && (int)kind < pickupSprites.Length ? pickupSprites[(int)kind] : null, position);
         if (kind == PickupKind.Chest) p.transform.localScale = Vector3.one * 1.9f;
+        if (kind == PickupKind.Magnet)
+        {
+            p.transform.localScale = Vector3.one * 1.8f;   // easy to spot
+            if (glowSprite != null && FxParticles.AdditiveSprite != null)
+            {
+                var g = new GameObject("Glow");
+                g.transform.SetParent(p.transform, false);
+                var sr = g.AddComponent<SpriteRenderer>();
+                sr.sprite = glowSprite; sr.sharedMaterial = FxParticles.AdditiveSprite;
+                sr.color = new Color(0.35f, 0.7f, 1f, 0.55f); sr.sortingOrder = 4;
+                g.transform.localScale = Vector3.one * (1.3f / Mathf.Max(0.01f, glowSprite.bounds.size.x));
+            }
+        }
     }
 
     public void CollectPickup(Pickup p)
@@ -324,7 +370,7 @@ public class RunManager : MonoBehaviour
         var stats = player.Stats;
         switch (p.Kind)
         {
-            case PickupKind.Meat: stats.Heal(30f); AudioManager.Play("heal", 0.8f); break;
+            case PickupKind.Meat: stats.Heal(20f); AudioManager.Play("heal", 0.8f); break;
             case PickupKind.Medkit: stats.Heal(stats.MaxHealth); AudioManager.Play("heal", 1f, 1.15f); break;
             case PickupKind.Magnet:
                 foreach (var g in XPGem.Active) g.Magnetize();
@@ -332,9 +378,8 @@ public class RunManager : MonoBehaviour
                 break;
             case PickupKind.GoldBag: gold += 15; hud.SetGold(gold); AudioManager.Play("coin", 0.9f); break;
             case PickupKind.Chest:
-                gold += 25; hud.SetGold(gold);
                 AudioManager.Play("coin", 1f);
-                hud.ShowChest(25, () => QueueLevelUp());
+                OpenBossChest();
                 break;
         }
         SpawnVfx(p.transform.position, 0.8f, Palette.Gold, 0.3f);
@@ -389,6 +434,58 @@ public class RunManager : MonoBehaviour
         }
         hud.SetXP(xp, xpNeeded, level);
         if (pendingLevelUps > 0 && !levelUp.IsOpen) { pendingLevelUps--; OfferLevelUp(); }
+    }
+
+    // ---------------- boss chest: 1-3 random rewards; the Fortune upgrade adds luck
+
+    void OpenBossChest()
+    {
+        int luck = Mathf.RoundToInt(MetaUpgrades.Bonus("rerolls"));   // Fortune level 0-3
+        int rolls = 1;
+        if (Random.value < 0.45f + 0.15f * luck) rolls++;
+        if (Random.value < 0.10f + 0.12f * luck) rolls++;
+
+        int levelUps = 0, chestGold = 0, chestGems = 0;
+        bool healed = false, magnet = false;
+        var lines = new List<string>();
+        for (int i = 0; i < rolls; i++)
+        {
+            float r = Random.value * 100f;
+            if (r < 32f) levelUps++;
+            else if (r < 62f) chestGold += Mathf.RoundToInt(Random.Range(20, 41) * (1f + 0.25f * luck));
+            else if (r < 77f) chestGems += Random.Range(3, 7) + luck;
+            else if (r < 90f && !healed) healed = true;
+            else if (!magnet) magnet = true;
+            else levelUps++;
+        }
+        if (levelUps == 0 && rolls == 1 && Random.value < 0.5f) levelUps = 1;   // a single roll still often levels you
+
+        // rare gear piece, better with Fortune
+        GearItem gearItem = null;
+        if (Random.value < 0.15f + 0.03f * luck)
+        {
+            float g = Random.value;
+            int rarity = g < 0.07f + 0.03f * luck ? 2 : g < 0.40f + 0.05f * luck ? 1 : 0;
+            var unlocked = new List<string>();
+            foreach (var c in classes) if (c != null && SaveSystem.IsClassUnlocked(c)) unlocked.Add(c.className);
+            gearItem = Gear.Grant(rarity, unlocked);
+            SaveSystem.Save();
+        }
+
+        if (chestGold > 0) { gold += chestGold; hud.SetGold(gold); lines.Add($"<color=#F2B33D>+{chestGold} gold</color>"); }
+        if (chestGems > 0) { SaveSystem.Data.gems += chestGems; SaveSystem.Save(); lines.Add($"<color=#A970FF>+{chestGems} gems</color>"); }
+        if (levelUps > 0) lines.Add(levelUps == 1 ? "+1 level up" : $"+{levelUps} level ups");
+        if (healed) { player.Stats.Heal(player.Stats.MaxHealth * 0.4f); lines.Add("<color=#4CC38A>Healed 40%</color>"); }
+        if (magnet) { foreach (var gm in XPGem.Active) gm.Magnetize(); lines.Add("<color=#3DA5F4>All XP pulled in</color>"); }
+        if (gearItem != null)
+        {
+            var d = Gear.Get(gearItem.id);
+            lines.Add($"<color=#{ColorUtility.ToHtmlStringRGB(Gear.RarityColors[gearItem.rarity])}>{Gear.RarityNames[gearItem.rarity]} {(d != null ? d.name : gearItem.id)}</color>");
+        }
+        if (lines.Count == 0) { gold += 20; hud.SetGold(gold); lines.Add("<color=#F2B33D>+20 gold</color>"); }
+
+        int ups = levelUps;
+        hud.ShowChest(string.Join("\n", lines), () => { for (int i = 0; i < ups; i++) QueueLevelUp(); });
     }
 
     void QueueLevelUp()
@@ -483,11 +580,8 @@ public class RunManager : MonoBehaviour
     {
         var cls = RunSelection.Class;
         if (cls == null) return weaponPool;
-        var pool = new List<WeaponDef>(cls.weapons);
-        foreach (var p in cls.paths)
-            if (p != RunSelection.Path && p.weapon != null && SaveSystem.IsPathUnlocked(cls, p) && !pool.Contains(p.weapon))
-                pool.Add(p.weapon);
-        return pool;
+        // Path skills are individual: only your own Path's skill (given at the start), never another Path's.
+        return new List<WeaponDef>(cls.weapons);
     }
 
     List<UpgradeOption> BuildOptions()

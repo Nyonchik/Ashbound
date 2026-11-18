@@ -168,7 +168,7 @@ public class StorePanel : MonoBehaviour
         var d = Gear.Get(item.id);
         var nm = UIKit.Text(card.transform, "Name", d != null ? d.name : item.id, true, 30, Palette.Text, TextAlignmentOptions.Center);
         UIKit.At(nm.rectTransform, 10, -264, 360, 40);
-        string sub = d != null && !string.IsNullOrEmpty(d.classLock) ? $"{d.slot}  ·  {d.classLock} only" : d != null ? d.slot.ToString() : "";
+        string sub = d != null && !string.IsNullOrEmpty(d.classLock) ? $"{d.slot}  ·  {Gear.LockLabel(d)}" : d != null ? d.slot.ToString() : "";
         var sl = UIKit.Text(card.transform, "Slot", sub, false, 19, Palette.TextMuted, TextAlignmentOptions.Center);
         UIKit.At(sl.rectTransform, 10, -304, 360, 28);
         var st = UIKit.Text(card.transform, "Stats", Gear.Describe(item), true, 21, Palette.Text, TextAlignmentOptions.Center);
