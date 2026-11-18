@@ -100,3 +100,11 @@ Test runs with F5 counted as real progress in the save (Berserker Beast path unl
 - Gear: weapons hero-locked; each slot has one item for everyone and one for certain heroes; 5 new hero-only items boost the
   hero mechanic (Archmage Hood, Bloodrage Harness, Hawkeye Bracers, Shadowstep Boots, Bastion Amulet). Chests only drop wearable gear.
 - Editor: Ashbound > Save > Back Up Save / Restore Save (Logs/save_backup.json). Your pre-test save is also in Logs/save_backup_before_balance.json.
+
+## Phase 3: Replay (Ascension, quests, hero levels, daily, endless)
+- **Ascension A1–A10** (Core/Progression.cs `Ascension`): pick it on the hero screen (header, next to the stage). Each level adds one curse on top of the earlier ones and gives +10% gold and gems. Winning at your highest level unlocks the next. Old saves that already won a stage start with A1 open.
+  A1 +15% enemy HP · A2 +10% enemy speed · A3 elites every 35s · A4 healing −30% · A5 +15% enemy damage · A6 bosses +30% HP · A7 −1 reroll · A8 +20% spawns · A9 another +20% HP · A10 fewer drops, −10% XP.
+- **Hero levels 1–20** (`HeroLevels`): XP per run = kills/10 + seconds/6 + 25 per boss + 100 for a win. Every 4 levels pick 1 of 2 talents in Heroes (damage/area, HP/cooldown, mechanic/pickup, damage/speed, mechanic/armor). Applied at run start.
+- **Quests** (main menu): 3 daily quests (gems) and 20 achievements (gems + gold), claim by hand. Lifetime stats live in the save (`statKeys/statValues`); old saves get their kills, runs and wins counted.
+- **Daily challenge**: same hero, Path, stage and 2 curses for the day (date seed), one attempt (starting the run uses it), 10–60 gems by time survived. Retry/Restart are hidden in a daily.
+- **Endless**: main menu → Endless → hero select. No bosses; enemy HP, damage and spawns keep climbing past 15:00. Best time is saved and shown under the timer.

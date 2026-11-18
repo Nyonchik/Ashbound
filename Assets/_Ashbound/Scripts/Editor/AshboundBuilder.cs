@@ -1116,17 +1116,22 @@ public static class AshboundBuilder
         var sub = Txt(canvas, "Subtitle", "Recover the Ember Crown. Survive the night.", fBold, 33, Palette.TextMuted);
         Place(sub.rectTransform, TopLeft, TopLeft, TopLeft, new Vector2(148, -300), new Vector2(1000, 50));
 
-        var menu = Node("MenuButtons", canvas); Place(menu, TopLeft, TopLeft, TopLeft, new Vector2(144, -400), new Vector2(450, 580));
+        var menu = Node("MenuButtons", canvas); Place(menu, TopLeft, TopLeft, TopLeft, new Vector2(144, -380), new Vector2(450, 660));
         var v = menu.gameObject.AddComponent<VerticalLayoutGroup>(); v.spacing = 14;
         v.childControlWidth = true; v.childControlHeight = true; v.childForceExpandWidth = true; v.childForceExpandHeight = false;
         var play = Btn(Inst(prefabsCache.primary, menu, "Play"), "Play");
+        var modeRow = Row(menu, "DailyEndlessRow", 14);
+        var dailyBtn = Btn(Inst(prefabsCache.secondary, modeRow, "Daily"), "Daily", 218, 72);
+        var endlessBtn = Btn(Inst(prefabsCache.secondary, modeRow, "Endless"), "Endless", 218, 72);
         var shopRow = Row(menu, "GearStoreRow", 14);
         var gearBtn = Btn(Inst(prefabsCache.secondary, shopRow, "Gear"), "Gear", 218, 78);
         var storeBtn = Btn(Inst(prefabsCache.secondary, shopRow, "Store"), "Store", 218, 78);
         var infoRow = Row(menu, "HeroesUnlocksRow", 14);
         var heroes = Btn(Inst(prefabsCache.secondary, infoRow, "Heroes"), "Heroes", 218, 78);
         var unlocks = Btn(Inst(prefabsCache.secondary, infoRow, "Unlocks"), "Unlocks", 218, 78);
-        var upgrades = Btn(Inst(prefabsCache.secondary, menu, "Upgrades"), "Upgrades");
+        var upRow = Row(menu, "UpgradesQuestsRow", 14);
+        var upgrades = Btn(Inst(prefabsCache.secondary, upRow, "Upgrades"), "Upgrades", 218, 72);
+        var questsBtn = Btn(Inst(prefabsCache.secondary, upRow, "Quests"), "Quests", 218, 72);
         var settings = Btn(Inst(prefabsCache.secondary, menu, "Settings"), "Settings");
         var quit = Btn(Inst(prefabsCache.secondary, menu, "Quit"), "Quit");
 
@@ -1151,6 +1156,11 @@ public static class AshboundBuilder
         Set(mm, "goldText", goldVal); Set(mm, "crownText", crownVal); Set(mm, "gemsText", gemsVal);
         UnityEventTools.AddPersistentListener(gearBtn.onClick, new UnityAction(mm.OpenGear));
         UnityEventTools.AddPersistentListener(storeBtn.onClick, new UnityAction(mm.OpenStore));
+        UnityEventTools.AddPersistentListener(dailyBtn.onClick, new UnityAction(mm.OpenDaily));
+        UnityEventTools.AddPersistentListener(endlessBtn.onClick, new UnityAction(mm.PlayEndless));
+        UnityEventTools.AddPersistentListener(questsBtn.onClick, new UnityAction(mm.OpenQuests));
+        Set(mm, "questsLabel", questsBtn.GetComponentInChildren<TextMeshProUGUI>()); Set(mm, "dailyLabel", dailyBtn.GetComponentInChildren<TextMeshProUGUI>());
+        Set(mm, "heroesLabel", heroes.GetComponentInChildren<TextMeshProUGUI>());
 
         // ---- Settings
         var (setRoot, setPanel) = MenuOverlay(canvas, "SettingsPanel", "SETTINGS", new Vector2(760, 920));
@@ -1186,14 +1196,19 @@ public static class AshboundBuilder
         SetArr(up, "icons", new List<Object> { Icon("icon_vitality"), Icon("icon_might"), Icon("icon_swiftness"), Icon("icon_magnet"), Icon("pickup_gold"), Icon("pickup_chest") });
 
         // ---- Heroes
-        var (heRoot, hePanel) = MenuOverlay(canvas, "HeroesPanel", "HEROES", new Vector2(1700, 820));
+        var (heRoot, hePanel) = MenuOverlay(canvas, "HeroesPanel", "HEROES", new Vector2(1700, 1040));
         var heRow = Row(hePanel, "Columns", 18);
         var cols = new List<Object>();
+        var talentAreas = new List<Object>();
         for (int i = 0; i < 5; i++)
         {
-            var col = Node("Column" + (i + 1), heRow); Img(col, sFill, Palette.Void, 1.5f); Fixed(col, 300, 520);
-            var t = Txt(col, "Text", "", fBold, 20, Palette.Text, TextAlignmentOptions.TopLeft); Stretch(t.rectTransform, 18, 18, 18, 18);
-            t.textWrappingMode = TextWrappingModes.Normal; t.lineSpacing = 4;
+            var heroCol = Node("Hero" + (i + 1), heRow); Fixed(heroCol, 300, 720);
+            var col = Node("Column", heroCol); Img(col, sFill, Palette.Void, 1.5f);
+            Place(col, TopLeft, TopLeft, TopLeft, Vector2.zero, new Vector2(300, 330));
+            var tal = Node("Talents", heroCol); Place(tal, TopLeft, TopLeft, TopLeft, new Vector2(0, -346), new Vector2(300, 374));
+            talentAreas.Add(tal);
+            var t = Txt(col, "Text", "", fBold, 20, Palette.Text, TextAlignmentOptions.TopLeft); Stretch(t.rectTransform, 16, 16, 14, 14);
+            t.textWrappingMode = TextWrappingModes.Normal; t.lineSpacing = 2; t.enableAutoSizing = true; t.fontSizeMin = 13; t.fontSizeMax = 20;
             cols.Add(t);
         }
         var heSum = Txt(hePanel, "Summary", "", fBlack, 24, Palette.TextMuted, TextAlignmentOptions.Center);
@@ -1201,6 +1216,27 @@ public static class AshboundBuilder
         var hp = heRoot.gameObject.AddComponent<HeroesPanel>();
         SetArr(hp, "classes", classesCache.ConvertAll(c => (Object)c)); SetArr(hp, "columns", cols);
         Set(hp, "summary", heSum); Set(hp, "closeButton", heClose); Set(hp, "menu", mm);
+        SetArr(hp, "talentAreas", talentAreas);
+        Set(hp, "font", fBold); Set(hp, "boldFont", fBlack); Set(hp, "panelSprite", sPanel); Set(hp, "fillSprite", sFill);
+
+        // ---- Quests + achievements (built at runtime)
+        var (quRoot, quPanel) = MenuOverlay(canvas, "QuestsPanel", "QUESTS", new Vector2(1500, 1000));
+        var quBody = Node("Body", quPanel); Fixed(quBody, 1404, 740);
+        var quClose = Btn(Inst(prefabsCache.primary, quPanel, "Close"), "Close", 300, 84);
+        var qp = quRoot.gameObject.AddComponent<QuestsPanel>();
+        Set(qp, "body", quBody); Set(qp, "closeButton", quClose); Set(qp, "menu", mm);
+        Set(qp, "font", fBold); Set(qp, "boldFont", fBlack); Set(qp, "panelSprite", sPanel); Set(qp, "fillSprite", sFill);
+        Set(mm, "questsPanel", quRoot.gameObject); quRoot.gameObject.SetActive(false);
+
+        // ---- Daily challenge
+        var (daRoot, daPanel) = MenuOverlay(canvas, "DailyPanel", "DAILY CHALLENGE", new Vector2(860, 860));
+        var daBody = Node("Body", daPanel); Fixed(daBody, 764, 570);
+        var daClose = Btn(Inst(prefabsCache.primary, daPanel, "Close"), "Close", 300, 84);
+        var dp = daRoot.gameObject.AddComponent<DailyPanel>();
+        SetArr(dp, "classes", classesCache.ConvertAll(c => (Object)c)); SetArr(dp, "stages", stagesCache.ConvertAll(c => (Object)c));
+        Set(dp, "body", daBody); Set(dp, "closeButton", daClose); Set(dp, "menu", mm);
+        Set(dp, "font", fBold); Set(dp, "boldFont", fBlack); Set(dp, "panelSprite", sPanel); Set(dp, "fillSprite", sFill);
+        Set(mm, "dailyPanel", daRoot.gameObject); daRoot.gameObject.SetActive(false);
 
         // ---- Unlocks
         var (unRoot, unPanel) = MenuOverlay(canvas, "UnlocksPanel", "UNLOCKS", new Vector2(1640, 900));
@@ -1322,21 +1358,29 @@ public static class AshboundBuilder
 
         // Header
         var header = Node("Header", canvas); Place(header, new Vector2(0, 1), new Vector2(1, 1), new Vector2(0.5f, 1), new Vector2(0, -48), new Vector2(-120, 84));
-        var hh = header.gameObject.AddComponent<HorizontalLayoutGroup>(); hh.spacing = 30; hh.childAlignment = TextAnchor.MiddleLeft;
+        var hh = header.gameObject.AddComponent<HorizontalLayoutGroup>(); hh.spacing = 16; hh.childAlignment = TextAnchor.MiddleLeft;
         hh.childControlWidth = true; hh.childControlHeight = true; hh.childForceExpandWidth = false; hh.childForceExpandHeight = false;
         var back = Btn(Inst(prefabs.secondary, header, "BackButton"), "Back", 165, 72);
-        var title = Txt(header, "Title", "Choose your hero", fTitle, 51, Palette.Text);
+        var title = Txt(header, "Title", "Choose your hero", fTitle, 44, Palette.Text);
         title.textWrappingMode = TextWrappingModes.NoWrap;
         var spacer = Node("Spacer", header); spacer.gameObject.AddComponent<LayoutElement>().flexibleWidth = 1;
+        var asPrev = Btn(Inst(prefabs.secondary, header, "AscPrev"), "<", 72, 72);
+        var asBox = Node("AscensionLevel", header); Img(asBox, sPanel, Palette.Panel);
+        asBox.gameObject.AddComponent<LayoutElement>().preferredWidth = 400;
+        var asv = asBox.gameObject.AddComponent<VerticalLayoutGroup>(); asv.padding = new RectOffset(18, 18, 8, 8); asv.spacing = 0;
+        asv.childControlWidth = true; asv.childControlHeight = true; asv.childForceExpandWidth = true; asv.childForceExpandHeight = false;
+        var asName = Txt(asBox, "Name", "Ascension: off", fBlack, 24, Palette.Text, TextAlignmentOptions.Center);
+        var asInfo = Txt(asBox, "Info", "", fBold, 16, Palette.TextMuted, TextAlignmentOptions.Center);
+        var asNext = Btn(Inst(prefabs.secondary, header, "AscNext"), ">", 72, 72);
         var stPrev = Btn(Inst(prefabs.secondary, header, "StagePrev"), "<", 72, 72);
         var stBox = Node("Stage", header); Img(stBox, sPanel, Palette.Panel);
-        stBox.gameObject.AddComponent<LayoutElement>().preferredWidth = 470;
+        stBox.gameObject.AddComponent<LayoutElement>().preferredWidth = 420;
         var stv = stBox.gameObject.AddComponent<VerticalLayoutGroup>(); stv.padding = new RectOffset(24, 24, 8, 8); stv.spacing = 0;
         stv.childControlWidth = true; stv.childControlHeight = true; stv.childForceExpandWidth = true; stv.childForceExpandHeight = false;
         var stName = Txt(stBox, "Name", "Stage 1 · Ashen Fields", fBlack, 24, Palette.Text, TextAlignmentOptions.Center);
         var stInfo = Txt(stBox, "Info", "", fBold, 17, Palette.TextMuted, TextAlignmentOptions.Center);
         var stNext = Btn(Inst(prefabs.secondary, header, "StageNext"), ">", 72, 72);
-        foreach (var b in new[] { stPrev, stNext })
+        foreach (var b in new[] { stPrev, stNext, asPrev, asNext })
         { var l = b.GetComponentInChildren<TextMeshProUGUI>(); l.alignment = TextAlignmentOptions.Center; Stretch(l.rectTransform, 0, 0, 0, 0); }
 
         // Body: class list | hero panel | paths
@@ -1379,7 +1423,7 @@ public static class AshboundBuilder
         barH.childControlWidth = true; barH.childControlHeight = true; barH.childForceExpandWidth = false; barH.childForceExpandHeight = false;
         var ascCol = Node("Ascension", bar); ascCol.gameObject.AddComponent<LayoutElement>().flexibleWidth = 1;
         var av = ascCol.gameObject.AddComponent<VerticalLayoutGroup>(); av.spacing = 4; av.childControlWidth = true; av.childControlHeight = true; av.childForceExpandHeight = false;
-        var ascLbl = Txt(ascCol, "Label", "ASCENSION AT MAX LEVEL", fBlack, 18, Palette.TextMuted); ascLbl.characterSpacing = 6;
+        var ascLbl = Txt(ascCol, "Label", "PATH AWAKENING AT MAX LEVEL", fBlack, 18, Palette.TextMuted); ascLbl.characterSpacing = 6;
         var ascText = Txt(ascCol, "Text", "Ascension", fBlack, 24, Palette.Text);
         var start = Btn(Inst(prefabs.primary, bar, "StartButton"), "Start run", 300, 84);
 
@@ -1393,6 +1437,7 @@ public static class AshboundBuilder
         Set(screen, "startButton", start); Set(screen, "backButton", back);
         SetArr(screen, "stages", stagesCache.ConvertAll(x => (Object)x));
         Set(screen, "stagePrev", stPrev); Set(screen, "stageNext", stNext); Set(screen, "stageName", stName); Set(screen, "stageInfo", stInfo);
+        Set(screen, "ascPrev", asPrev); Set(screen, "ascNext", asNext); Set(screen, "ascName", asName); Set(screen, "ascInfo", asInfo); Set(screen, "titleText", title);
 
         EditorSceneManager.SaveScene(scene, ClassSelectPath);
     }

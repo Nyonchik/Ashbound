@@ -119,7 +119,7 @@ public class Enemy : MonoBehaviour
         IsElite = type.isElite; IsProp = type.isProp; IsGoblin = type.isGoblin; PropKind = type.propKind; Flee = type.isGoblin;
         owner = spawner;
         maxHp = hp = type.health * healthScale;
-        speed = type.speed;
+        speed = type.speed * Ascension.SpeedMul;
         damage = type.damage * damageScale;
         xp = type.xp;
         IsBoss = type.isBoss;

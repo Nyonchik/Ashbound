@@ -81,7 +81,9 @@ public class EnemySpawner : MonoBehaviour
         if (stage == null) return;
         stageOrder = Mathf.Max(0, stage.order);
         bossBase = stageOrder * 3 + 2 < bosses.Length ? stageOrder * 3 : 0;
-        hpMul = stage.enemyHealth; dmgMul = stage.enemyDamage; spawnMul = stage.spawnRate; tint = stage.enemyTint;
+        hpMul = stage.enemyHealth * Ascension.HpMul; dmgMul = stage.enemyDamage * Ascension.DamageMul; spawnMul = stage.spawnRate * Ascension.SpawnMul; tint = stage.enemyTint;
+        eliteEvery = Ascension.EliteEvery;
+        if (RunSelection.Mode == RunMode.Endless) nextBoss = 3;   // endless: no bosses, it just keeps scaling
         // Stage art: walker, hound and brute get this stage's own sprites (copies, so the scene data stays untouched)
         if (stage.enemySprites != null)
             for (int i = 0; i < types.Length && i < stage.enemySprites.Length; i++)
@@ -110,13 +112,13 @@ public class EnemySpawner : MonoBehaviour
         float t = run.RunTime;
 
         // During a boss fight only the boss (and its own minions) are in the arena
-        if (!run.BossFight) accumulator += spawnsPerSecond.Evaluate(t) * spawnMul * EventSpawnMul * Time.deltaTime;
+        if (!run.BossFight) accumulator += SpawnsAt(t) * spawnMul * EventSpawnMul * Time.deltaTime;
         UpdateProps(t);
         UpdateEvents(t);
         while (accumulator >= 1f)
         {
             accumulator -= 1f;
-            if (Enemy.Active.Count < maxAlive) Spawn(Pick(t), healthScale.Evaluate(t) * hpMul);
+            if (Enemy.Active.Count < maxAlive) Spawn(Pick(t), HealthAt(t) * hpMul);
         }
 
         // a golden elite every ~50s (not during boss fights)
@@ -125,14 +127,14 @@ public class EnemySpawner : MonoBehaviour
         {
             nextElite = t + eliteEvery;
             var et = Elite(Pick(t));
-            var el = Spawn(et, healthScale.Evaluate(t) * hpMul);
+            var el = Spawn(et, HealthAt(t) * hpMul);
             if (el != null) { el.Body.color = et.tint; RunManager.Instance.OnEliteSpawned(el); }
         }
 
         if (nextBoss < 3 && t >= Boss(nextBoss).startTime)
         {
             var def = Boss(nextBoss);
-            var boss = Spawn(def, hpMul);
+            var boss = Spawn(def, hpMul * Ascension.BossHpMul);
             if (boss != null)
             {
                 if (!boss.TryGetComponent(out BossAI ai)) ai = boss.gameObject.AddComponent<BossAI>();
@@ -142,6 +144,11 @@ public class EnemySpawner : MonoBehaviour
             nextBoss++;
         }
     }
+
+    /// <summary>Health / damage scale; past the curve's end (15:00) it keeps climbing so Endless never plateaus.</summary>
+    float HealthAt(float t) => t <= 900f ? healthScale.Evaluate(t) : healthScale.Evaluate(900f) + (t - 900f) * 0.035f + Mathf.Pow((t - 900f) / 300f, 2f) * 2f;
+    float DamageAt(float t) => t <= 900f ? damageScale.Evaluate(t) : damageScale.Evaluate(900f) + (t - 900f) * 0.004f;
+    float SpawnsAt(float t) => t <= 900f ? spawnsPerSecond.Evaluate(t) : spawnsPerSecond.Evaluate(900f) * Mathf.Min(1.8f, 1f + (t - 900f) / 900f);
 
     EnemyType Pick(float t)
     {
@@ -178,7 +185,7 @@ public class EnemySpawner : MonoBehaviour
         if (Enemy.Active.Count >= maxAlive + 60) return;
         var type = types[Mathf.Clamp(typeIndex, 0, types.Length - 1)];
         var e = pool.Get();
-        e.Init(this, type, healthScale.Evaluate(run.RunTime) * hpMul, dmgMul * damageScale.Evaluate(run.RunTime), tint, pos);
+        e.Init(this, type, HealthAt(run.RunTime) * hpMul, dmgMul * DamageAt(run.RunTime), tint, pos);
         if (e.TryGetComponent(out BossAI ai)) ai.enabled = false;
     }
 
@@ -192,7 +199,7 @@ public class EnemySpawner : MonoBehaviour
         float a = Random.value * Mathf.PI * 2f;
         Vector2 pos = (Vector2)p.transform.position + new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * r;
         var e = pool.Get();
-        e.Init(this, type, hpScale, type.isBoss ? dmgMul : dmgMul * damageScale.Evaluate(run.RunTime) * EventDamageMul, type.isElite || type.isProp || type.isGoblin ? Color.white : tint, pos);
+        e.Init(this, type, hpScale, type.isBoss ? dmgMul : dmgMul * DamageAt(run.RunTime) * EventDamageMul, type.isElite || type.isProp || type.isGoblin ? Color.white : tint, pos);
         if (!type.isBoss && e.TryGetComponent(out BossAI ai)) ai.enabled = false;
         return e;
     }
@@ -203,7 +210,7 @@ public class EnemySpawner : MonoBehaviour
     {
         if (Enemy.Active.Count >= maxAlive + 80) return null;
         var e = pool.Get();
-        e.Init(this, type, hpScale, type.isProp || type.isGoblin ? 0f : dmgMul * damageScale.Evaluate(run.RunTime) * EventDamageMul, type.isElite || type.isProp || type.isGoblin ? Color.white : tint, pos);
+        e.Init(this, type, hpScale, type.isProp || type.isGoblin ? 0f : dmgMul * DamageAt(run.RunTime) * EventDamageMul, type.isElite || type.isProp || type.isGoblin ? Color.white : tint, pos);
         if (e.TryGetComponent(out BossAI ai)) ai.enabled = false;
         return e;
     }
@@ -267,7 +274,7 @@ public class EnemySpawner : MonoBehaviour
             if (run.IsOver || run.BossFight) yield break;
             float a = baseAng + Random.Range(-0.45f, 0.45f);
             Vector2 pos = (Vector2)p.transform.position + new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * r;
-            SpawnAt(hound, pos, healthScale.Evaluate(t) * hpMul * 0.7f);
+            SpawnAt(hound, pos, HealthAt(t) * hpMul * 0.7f);
             yield return new WaitForSeconds(0.08f);
         }
     }
@@ -282,7 +289,7 @@ public class EnemySpawner : MonoBehaviour
         {
             float a = i * Mathf.PI * 2f / n;
             Vector2 pos = (Vector2)p.transform.position + new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * 8.5f;
-            SpawnAt(types[0], pos, healthScale.Evaluate(t) * hpMul);
+            SpawnAt(types[0], pos, HealthAt(t) * hpMul);
         }
     }
 
@@ -293,7 +300,7 @@ public class EnemySpawner : MonoBehaviour
         goblinType ??= new EnemyType { name = "Treasure Goblin", health = 60, speed = 3.3f, damage = 0, scale = 1.1f, xp = 25, tint = Color.white, isGoblin = true, sprite = goblinSprite };
         float a = Random.value * Mathf.PI * 2f;
         Vector2 pos = (Vector2)p.transform.position + new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * 5.5f;
-        var g = SpawnAt(goblinType, pos, healthScale.Evaluate(t) * hpMul);
+        var g = SpawnAt(goblinType, pos, HealthAt(t) * hpMul);
         if (g == null) return;
         if (goblinSprite == null) g.Body.color = new Color(0.4f, 1f, 0.45f);
         run.EventBanner("TREASURE GOBLIN!", "Catch it before it escapes (15s) for gold and gems!");

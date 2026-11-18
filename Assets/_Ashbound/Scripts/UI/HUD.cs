@@ -257,4 +257,22 @@ public class HUD : MonoBehaviour
     public void HideBossBar() { if (bossBar && bossBar.activeSelf) { bossBar.SetActive(false); bossBarFill.fillAmount = 1f; } }
 
     public void HideBossWarning() => bossWarning.SetActive(false);
+
+    TMP_Text modeText;
+    /// <summary>A small line under the timer: Daily curses, Ascension level or Endless record.</summary>
+    public void SetModeLine(string text)
+    {
+        if (timerText == null) return;
+        if (modeText == null)
+        {
+            modeText = Instantiate(timerText, timerText.transform.parent);
+            modeText.name = "ModeLine";
+            var rt = modeText.rectTransform;
+            rt.anchoredPosition = timerText.rectTransform.anchoredPosition + new Vector2(0f, -timerText.rectTransform.rect.height * 0.95f);
+            rt.sizeDelta = new Vector2(1000f, 34f);
+            modeText.enableAutoSizing = false; modeText.fontSize = 20f; modeText.color = Palette.TextMuted;
+            modeText.textWrappingMode = TextWrappingModes.NoWrap; modeText.alignment = TextAlignmentOptions.Top;
+        }
+        modeText.text = text;
+    }
 }

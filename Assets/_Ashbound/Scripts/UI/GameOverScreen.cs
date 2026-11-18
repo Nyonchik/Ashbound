@@ -22,8 +22,9 @@ public class GameOverScreen : MonoBehaviour
 
     public void Show(bool won, float time, int level, int kills, int gold, string notes = "", string details = "")
     {
-        title.text = won ? "VICTORY" : "YOU FELL";
-        title.color = won ? Palette.Gold : Palette.Health;
+        title.text = won ? "VICTORY" : RunSelection.Mode == RunMode.Endless ? "THE NIGHT WINS" : RunSelection.Mode == RunMode.Daily ? "DAILY DONE" : "YOU FELL";
+        title.color = won ? Palette.Gold : RunSelection.Mode == RunMode.Normal ? Palette.Health : Palette.Accent;
+        if (retryButton) retryButton.gameObject.SetActive(RunSelection.Mode != RunMode.Daily);   // the daily is one attempt
         int m = (int)(time / 60f), s = (int)(time % 60f);
         stats.text = $"Survived {m:00}:{s:00}\nLevel {level}  ·  {kills:N0} kills  ·  {gold:N0} gold";
         if (rewards != null) rewards.text = notes;

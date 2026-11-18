@@ -11,6 +11,7 @@ public class PlayerStats : MonoBehaviour
 
     [HideInInspector] public float damageMul = 1f, cooldownMul = 1f, areaMul = 1f, moveMul = 1f, pickupMul = 1f;
     [HideInInspector] public float damageReduction;   // from gear, capped at 50%
+    [HideInInspector] public float healMul = 1f;   // Ascension 4 weakens healing
     float bonusHealth;
 
     [SerializeField] SpriteRenderer[] flashRenderers;
@@ -61,7 +62,7 @@ public class PlayerStats : MonoBehaviour
     public void Heal(float amount)
     {
         if (IsDead) return;
-        Health = Mathf.Min(MaxHealth, Health + amount);
+        Health = Mathf.Min(MaxHealth, Health + amount * healMul);
         OnHealthChanged?.Invoke(Health, MaxHealth);
     }
 

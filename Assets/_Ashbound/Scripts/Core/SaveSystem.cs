@@ -26,6 +26,23 @@ public class SaveData
     public int nextGearId = 1;
     public int gems = 40;            // existing saves start with 40 gems too
     public long lastFreeChest;
+    // Phase 3: ascension, hero levels, achievements, quests, daily, endless
+    public int ascensionUnlocked;          // highest Ascension level you may pick
+    public int ascensionSelected;
+    public List<string> heroNames = new();
+    public List<int> heroXp = new();
+    public List<string> talentPicks = new();   // "Mage:0=1"
+    public List<string> statKeys = new();
+    public List<float> statValues = new();
+    public List<string> achievementsClaimed = new();
+    public string questDate = "";
+    public List<string> questIds = new();
+    public List<float> questBase = new();
+    public List<string> questClaimed = new();
+    public string dailyDate = "";
+    public float dailyBest;                // seconds survived in today's daily
+    public int dailyGems;
+    public float endlessBest;
 }
 
 /// <summary>Progress and settings, stored as JSON in PlayerPrefs.</summary>

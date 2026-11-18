@@ -59,7 +59,7 @@ public class PauseMenu : MonoBehaviour
         if (chestPopup && chestPopup.activeSelf) return;
         bool pause = !overlay.activeSelf;
         overlay.SetActive(pause);
-        if (pause) { GameSpeed.Pause(); BuildLoadout(); }
+        if (pause) { GameSpeed.Pause(); BuildLoadout(); if (restartButton) restartButton.gameObject.SetActive(RunSelection.Mode != RunMode.Daily); }
         else { GameSpeed.Resume(); SaveSystem.Save(); }
     }
 

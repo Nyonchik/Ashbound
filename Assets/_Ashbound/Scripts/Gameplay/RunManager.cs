@@ -158,10 +158,16 @@ public class RunManager : MonoBehaviour
         if (RunSelection.Class != null)
         {
             gearGold = Gear.ApplyTo(stats, RunSelection.Class.className);
+            // hero level talents
+            var (talentGold, talentMech) = HeroLevels.ApplyTo(stats, RunSelection.Class.className);
+            gearGold += talentGold;
             // the hero's own mechanic (Mana, Rage, Focus, Shadowstep, Fortify)
-            player.gameObject.AddComponent<HeroMechanic>().Setup(RunSelection.Class.className, Gear.MechanicBoost(RunSelection.Class.className), barSprite);
+            player.gameObject.AddComponent<HeroMechanic>().Setup(RunSelection.Class.className, Gear.MechanicBoost(RunSelection.Class.className) + talentMech, barSprite);
             ShowTip("mechanic_" + RunSelection.Class.className, MechanicTip(RunSelection.Class.className));
         }
+
+        stats.healMul = Ascension.HealMul;
+        StartModeTips();
 
         float lastHealth = stats.Health;
         stats.OnHealthChanged += (h, m) =>
@@ -196,7 +202,7 @@ public class RunManager : MonoBehaviour
                 : fallbackPathWeapon;
         pathWeapon = AddWeapon(def, true);
 
-        levelUp.SetCharges(2 + Mathf.RoundToInt(MetaUpgrades.Bonus("rerolls")), 1);
+        levelUp.SetCharges(Mathf.Max(0, 2 + Mathf.RoundToInt(MetaUpgrades.Bonus("rerolls")) - Ascension.RerollPenalty), 1);
         levelUp.OnPicked += option =>
         {
             option.apply?.Invoke();
@@ -235,7 +241,7 @@ public class RunManager : MonoBehaviour
         // music: boss theme while a boss is alive
         AudioManager.PlayMusic(BossFight ? "music_boss" : StageMusic);
         if (RunTime > 40f) ShowTip("pause", "Press Esc or the pause button to see your whole build.");
-        if (RunTime >= runLength && spawner.AllBossesSpawned && bossesAlive <= 0 && !ending) StartCoroutine(VictoryMoment());
+        if (RunSelection.Mode != RunMode.Endless && RunTime >= runLength && spawner.AllBossesSpawned && bossesAlive <= 0 && !ending) StartCoroutine(VictoryMoment());
     }
 
     // ---------------- events from gameplay
@@ -300,8 +306,10 @@ public class RunManager : MonoBehaviour
     public void OnEnemyKilled(Enemy e, int xpValue)
     {
         Vector2 position = e.transform.position;
-        if (e.IsProp) { PropLoot(e, position); return; }
+        if (e.IsProp) { PropLoot(e, position); propsBroken++; return; }
         kills++;
+        if (e.IsGoblin) goblinsCaught++;
+        if (e.IsElite) elitesKilled++;
         CountStreak();
         if (e.IsGoblin) GoblinLoot(position);
         hud.SetKills(kills);
@@ -342,6 +350,7 @@ public class RunManager : MonoBehaviour
         float r = Random.value;
         // Random drops are rare (~0.26% per kill) and at least 15s apart, so healing stays precious
         if (RunTime < nextDropTime) return;
+        if (Ascension.DropMul < 1f && Random.value > Ascension.DropMul) return;
         PickupKind? drop = r < 0.0012f ? PickupKind.Meat
                          : r < 0.0020f ? PickupKind.GoldBag
                          : r < 0.0024f ? PickupKind.Magnet
@@ -440,6 +449,7 @@ public class RunManager : MonoBehaviour
     public void AddXP(int amount)
     {
         if (IsOver) return;
+        if (Ascension.XpMul < 1f) amount = Mathf.Max(1, Mathf.RoundToInt(amount * Ascension.XpMul));
         xp += amount;
         while (xp >= xpNeeded)
         {
@@ -637,13 +647,15 @@ public class RunManager : MonoBehaviour
         var cls = RunSelection.Class;
         save.runsPlayed++;
         save.totalKills += kills;
-        int earned = Mathf.RoundToInt(gold * (stage != null ? stage.goldMultiplier : 1f) * (1f + MetaUpgrades.Bonus("greed") + gearGold));
+        int earned = Mathf.RoundToInt(gold * (stage != null ? stage.goldMultiplier : 1f) * (1f + MetaUpgrades.Bonus("greed") + gearGold) * Ascension.RewardMul);
         save.gold += earned;
         int gemsEarned = bossesKilled * 3 + (RunTime >= 600f ? 5 : 0) + (won ? 20 : 0);
         if (won && stage != null && !save.stagesWon.Contains(stage.stageName)) gemsEarned += 30;
+        gemsEarned = Mathf.RoundToInt(gemsEarned * Ascension.RewardMul);
+        var notes = new List<string> { $"+{earned} gold" + (Ascension.Level > 0 ? $" <size=80%>(A{Ascension.Level} +{Ascension.Level * 10}%)</size>" : "") };
+        ProgressionResults(won, notes, ref gemsEarned);
         save.gems += gemsEarned;
-        var notes = new List<string> { $"+{earned} gold" };
-        if (gemsEarned > 0) notes.Add($"+{gemsEarned} gems");
+        if (gemsEarned > 0) notes.Insert(1, $"+{gemsEarned} gems");
 
         if (RunTime >= 600f)
         {
@@ -678,6 +690,93 @@ public class RunManager : MonoBehaviour
         SaveSystem.Save();
         AudioManager.Play(won ? "victory" : "gameover", 0.9f);
         gameOver.Show(won, RunTime, level, kills, gold, string.Join("\n", notes), Breakdown());
+    }
+
+    // ---------------- Phase 3: ascension, hero XP, achievements, daily, endless
+
+    int elitesKilled, goblinsCaught, propsBroken, evolutions, synergiesOn;
+
+    void StartModeTips()
+    {
+        if (RunSelection.Mode == RunMode.Daily)
+        {
+            SaveSystem.Data.dailyDate = Daily.Today;   // one attempt: starting the run uses it
+            SaveSystem.Data.dailyBest = 0f; SaveSystem.Data.dailyGems = 0;
+            SaveSystem.Save();
+            hud.ShowTip($"<color=#A970FF><b>Daily challenge</b></color>  {Ascension.Curses[RunSelection.CurseA - 1]} · {Ascension.Curses[RunSelection.CurseB - 1]}");
+            hud.SetModeLine($"<color=#A970FF>Daily</color> · {Ascension.Curses[RunSelection.CurseA - 1]} · {Ascension.Curses[RunSelection.CurseB - 1]}");
+        }
+        else if (RunSelection.Mode == RunMode.Endless)
+        {
+            hud.ShowTip("<color=#F08A3C><b>Endless</b></color>  No bosses. It never stops getting harder. How long can you last?");
+            float best = SaveSystem.Data.endlessBest;
+            hud.SetModeLine(best > 0f ? $"<color=#F08A3C>Endless</color> · best {(int)(best / 60f)}:{(int)(best % 60f):00}" : "<color=#F08A3C>Endless</color>");
+        }
+        if (Ascension.Level > 0)
+        {
+            if (RunSelection.Mode == RunMode.Normal) hud.ShowTip($"<color=#F08A3C><b>Ascension {Ascension.Level}</b></color>  {Ascension.Curses[Ascension.Level - 1]} (+{Ascension.Level - 1} more curses)");
+            if (RunSelection.Mode == RunMode.Normal) hud.SetModeLine($"<color=#F08A3C>Ascension {Ascension.Level}</color>");
+            else if (RunSelection.Mode == RunMode.Endless) hud.SetModeLine($"<color=#F08A3C>Endless · A{Ascension.Level}</color>" + (SaveSystem.Data.endlessBest > 0f ? $" · best {(int)(SaveSystem.Data.endlessBest / 60f)}:{(int)(SaveSystem.Data.endlessBest % 60f):00}" : ""));
+        }
+    }
+
+    void ProgressionResults(bool won, List<string> notes, ref int gemsEarned)
+    {
+        var save = SaveSystem.Data;
+        Achievements.Add("kills", kills);
+        Achievements.Add("bosses", bossesKilled);
+        Achievements.Add("elites", elitesKilled);
+        Achievements.Add("goblins", goblinsCaught);
+        Achievements.Add("props", propsBroken);
+        Achievements.Add("evolutions", evolutions);
+        Achievements.Add("synergies", synergiesOn);
+        Achievements.Add("streak", bestStreak);
+        Achievements.Add("time", RunTime);
+        Achievements.Add("runs", 1);
+        if (won) Achievements.Add("wins", 1);
+
+        switch (RunSelection.Mode)
+        {
+            case RunMode.Normal:
+                if (won)
+                {
+                    Achievements.Add("ascension", Ascension.Level);
+                    if (Ascension.Level >= save.ascensionUnlocked && Ascension.Level < Ascension.Max)
+                    {
+                        save.ascensionUnlocked = Ascension.Level + 1;
+                        notes.Add($"<color=#F08A3C>Ascension {save.ascensionUnlocked} unlocked!</color>");
+                    }
+                }
+                break;
+            case RunMode.Daily:
+                int daily = Daily.Reward(RunTime);
+                gemsEarned += daily;
+                save.dailyBest = RunTime; save.dailyGems = daily;
+                Achievements.Add("dailies", 1);
+                notes.Add($"Daily challenge: +{daily} gems");
+                break;
+            case RunMode.Endless:
+                Achievements.Add("endless", RunTime);
+                if (RunTime > save.endlessBest)
+                {
+                    notes.Add(save.endlessBest > 0f ? $"<color=#FFD95A>New Endless record!</color> (was {save.endlessBest / 60f:0}:{save.endlessBest % 60f:00})" : "<color=#FFD95A>First Endless record set!</color>");
+                    save.endlessBest = RunTime;
+                }
+                break;
+        }
+
+        var cls = RunSelection.Class;
+        if (cls != null)
+        {
+            int heroXp = HeroLevels.RunXp(kills, RunTime, bossesKilled, won);
+            int ups = HeroLevels.AddXp(cls.className, heroXp);
+            var (lv, _, _) = HeroLevels.Level(cls.className);
+            Achievements.Add("herolevel", lv);
+            notes.Add($"{cls.className} +{heroXp} hero XP" + (ups > 0 ? $"  <color=#FFD95A>Level {lv}!</color>" : $"  (Lv {lv})"));
+            if (ups > 0 && HeroLevels.UnspentPicks(cls.className) > 0) notes.Add("<color=#FFD95A>New talent to pick in Heroes!</color>");
+        }
+        int ready = Achievements.Unclaimed();
+        if (ready > 0) notes.Add($"<color=#A970FF>{ready} reward{(ready > 1 ? "s" : "")} ready in Quests</color>");
     }
 
     void UnlockClass(string className, bool condition, List<string> notes)
@@ -800,6 +899,7 @@ public class RunManager : MonoBehaviour
             apply = () =>
             {
                 w.Evolve();
+                evolutions++;
                 AudioManager.Play("evolve", 1f);
                 CameraFollow.Shake(0.25f, 0.35f);
                 SpawnVfx(player.transform.position, 3f, Palette.Gold, 0.6f);
@@ -878,6 +978,7 @@ public class RunManager : MonoBehaviour
         var defs = new List<WeaponDef>(); foreach (var w in weapons) defs.Add(w.Def);
         foreach (var syn in Synergies.Refresh(defs))
         {
+            synergiesOn++;
             AudioManager.Play("chime", 0.8f);
             hud.ShowTip($"<color=#{ColorUtility.ToHtmlStringRGB(syn.color)}>Synergy: {syn.name}</color>  {syn.description}");
             FxParticles.Motes(player.transform.position, syn.color, 14, 0.6f, 0.18f, 1f);
