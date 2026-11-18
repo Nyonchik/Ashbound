@@ -1163,7 +1163,7 @@ public static class AshboundBuilder
         Set(mm, "heroesLabel", heroes.GetComponentInChildren<TextMeshProUGUI>());
 
         // ---- Settings
-        var (setRoot, setPanel) = MenuOverlay(canvas, "SettingsPanel", "SETTINGS", new Vector2(760, 920));
+        var (setRoot, setPanel) = MenuOverlay(canvas, "SettingsPanel", "SETTINGS", new Vector2(1000, 960));
         var music = LabeledSlider(setPanel, "Music");
         var sfx = LabeledSlider(setPanel, "Sound effects");
         var fsBtn = Btn(Inst(prefabsCache.secondary, setPanel, "Fullscreen"), "Fullscreen: On");
@@ -1173,13 +1173,22 @@ public static class AshboundBuilder
         resLbl.gameObject.AddComponent<LayoutElement>().preferredWidth = 300;
         var resNext = Btn(Inst(prefabsCache.secondary, resRow, "Next"), ">", 78, 72);
         foreach (var b in new[] { resPrev, resNext }) { var l = b.GetComponentInChildren<TextMeshProUGUI>(); l.alignment = TextAlignmentOptions.Center; Stretch(l.rectTransform, 0, 0, 0, 0); }
-        var dmgBtn = Btn(Inst(prefabsCache.secondary, setPanel, "DamageNumbers"), "Damage numbers: On");
-        var shakeBtn = Btn(Inst(prefabsCache.secondary, setPanel, "ScreenShake"), "Screen shake: On");
+        var setRow1 = Row(setPanel, "NumbersRow", 14);
+        var dmgBtn = Btn(Inst(prefabsCache.secondary, setRow1, "DamageNumbers"), "Damage numbers: On", 445, 72);
+        var cbBtn = Btn(Inst(prefabsCache.secondary, setRow1, "Colorblind"), "Colorblind numbers: Off", 445, 72);
+        var setRow2 = Row(setPanel, "ShakeRow", 14);
+        var shakeBtn = Btn(Inst(prefabsCache.secondary, setRow2, "ScreenShake"), "Screen shake: Full", 445, 72);
+        var hudBtn = Btn(Inst(prefabsCache.secondary, setRow2, "HudSize"), "HUD size: 100%", 445, 72);
+        var setRow3 = Row(setPanel, "ControlsRow", 14);
+        var ctrlBtn = Btn(Inst(prefabsCache.secondary, setRow3, "Controls"), "Controls", 445, 72);
+        var tutBtn = Btn(Inst(prefabsCache.secondary, setRow3, "Tutorial"), "Replay tutorial", 445, 72);
         var resetBtn = Btn(Inst(prefabsCache.secondary, setPanel, "Reset"), "Reset progress");
         var setClose = Btn(Inst(prefabsCache.primary, setPanel, "Close"), "Close");
         var sp = setRoot.gameObject.AddComponent<SettingsPanel>();
         Set(sp, "musicSlider", music); Set(sp, "sfxSlider", sfx); Set(sp, "fullscreenButton", fsBtn); Set(sp, "resPrev", resPrev); Set(sp, "resNext", resNext);
         Set(sp, "damageNumbersButton", dmgBtn); Set(sp, "shakeButton", shakeBtn);
+        Set(sp, "colorblindButton", cbBtn); Set(sp, "hudScaleButton", hudBtn); Set(sp, "controlsButton", ctrlBtn); Set(sp, "tutorialButton", tutBtn);
+        Set(sp, "font", fBold); Set(sp, "boldFont", fBlack); Set(sp, "panelSprite", sPanel); Set(sp, "fillSprite", sFill);
         Set(sp, "resetButton", resetBtn); Set(sp, "closeButton", setClose); Set(sp, "menu", mm);
         Set(sp, "fullscreenLabel", fsBtn.GetComponentInChildren<TextMeshProUGUI>()); Set(sp, "resolutionLabel", resLbl); Set(sp, "resetLabel", resetBtn.GetComponentInChildren<TextMeshProUGUI>());
 

@@ -133,7 +133,7 @@ public class HeroMechanic : MonoBehaviour
         if (r != null) stats.SetBaseColor(r, stealth > 0.5f ? new Color(1f, 1f, 1f, 0.35f) : UnityEngine.Color.white);
 
         var kb = Keyboard.current;
-        if (kb != null && kb.spaceKey.wasPressedThisFrame && dashReady <= 0f && Time.timeScale > 0f)
+        if (kb != null && Controls.Pressed(Controls.Action.Dash) && dashReady <= 0f && Time.timeScale > 0f)
         {
             dashReady = cd;
             stealth = 1.5f;   // 0.5s invisible + 1s of guaranteed crits

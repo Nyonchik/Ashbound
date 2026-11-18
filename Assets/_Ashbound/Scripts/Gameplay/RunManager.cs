@@ -113,6 +113,7 @@ public class RunManager : MonoBehaviour
     public IReadOnlyList<PassiveDef> Passives => passives;
     public int PassiveLevel(PassiveDef p) { int i = passives.IndexOf(p); return i < 0 ? 0 : passiveLevels[i]; }
     public int Level => level;
+    public int Kills => kills;
 
     // ---------------- boss arena + health bar
     readonly List<(Enemy e, string name)> liveBosses = new();
@@ -168,6 +169,17 @@ public class RunManager : MonoBehaviour
 
         stats.healMul = Ascension.HealMul;
         StartModeTips();
+        ApplyHudScale();
+        if (SaveSystem.Data.runsPlayed > 0 && !SaveSystem.Data.tutorialDone && !SaveSystem.Data.seenTips.Contains("tutorial_replay")) { SaveSystem.Data.tutorialDone = true; }   // veterans skip it (Settings can replay it)
+        if (Benchmark) StartCoroutine(BenchmarkRoutine());
+        else if (Tutorial.ShouldRun && hud != null)
+        {
+            var canvas = hud.GetComponentInParent<Canvas>();
+            var font = hud.GetComponentInChildren<TMPro.TMP_Text>(true);
+            if (canvas != null && font != null)
+                gameObject.AddComponent<Tutorial>().Setup(this, spawner, canvas.rootCanvas.transform, font.font,
+                    RunSelection.Class != null ? MechanicTip(RunSelection.Class.className) : "Survive as long as you can!");
+        }
 
         float lastHealth = stats.Health;
         stats.OnHealthChanged += (h, m) =>
@@ -251,7 +263,7 @@ public class RunManager : MonoBehaviour
     /// <summary>First-run hint: each tip shows once per save.</summary>
     public void ShowTip(string id, string text)
     {
-        if (string.IsNullOrEmpty(text)) return;
+        if (string.IsNullOrEmpty(text) || GetComponent<Tutorial>() != null) return;   // the tutorial covers these
         var seen = SaveSystem.Data.seenTips;
         if (seen.Contains(id)) return;
         seen.Add(id);
@@ -448,7 +460,7 @@ public class RunManager : MonoBehaviour
 
     public void AddXP(int amount)
     {
-        if (IsOver) return;
+        if (IsOver || benchRunning) return;
         if (Ascension.XpMul < 1f) amount = Mathf.Max(1, Mathf.RoundToInt(amount * Ascension.XpMul));
         xp += amount;
         while (xp >= xpNeeded)
@@ -718,6 +730,47 @@ public class RunManager : MonoBehaviour
             if (RunSelection.Mode == RunMode.Normal) hud.SetModeLine($"<color=#F08A3C>Ascension {Ascension.Level}</color>");
             else if (RunSelection.Mode == RunMode.Endless) hud.SetModeLine($"<color=#F08A3C>Endless · A{Ascension.Level}</color>" + (SaveSystem.Data.endlessBest > 0f ? $" · best {(int)(SaveSystem.Data.endlessBest / 60f)}:{(int)(SaveSystem.Data.endlessBest % 60f):00}" : ""));
         }
+    }
+
+    void ApplyHudScale()
+    {
+        if (hud == null) return;
+        var scaler = hud.GetComponentInParent<UnityEngine.UI.CanvasScaler>();
+        if (scaler == null || scaler.uiScaleMode != UnityEngine.UI.CanvasScaler.ScaleMode.ScaleWithScreenSize) return;
+        float k = Mathf.Clamp(SaveSystem.Data.hudScale, 0.75f, 1.5f);
+        scaler.referenceResolution = new Vector2(1920f, 1080f) / k;
+    }
+
+    // ---------------- benchmark: Ctrl+Shift+B on the hero screen. God mode at 8:00 with a full arena; writes Builds/benchmark.txt
+    public static bool Benchmark;
+    bool benchRunning;   // no level-up screens while measuring
+
+    System.Collections.IEnumerator BenchmarkRoutine()
+    {
+        Benchmark = false; benchRunning = true;
+        player.Stats.godMode = true;
+        RunTime = 480f;
+        hud.ShowTip("<color=#FFD95A><b>Benchmark</b></color>  filling the arena, then measuring for 45s...");
+        yield return new WaitForSecondsRealtime(15f);
+        var frames = new List<float>();
+        float t = 0f;
+        while (t < 45f)
+        {
+            float dt = Time.unscaledDeltaTime;
+            if (Time.timeScale > 0f) { frames.Add(dt); t += dt; }
+            yield return null;
+        }
+        frames.Sort();
+        float avg = 0f; foreach (var f in frames) avg += f; avg /= Mathf.Max(1, frames.Count);
+        float p99 = frames.Count > 0 ? frames[Mathf.Min(frames.Count - 1, (int)(frames.Count * 0.99f))] : 0f;
+        string result = $"Ashbound benchmark {System.DateTime.Now:yyyy-MM-dd HH:mm}\n{Screen.width}x{Screen.height} {SystemInfo.graphicsDeviceName}\n" +
+                        $"avg {1f / avg:0} fps ({avg * 1000f:0.0} ms), 1% low {1f / Mathf.Max(0.0001f, p99):0} fps ({p99 * 1000f:0.0} ms)\n" +
+                        $"enemies {Enemy.Active.Count}, gems {XPGem.Active.Count}, frames {frames.Count}";
+        Debug.Log("[Ashbound] " + result.Replace("\n", " | "));
+        try { System.IO.File.AppendAllText(System.IO.Path.Combine(Application.dataPath, "..", "..", "benchmark.txt"), result + "\n\n"); } catch { }
+        hud.ShowTip("<color=#FFD95A>Benchmark</color>  " + result.Replace("\n", "  ·  "));
+        yield return new WaitForSecondsRealtime(6f);
+        UnityEngine.SceneManagement.SceneManager.LoadScene("MainMenu");
     }
 
     void ProgressionResults(bool won, List<string> notes, ref int gemsEarned)
@@ -1013,7 +1066,9 @@ public class RunManager : MonoBehaviour
         if (crit) AudioManager.Play("crit", 0.35f, 0.9f + Random.value * 0.3f, 0.06f);
         if (damageNumberPrefab == null || activeNumbers > 90 || amount < 1f || !SaveSystem.Data.showDamageNumbers) return;
         activeNumbers++;
-        var color = crit ? CritColor : big ? Palette.Gold : amount >= 30f ? new Color(1f, 0.6f, 0.25f) : Color.white;
+        var color = SaveSystem.Data.colorblindNumbers
+            ? (crit ? new Color(1f, 0.88f, 0.2f) : big ? new Color(0.45f, 0.8f, 1f) : amount >= 30f ? new Color(0.75f, 0.9f, 1f) : Color.white)   // yellow / blue / white: no red-green
+            : crit ? CritColor : big ? Palette.Gold : amount >= 30f ? new Color(1f, 0.6f, 0.25f) : Color.white;
         float size = crit ? 4.8f : big || amount >= 30f ? 4.2f : 3.2f;
         numbers.Get().Play(position, Mathf.RoundToInt(amount), color, size, n => { activeNumbers--; numbers.Release(n); });
     }

@@ -43,6 +43,12 @@ public class SaveData
     public float dailyBest;                // seconds survived in today's daily
     public int dailyGems;
     public float endlessBest;
+    // Phase 4: settings + tutorial
+    public List<string> keyBinds = new();   // Controls.Action order; empty = defaults
+    public float shakeStrength = 1f;        // 0 off .. 1 full
+    public bool colorblindNumbers;
+    public float hudScale = 1f;
+    public bool tutorialDone;
 }
 
 /// <summary>Progress and settings, stored as JSON in PlayerPrefs.</summary>

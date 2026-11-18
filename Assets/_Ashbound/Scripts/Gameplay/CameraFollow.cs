@@ -11,7 +11,8 @@ public class CameraFollow : MonoBehaviour
 
     public static void Shake(float amount, float duration)
     {
-        if (!SaveSystem.Data.screenShake) return;
+        if (!SaveSystem.Data.screenShake || SaveSystem.Data.shakeStrength <= 0.01f) return;
+        amount *= SaveSystem.Data.shakeStrength;
         if (amount >= shakeAmount || shakeTime <= 0f) shakeAmount = amount;
         shakeTime = Mathf.Max(shakeTime, duration);
     }

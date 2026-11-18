@@ -52,6 +52,7 @@ public class EnemySpawner : MonoBehaviour
     EnemyType goblinType;
     /// <summary>Cursed shrine: more enemies that hit harder while it's active.</summary>
     public float EventSpawnMul = 1f, EventDamageMul = 1f;
+    [System.NonSerialized] public float TutorialMul = 1f;
     readonly List<Enemy> scratch = new();
 
     ObjectPool<Enemy> pool;
@@ -112,7 +113,7 @@ public class EnemySpawner : MonoBehaviour
         float t = run.RunTime;
 
         // During a boss fight only the boss (and its own minions) are in the arena
-        if (!run.BossFight) accumulator += SpawnsAt(t) * spawnMul * EventSpawnMul * Time.deltaTime;
+        if (!run.BossFight) accumulator += SpawnsAt(t) * spawnMul * EventSpawnMul * TutorialMul * Time.deltaTime;
         UpdateProps(t);
         UpdateEvents(t);
         while (accumulator >= 1f)

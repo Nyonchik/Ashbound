@@ -74,6 +74,17 @@ public class ClassSelectScreen : MonoBehaviour
         UpdateStart();
     }
 
+    void Update()
+    {
+        var kb = UnityEngine.InputSystem.Keyboard.current;
+        if (kb != null && kb.leftCtrlKey.isPressed && kb.leftShiftKey.isPressed && kb.bKey.wasPressedThisFrame && currentClass != null && currentPath != null)
+        {
+            RunManager.Benchmark = true;
+            RunSelection.Mode = RunMode.Normal;
+            StartRun();
+        }
+    }
+
     void ChangeAscension(int delta)
     {
         var d = SaveSystem.Data;

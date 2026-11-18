@@ -49,7 +49,7 @@ public class PauseMenu : MonoBehaviour
 
     void Update()
     {
-        if (Keyboard.current != null && (Keyboard.current.escapeKey.wasPressedThisFrame || Keyboard.current.pKey.wasPressedThisFrame)) Toggle();
+        if (Keyboard.current != null && (Keyboard.current.escapeKey.wasPressedThisFrame || Controls.Pressed(Controls.Action.Pause))) Toggle();
     }
 
     public void Toggle()

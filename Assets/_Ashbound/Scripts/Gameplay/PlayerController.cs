@@ -37,9 +37,9 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
 
         move = new InputAction("Move", InputActionType.Value);
-        move.AddCompositeBinding("2DVector")
-            .With("Up", "<Keyboard>/w").With("Down", "<Keyboard>/s")
-            .With("Left", "<Keyboard>/a").With("Right", "<Keyboard>/d");
+        move.AddCompositeBinding("2DVector")   // rebindable in Settings > Controls
+            .With("Up", Controls.Path(Controls.Action.Up)).With("Down", Controls.Path(Controls.Action.Down))
+            .With("Left", Controls.Path(Controls.Action.Left)).With("Right", Controls.Path(Controls.Action.Right));
         move.AddCompositeBinding("2DVector")
             .With("Up", "<Keyboard>/upArrow").With("Down", "<Keyboard>/downArrow")
             .With("Left", "<Keyboard>/leftArrow").With("Right", "<Keyboard>/rightArrow");
