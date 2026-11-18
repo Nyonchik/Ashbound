@@ -60,6 +60,7 @@ MonoBehaviour:
     pierce: 0
     explode: 0
   style: 13
+  element: Blood
   effect: {fileID: 0}
   awakenIcon: {fileID: 21300000, guid: 0b77f66e30eb64b0fb57d4835a650407, type: 3}
   awakenProjectile: {fileID: 0}

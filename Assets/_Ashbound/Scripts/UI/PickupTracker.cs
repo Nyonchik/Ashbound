@@ -9,7 +9,7 @@ public class PickupTracker : MonoBehaviour
     [SerializeField] Sprite backgroundSprite, arrowSprite;
     [SerializeField] float margin = 70f;
     [SerializeField] int maxShown = 10;
-    [Tooltip("Icons for off-screen elites and bosses")] [SerializeField] Sprite eliteIcon, bossIcon;
+    [Tooltip("Icons for off-screen elites and bosses")] [SerializeField] Sprite eliteIcon, bossIcon, goblinIcon;
 
     class Indicator { public RectTransform root, arrow; public Image icon, arrowImg; }
     readonly List<Indicator> pool = new();
@@ -31,6 +31,7 @@ public class PickupTracker : MonoBehaviour
             foreach (var e in Enemy.Active)
             {
                 if (used >= maxShown) break;
+                if (e.IsGoblin) { if (Point(cam, e.transform.position, half, used, goblinIcon, Color.white, Palette.Gold)) used++; continue; }
                 if (!e.IsElite && !e.IsBoss) continue;
                 bool boss = e.IsBoss;
                 var ic = boss ? bossIcon : eliteIcon;

@@ -60,6 +60,7 @@ MonoBehaviour:
     pierce: 1
     explode: 0
   style: 18
+  element: Arcane
   effect: {fileID: 0}
   awakenIcon: {fileID: 21300000, guid: 464b517f8646147b789e6a0d797d8878, type: 3}
   awakenProjectile: {fileID: 0}

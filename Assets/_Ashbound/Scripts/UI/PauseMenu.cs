@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Text;
 using TMPro;
 using UnityEngine;
@@ -106,6 +107,9 @@ public class PauseMenu : MonoBehaviour
             var sb = new StringBuilder();
             sb.Append($"Level {run.Level}");
             if (s != null) sb.Append($"   ·   {Mathf.CeilToInt(s.Health)} / {Mathf.CeilToInt(s.MaxHealth)} HP   ·   Damage x{s.damageMul:0.00}   ·   Speed x{s.moveMul:0.00}");
+            var syns = new List<string>();
+            foreach (var id in Synergies.ActiveIds) { var d = Synergies.Get(id); if (d != null) syns.Add($"<color=#{ColorUtility.ToHtmlStringRGB(d.color)}>{d.name}</color>"); }
+            if (syns.Count > 0) sb.Append("\nSynergies: " + string.Join("  ·  ", syns));
             statsText.text = sb.ToString();
         }
     }

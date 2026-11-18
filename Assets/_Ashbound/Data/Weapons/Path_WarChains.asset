@@ -60,6 +60,7 @@ MonoBehaviour:
     pierce: 0
     explode: 0
   style: 14
+  element: Physical
   effect: {fileID: 0}
   awakenIcon: {fileID: 21300000, guid: 40518c18937ba4362b41d0e27883354b, type: 3}
   awakenProjectile: {fileID: 0}

@@ -60,6 +60,7 @@ MonoBehaviour:
     pierce: 0
     explode: 0
   style: 24
+  element: Holy
   effect: {fileID: 0}
   awakenIcon: {fileID: 21300000, guid: 347e7022edeab458d952e71a0758813a, type: 3}
   awakenProjectile: {fileID: 0}

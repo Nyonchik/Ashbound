@@ -60,6 +60,7 @@ MonoBehaviour:
     pierce: 0
     explode: 0
   style: 26
+  element: Earth
   effect: {fileID: 0}
   awakenIcon: {fileID: 21300000, guid: 9d193c26f66b3452987841588fd98a3e, type: 3}
   awakenProjectile: {fileID: 0}

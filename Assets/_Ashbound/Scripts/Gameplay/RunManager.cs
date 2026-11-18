@@ -147,6 +147,7 @@ public class RunManager : MonoBehaviour
 
     void Start()
     {
+        Synergies.Clear();
         var stats = player.Stats;
         // permanent upgrades from the main menu
         stats.AddMaxHealth(MetaUpgrades.Bonus("health"));
@@ -256,7 +257,7 @@ public class RunManager : MonoBehaviour
     {
         bossesAlive++;
         // Clear the arena: every regular mob dies (drops its XP), only the boss remains
-        foreach (var e in new List<Enemy>(Enemy.Active)) if (!e.IsBoss && e != boss) e.Kill();
+        foreach (var e in new List<Enemy>(Enemy.Active)) if (!e.IsBoss && !e.IsProp && e != boss) { if (e.IsGoblin) e.Vanish(); else e.Kill(); }
         liveBosses.Add((boss, bossName));
         hud.ShowBossIntro(bossName, bossTitle);
         ShowTip("boss", "Boss fight! You're locked in the arena until it falls. Regular enemies stop coming.");
@@ -299,8 +300,10 @@ public class RunManager : MonoBehaviour
     public void OnEnemyKilled(Enemy e, int xpValue)
     {
         Vector2 position = e.transform.position;
+        if (e.IsProp) { PropLoot(e, position); return; }
         kills++;
         CountStreak();
+        if (e.IsGoblin) GoblinLoot(position);
         hud.SetKills(kills);
         AudioManager.Play("death", 0.35f, 0.9f + Random.value * 0.25f, 0.05f);
         if (e.Body != null)
@@ -414,6 +417,7 @@ public class RunManager : MonoBehaviour
         if (k != null && k.gKey.wasPressedThisFrame) { player.Stats.godMode = !player.Stats.godMode; Debug.Log("[Ashbound] God mode " + player.Stats.godMode); }
         if (k != null && k.bKey.wasPressedThisFrame && !IsOver) Debug.Log("[Ashbound] Boss set now starts with " + spawner.DebugNextBossSet());
         if (k != null && k.cKey.wasPressedThisFrame && !IsOver) SpawnPickup(PickupKind.Chest, (Vector2)player.transform.position + Vector2.right * 1.5f);
+        if (k != null && k.eKey.wasPressedThisFrame && !IsOver) spawner.DebugEvent();   // E: next map event
         // K: try the next custom Path skill (replaces the last one tried). L: level it up (Lv 6 = awakened).
         if (k != null && k.kKey.wasPressedThisFrame && !IsOver)
         {
@@ -513,6 +517,57 @@ public class RunManager : MonoBehaviour
 
     bool ending;
 
+    // ---------------- map events, props, shrine
+
+    public void EventBanner(string title, string text)
+    {
+        if (!string.IsNullOrEmpty(title)) AudioManager.Play("horn", 0.7f);
+        hud.ShowTip(string.IsNullOrEmpty(title) ? text : $"<color=#F08A3C><b>{title}</b></color>  {text}");
+    }
+
+    void PropLoot(Enemy e, Vector2 p)
+    {
+        AudioManager.Play("break", 0.6f, 0.9f + Random.value * 0.2f);
+        var col = e.PropKind == 1 ? new Color(1f, 0.55f, 0.2f) : e.PropKind == 2 ? new Color(0.75f, 0.75f, 0.8f) : new Color(0.6f, 0.42f, 0.25f);
+        FxParticles.Debris(p, col, 14, 4.5f, 0.15f, 0.55f);
+        FxParticles.Smoke(p, new Color(0.5f, 0.45f, 0.4f, 0.5f), 4, 0.3f, 0.9f, 0.6f, 1f);
+        if (e.PropKind == 1) FxParticles.Sparks(p, new Color(1f, 0.6f, 0.2f), 12, 3.5f, 0.18f, 0.5f);
+        float r = Random.value;
+        PickupKind? drop = e.PropKind switch
+        {
+            0 => r < 0.40f ? PickupKind.GoldBag : r < 0.55f ? PickupKind.Meat : r < 0.62f ? PickupKind.Magnet : null,
+            1 => r < 0.40f ? PickupKind.GoldBag : r < 0.58f ? PickupKind.Meat : null,
+            _ => r < 0.20f ? PickupKind.Chest : r < 0.50f ? PickupKind.Magnet : r < 0.80f ? PickupKind.GoldBag : r < 0.90f ? PickupKind.Medkit : null,
+        };
+        if (drop.HasValue) SpawnPickup(drop.Value, p);
+        else { gold += 2; hud.SetGold(gold); FxParticles.Sparks(p, Palette.Gold, 6, 2.5f, 0.15f, 0.4f); }
+    }
+
+    void GoblinLoot(Vector2 p)
+    {
+        gold += 30; hud.SetGold(gold);
+        SaveSystem.Data.gems += 3; SaveSystem.Save();
+        SpawnPickup(PickupKind.GoldBag, p + Vector2.left * 0.6f);
+        SpawnPickup(PickupKind.GoldBag, p + Vector2.right * 0.6f);
+        AudioManager.Play("coin", 1f, 1.2f);
+        FxParticles.Sparks(p, Palette.Gold, 40, 7f, 0.22f, 0.6f);
+        HitStop(0.08f);
+        hud.ShowTip("<color=#FFD95A><b>Goblin caught!</b></color>  +30 gold, +3 gems");
+    }
+
+    public void SpawnShrine(Sprite art)
+    {
+        Vector2 c = (Vector2)player.transform.position + Random.insideUnitCircle.normalized * 4.5f;
+        var go = new GameObject("CursedShrine");
+        go.transform.position = c;
+        var sr = go.AddComponent<SpriteRenderer>();
+        sr.sprite = art != null ? art : FallbackSprite; sr.sortingOrder = 5;
+        sr.sharedMaterial = SpriteMaterial;
+        if (art != null) go.transform.localScale = Vector3.one * (1.6f / Mathf.Max(0.01f, art.bounds.size.y));
+        else sr.color = new Color(0.6f, 0.3f, 0.9f);
+        go.AddComponent<CursedShrine>().Setup(this, spawner);
+        EventBanner("CURSED SHRINE", "Stand on it to take its power: +40% damage, but twice as many enemies for 40s.");
+    }
     // slow-motion fall before the game-over screen
     System.Collections.IEnumerator DeathMoment()
     {
@@ -697,6 +752,15 @@ public class RunManager : MonoBehaviour
         return false;
     }
 
+    string SynergyHint(WeaponDef d)
+    {
+        var owned = new List<WeaponDef>(); foreach (var w in weapons) owned.Add(w.Def);
+        var list = Synergies.WouldUnlock(owned, d);
+        if (list.Count == 0) return "";
+        var names = new List<string>(); foreach (var x in list) names.Add($"<color=#{ColorUtility.ToHtmlStringRGB(x.color)}>{x.name}</color>");
+        return "\nSynergy: " + string.Join(", ", names);
+    }
+
     static string EvolveHint(WeaponDef d) =>
         d.evolvePassive != null && d.evolvesInto != null ? $"\n<color=#FFD95A>Evolves with {d.evolvePassive.passiveName} Lv 5</color>" : "";
 
@@ -749,7 +813,7 @@ public class RunManager : MonoBehaviour
         tag = "NEW WEAPON",
         name = d.weaponName,
         levelLine = "Lv 1",
-        effect = (d.levelText != null && d.levelText.Length > 0 ? d.levelText[0] : "") + EvolveHint(d),
+        effect = (d.levelText != null && d.levelText.Length > 0 ? d.levelText[0] : "") + EvolveHint(d) + SynergyHint(d),
         color = d.color,
         icon = d.icon,
         fromLevel = 0,
@@ -810,6 +874,15 @@ public class RunManager : MonoBehaviour
 
     void RefreshLoadout()
     {
+        // synergies: owning matching elements turns on combos
+        var defs = new List<WeaponDef>(); foreach (var w in weapons) defs.Add(w.Def);
+        foreach (var syn in Synergies.Refresh(defs))
+        {
+            AudioManager.Play("chime", 0.8f);
+            hud.ShowTip($"<color=#{ColorUtility.ToHtmlStringRGB(syn.color)}>Synergy: {syn.name}</color>  {syn.description}");
+            FxParticles.Motes(player.transform.position, syn.color, 14, 0.6f, 0.18f, 1f);
+        }
+
         if (pathWeapon != null)
             hud.SetPathSkill(pathWeapon.Icon, pathWeapon.Def.color, Mathf.Min(pathWeapon.Level, 5), pathWeapon.Golden, pathWeapon.DisplayName);
 

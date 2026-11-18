@@ -735,6 +735,17 @@ public static class AshboundBuilder
         CustomLook("Path_BrambleArmor", WeaponStyle.Brambles, "fx_bramble_ring", null, "icon_bramble_armor", "awk_ironwood");
         CustomLook("Path_Charge", WeaponStyle.Charge, null, null, "icon_charge", "awk_unstoppable");
         CustomLook("Path_CursedBlade", WeaponStyle.CursedBlade, "fx_cursed_sword", "fx_dark_sweep", "icon_cursed_blade", "awk_dread_lord");
+        // elements for synergies
+        foreach (var (file, el) in new[] {
+            ("Path_Fireball", "Fire"), ("Path_TidalWave", "Frost"), ("Path_ChainLightning", "Lightning"), ("Path_StoneSpikes", "Earth"), ("Path_ShadowBolt", "Shadow"), ("Path_HolyBeam", "Holy"),
+            ("Path_BloodAxes", "Blood"), ("Path_ThunderHammer", "Lightning"), ("Path_WolfClaws", "Blood"), ("Path_WarChains", "Physical"), ("Path_GreatAxe", "Physical"),
+            ("Path_PiercingShot", "Physical"), ("Path_Multishot", "Lightning"), ("Path_WolfTraps", "Physical"), ("Path_IceArrows", "Frost"), ("Path_SpectralArrows", "Arcane"),
+            ("Path_PoisonDaggers", "Poison"), ("Path_Shadowstep", "Shadow"), ("Path_DecoyClone", "Arcane"), ("Path_Hemorrhage", "Blood"), ("Path_FanOfKnives", "Physical"),
+            ("Path_HolyShield", "Holy"), ("Path_ShieldBash", "Physical"), ("Path_BrambleArmor", "Earth"), ("Path_Charge", "Physical"), ("Path_CursedBlade", "Shadow"),
+            ("Path_ShadowDaggers", "Shadow"), ("Path_GuardianShields", "Holy"),
+            ("ArcaneOrb", "Arcane"), ("MagicMissile", "Arcane"), ("FrostNova", "Frost"), ("SpinningAxe", "Physical"), ("ThrowingDaggers", "Physical"),
+            ("Evo_BlackHole", "Arcane"), ("Evo_Starfall", "Arcane"), ("Evo_Glacier", "Frost"), ("Evo_CrimsonWhirlwind", "Physical"), ("Evo_PhantomBlades", "Physical") })
+            if (c.byFile.TryGetValue(file, out var ew)) { ew.element = el; EditorUtility.SetDirty(ew); }
         contentBuilding = null;
 
         AssetDatabase.SaveAssets();
@@ -1419,6 +1430,11 @@ public static class AshboundBuilder
             pso.ApplyModifiedPropertiesWithoutUndo();
         }
         var spawner = new GameObject("Enemy Spawner").AddComponent<EnemySpawner>();
+        {
+            Sprite Prop(string f) => ArtFile($"InGame/Props/{f}.png", 256, bottomPivot: true);
+            SetArr(spawner, "propSprites", new List<Object> { Prop("prop_crate"), Prop("prop_brazier"), Prop("prop_statue") });
+            Set(spawner, "goblinSprite", Prop("prop_goblin")); Set(spawner, "shrineSprite", Prop("prop_shrine"));
+        }
         Set(spawner, "enemyPrefab", gp.enemy.GetComponent<Enemy>());
         var sso = new SerializedObject(spawner);
         var bossProp = sso.FindProperty("bosses");
@@ -1504,7 +1520,7 @@ public static class AshboundBuilder
         // Off-screen pickup trackers
         var tracker = Node("PickupTrackers", canvas); Stretch(tracker, 0, 0, 0, 0);
         var trk = tracker.gameObject.AddComponent<PickupTracker>();
-        Set(trk, "eliteIcon", Icon("icon_skull")); Set(trk, "bossIcon", Icon("icon_skull"));
+        Set(trk, "eliteIcon", Icon("icon_skull")); Set(trk, "bossIcon", Icon("icon_skull")); Set(trk, "goblinIcon", Icon("pickup_gold_bag"));
         Set(trk, "container", tracker); Set(trk, "backgroundSprite", sCircle); Set(trk, "arrowSprite", ImportSprite("ui_arrow.png", 0));
 
         // Loadout (bottom-left)

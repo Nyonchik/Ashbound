@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
 
@@ -42,6 +43,17 @@ public class EnemySpawner : MonoBehaviour
     float nextElite = -1f;
     EnemyType[] eliteTypes;
 
+    [Header("Props + events")]
+    [Tooltip("Crate, brazier, statue")] [SerializeField] Sprite[] propSprites = new Sprite[3];
+    [SerializeField] Sprite goblinSprite, shrineSprite;
+    [SerializeField] int maxProps = 7;
+    float propTimer = 3f, nextEvent = 70f;
+    EnemyType[] propTypes;
+    EnemyType goblinType;
+    /// <summary>Cursed shrine: more enemies that hit harder while it's active.</summary>
+    public float EventSpawnMul = 1f, EventDamageMul = 1f;
+    readonly List<Enemy> scratch = new();
+
     ObjectPool<Enemy> pool;
     float hpMul = 1f, dmgMul = 1f, spawnMul = 1f;
     Color tint = Color.white;
@@ -52,6 +64,12 @@ public class EnemySpawner : MonoBehaviour
 
 #if UNITY_EDITOR
     /// <summary>Editor test: switch to the next stage's boss trio and restart the boss order.</summary>
+    int debugEvent;
+    public void DebugEvent()
+    {
+        float t = run.RunTime;
+        switch (debugEvent++ % 4) { case 0: StartCoroutine(Swarm(t)); break; case 1: Encircle(t); break; case 2: Goblin(t); break; default: run.SpawnShrine(shrineSprite); break; }
+    }
     public string DebugNextBossSet() { bossBase = (bossBase + 3) % bosses.Length; nextBoss = 0; return Boss(0).name; }
 #endif
     public float NextBossTime => nextBoss < 3 ? Boss(nextBoss).startTime : -1f;
@@ -92,7 +110,9 @@ public class EnemySpawner : MonoBehaviour
         float t = run.RunTime;
 
         // During a boss fight only the boss (and its own minions) are in the arena
-        if (!run.BossFight) accumulator += spawnsPerSecond.Evaluate(t) * spawnMul * Time.deltaTime;
+        if (!run.BossFight) accumulator += spawnsPerSecond.Evaluate(t) * spawnMul * EventSpawnMul * Time.deltaTime;
+        UpdateProps(t);
+        UpdateEvents(t);
         while (accumulator >= 1f)
         {
             accumulator -= 1f;
@@ -172,9 +192,130 @@ public class EnemySpawner : MonoBehaviour
         float a = Random.value * Mathf.PI * 2f;
         Vector2 pos = (Vector2)p.transform.position + new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * r;
         var e = pool.Get();
-        e.Init(this, type, hpScale, type.isBoss ? dmgMul : dmgMul * damageScale.Evaluate(run.RunTime), type.isElite ? Color.white : tint, pos);
+        e.Init(this, type, hpScale, type.isBoss ? dmgMul : dmgMul * damageScale.Evaluate(run.RunTime) * EventDamageMul, type.isElite || type.isProp || type.isGoblin ? Color.white : tint, pos);
         if (!type.isBoss && e.TryGetComponent(out BossAI ai)) ai.enabled = false;
         return e;
+    }
+
+    public void Despawn(Enemy e) => pool.Release(e);
+
+    Enemy SpawnAt(EnemyType type, Vector2 pos, float hpScale)
+    {
+        if (Enemy.Active.Count >= maxAlive + 80) return null;
+        var e = pool.Get();
+        e.Init(this, type, hpScale, type.isProp || type.isGoblin ? 0f : dmgMul * damageScale.Evaluate(run.RunTime) * EventDamageMul, type.isElite || type.isProp || type.isGoblin ? Color.white : tint, pos);
+        if (e.TryGetComponent(out BossAI ai)) ai.enabled = false;
+        return e;
+    }
+
+    // ---------------- breakable props: crates, braziers, rare statues
+
+    void UpdateProps(float t)
+    {
+        propTimer -= Time.deltaTime;
+        if (propTimer > 0f) return;
+        propTimer = 4f;
+        var p = PlayerController.Instance;
+        if (p == null) return;
+        int count = 0;
+        scratch.Clear();
+        foreach (var e in Enemy.Active) if (e.IsProp) { count++; if (((Vector2)e.transform.position - (Vector2)p.transform.position).sqrMagnitude > 26f * 26f) scratch.Add(e); }
+        foreach (var e in scratch) { e.Vanish(); count--; }
+        if (count >= maxProps || run.BossFight) return;
+        propTypes ??= new[]
+        {
+            new EnemyType { name = "Crate", health = 12, speed = 0, damage = 0, scale = 1f, xp = 0, tint = Color.white, isProp = true, propKind = 0, sprite = propSprites.Length > 0 ? propSprites[0] : null },
+            new EnemyType { name = "Brazier", health = 18, speed = 0, damage = 0, scale = 1f, xp = 0, tint = Color.white, isProp = true, propKind = 1, sprite = propSprites.Length > 1 ? propSprites[1] : null },
+            new EnemyType { name = "Statue", health = 40, speed = 0, damage = 0, scale = 1.15f, xp = 0, tint = Color.white, isProp = true, propKind = 2, sprite = propSprites.Length > 2 ? propSprites[2] : null },
+        };
+        float r = Random.value;
+        var type = r < 0.5f ? propTypes[0] : r < 0.85f ? propTypes[1] : propTypes[2];
+        float a = Random.value * Mathf.PI * 2f, d = Random.Range(9f, 14f);
+        Vector2 pos = (Vector2)p.transform.position + new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * d;
+        if (PlayerController.ArenaCenter.HasValue) return;
+        SpawnAt(type, pos, 1f + t / 300f);
+    }
+
+    // ---------------- map events
+
+    void UpdateEvents(float t)
+    {
+        if (t < nextEvent || run.BossFight) return;
+        float untilBoss = NextBossTime - t;
+        if (NextBossTime > 0f && untilBoss < 25f) { nextEvent = t + untilBoss + 30f; return; }
+        nextEvent = t + Random.Range(70f, 100f);
+        switch (Random.Range(0, 4))
+        {
+            case 0: StartCoroutine(Swarm(t)); break;
+            case 1: Encircle(t); break;
+            case 2: Goblin(t); break;
+            default: run.SpawnShrine(shrineSprite); break;
+        }
+    }
+
+    System.Collections.IEnumerator Swarm(float t)
+    {
+        run.EventBanner("SWARM!", "A pack of Hollow hounds is rushing in!");
+        var p = PlayerController.Instance;
+        var cam = Camera.main;
+        if (p == null || cam == null) yield break;
+        var hound = types.Length > 1 ? types[1] : types[0];
+        float baseAng = Random.value * Mathf.PI * 2f;
+        float r = Mathf.Sqrt(Mathf.Pow(cam.orthographicSize * cam.aspect, 2) + Mathf.Pow(cam.orthographicSize, 2)) + 1f;
+        for (int i = 0; i < 36; i++)
+        {
+            if (run.IsOver || run.BossFight) yield break;
+            float a = baseAng + Random.Range(-0.45f, 0.45f);
+            Vector2 pos = (Vector2)p.transform.position + new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * r;
+            SpawnAt(hound, pos, healthScale.Evaluate(t) * hpMul * 0.7f);
+            yield return new WaitForSeconds(0.08f);
+        }
+    }
+
+    void Encircle(float t)
+    {
+        run.EventBanner("SURROUNDED!", "The Hollow close in from every side. Break out!");
+        var p = PlayerController.Instance;
+        if (p == null) return;
+        const int n = 32;
+        for (int i = 0; i < n; i++)
+        {
+            float a = i * Mathf.PI * 2f / n;
+            Vector2 pos = (Vector2)p.transform.position + new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * 8.5f;
+            SpawnAt(types[0], pos, healthScale.Evaluate(t) * hpMul);
+        }
+    }
+
+    void Goblin(float t)
+    {
+        var p = PlayerController.Instance;
+        if (p == null) return;
+        goblinType ??= new EnemyType { name = "Treasure Goblin", health = 60, speed = 3.3f, damage = 0, scale = 1.1f, xp = 25, tint = Color.white, isGoblin = true, sprite = goblinSprite };
+        float a = Random.value * Mathf.PI * 2f;
+        Vector2 pos = (Vector2)p.transform.position + new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * 5.5f;
+        var g = SpawnAt(goblinType, pos, healthScale.Evaluate(t) * hpMul);
+        if (g == null) return;
+        if (goblinSprite == null) g.Body.color = new Color(0.4f, 1f, 0.45f);
+        run.EventBanner("TREASURE GOBLIN!", "Catch it before it escapes (15s) for gold and gems!");
+        AudioManager.Play("goblin", 0.9f);
+        StartCoroutine(GoblinTimer(g));
+    }
+
+    System.Collections.IEnumerator GoblinTimer(Enemy g)
+    {
+        float life = 15f;
+        while (life > 0f && g != null && g.isActiveAndEnabled && g.IsGoblin && g.HealthFraction > 0f)
+        {
+            life -= Time.deltaTime;
+            if (Random.value < Time.deltaTime * 8f) FxParticles.Sparks(g.transform.position, new Color(1f, 0.85f, 0.3f), 1, 1.5f, 0.15f, 0.4f);
+            yield return null;
+        }
+        if (g != null && g.isActiveAndEnabled && g.IsGoblin && g.HealthFraction > 0f)
+        {
+            FxParticles.Smoke(g.transform.position, new Color(0.3f, 0.3f, 0.3f, 0.7f), 8, 0.4f, 1f, 0.6f, 1.5f);
+            g.Vanish();
+            run.EventBanner("", "The goblin escaped with its loot...");
+        }
     }
 
     public void OnEnemyKilled(Enemy e, int xp)

@@ -343,3 +343,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
   body: {fileID: 2097042139424180155}
   visual: {fileID: 8846202870540250307}
+  Flee: 0

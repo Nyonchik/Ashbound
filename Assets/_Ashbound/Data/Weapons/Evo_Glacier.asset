@@ -60,6 +60,7 @@ MonoBehaviour:
     pierce: 0
     explode: 0
   style: 4
+  element: Frost
   effect: {fileID: 21300000, guid: d7e411a4e231e4efca982793caa30a1b, type: 3}
   awakenIcon: {fileID: 0}
   awakenProjectile: {fileID: 0}

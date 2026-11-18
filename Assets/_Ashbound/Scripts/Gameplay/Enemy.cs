@@ -14,6 +14,9 @@ public class EnemyType
     public Color tint = new(0.43f, 0.46f, 0.41f);
     public bool isBoss;
     [Tooltip("Golden elite: much more health, bigger, more XP")] public bool isElite;
+    [Tooltip("Breakable prop (crate, brazier, statue): doesn't move or hurt, drops loot")] public bool isProp;
+    public int propKind;
+    [Tooltip("Treasure goblin: runs away, drops gold and gems")] public bool isGoblin;
     [Tooltip("Optional art that replaces the default enemy sprite")] public Sprite sprite;
     [Tooltip("Seconds into the run when this type starts appearing (bosses: when they spawn)")] public float startTime;
     [Tooltip("Relative spawn chance")] public float weight = 1f;
@@ -66,6 +69,7 @@ public class Enemy : MonoBehaviour
     /// <summary>Slow (mul 0.25 = 75% slower) for a while; tints the enemy icy.</summary>
     public void Slow(float seconds, float mul)
     {
+        if (IsProp) return;
         if (dead) return;
         slowTimer = Mathf.Max(slowTimer, seconds);
         slowMul = IsBoss ? Mathf.Max(mul, 0.6f) : mul;
@@ -73,11 +77,19 @@ public class Enemy : MonoBehaviour
     }
 
     /// <summary>Drag toward a point this physics step (black holes). Bosses resist.</summary>
-    public void Pull(Vector2 velocity) { if (!dead) pull += IsBoss ? velocity * 0.25f : velocity; }
+    public void Pull(Vector2 velocity) { if (!dead && !IsProp) pull += IsBoss ? velocity * 0.25f : velocity; }
     bool dead;
 
     public bool IsBoss { get; private set; }
     public bool IsElite { get; private set; }
+    public bool IsProp { get; private set; }
+    public bool IsGoblin { get; private set; }
+    public int PropKind { get; private set; }
+    /// <summary>Runs away from the player (treasure goblin).</summary>
+    public bool Flee;
+
+    /// <summary>Removed without dying (no XP, no kill), e.g. a goblin that escaped.</summary>
+    public void Vanish() { if (dead) return; dead = true; owner.Despawn(this); }
     public float Radius => radius;
     public float HealthFraction => hp <= 0 ? 0 : hp / maxHp;
     float maxHp;
@@ -104,7 +116,7 @@ public class Enemy : MonoBehaviour
 
     public void Init(EnemySpawner spawner, EnemyType type, float healthScale, float damageScale, Color stageTint, Vector2 position)
     {
-        IsElite = type.isElite;
+        IsElite = type.isElite; IsProp = type.isProp; IsGoblin = type.isGoblin; PropKind = type.propKind; Flee = type.isGoblin;
         owner = spawner;
         maxHp = hp = type.health * healthScale;
         speed = type.speed;
@@ -116,6 +128,7 @@ public class Enemy : MonoBehaviour
         transform.position = position;
         rb.position = position;
         rb.linearVelocity = Vector2.zero;
+        rb.bodyType = IsProp ? RigidbodyType2D.Kinematic : RigidbodyType2D.Dynamic;
         body.sprite = type.sprite != null ? type.sprite : defaultSprite;
         baseColor = type.tint * stageTint;
         body.color = baseColor;
@@ -131,6 +144,7 @@ public class Enemy : MonoBehaviour
     {
         var p = PlayerController.Instance;
         if (p == null || dead) return;
+        if (IsProp) { rb.linearVelocity = Vector2.zero; return; }
         Vector2 goal = p.transform.position;
         if (!IsBoss && Decoys.Count > 0)
         {
@@ -138,6 +152,7 @@ public class Enemy : MonoBehaviour
             foreach (var d in Decoys) { float dd = (d - rb.position).sqrMagnitude; if (dd < best) { best = dd; goal = d; } }
         }
         Vector2 dir = (goal - rb.position).normalized;
+        if (Flee) dir = -dir;
         if (ForcedVelocity.HasValue) { rb.linearVelocity = ForcedVelocity.Value * (slowTimer > 0f ? Mathf.Max(slowMul, 0.6f) : 1f); pull = Vector2.zero; return; }
         float sp = slowTimer > 0f ? speed * slowMul : speed;
         rb.linearVelocity = dir * sp + knock + pull;
@@ -151,9 +166,9 @@ public class Enemy : MonoBehaviour
         if (p != null && !dead)
         {
             Vector2 toPlayer = (Vector2)p.transform.position - (Vector2)transform.position;
-            if (toPlayer.sqrMagnitude < (radius + 0.4f) * (radius + 0.4f)) p.Stats.TakeDamage(damage);
+            if (damage > 0f && !IsProp && toPlayer.sqrMagnitude < (radius + 0.4f) * (radius + 0.4f)) p.Stats.TakeDamage(damage);
 
-            if (visual)
+            if (visual && !IsProp)
             {
                 bob += Time.deltaTime * 9f;
                 float s = Mathf.Sin(bob) * 0.05f;
@@ -188,18 +203,22 @@ public class Enemy : MonoBehaviour
         if (curseTimer > 0f) amount *= 1.25f;
         bool crit = CritChance > 0f && Random.value < CritChance;
         if (crit) amount *= 2f;
+        var src = Source;
+        if (src != null) amount = Synergies.Modify(src, this, amount);
         if (Source != null) Source.TotalDamage += Mathf.Min(amount, Mathf.Max(0f, hp));
         hp -= amount;
         RunManager.Instance?.ShowDamage(transform.position + Vector3.up * (radius * 2.2f), amount, IsBoss, crit);
         flash = 0.08f;
         body.color = HitColor;
-        if (!IsBoss) knock += knockDir * knockForce;
+        if (!IsBoss && !IsProp) knock += knockDir * knockForce;
         if (hp <= 0f)
         {
             dead = true;
             owner.OnEnemyKilled(this, xp);
+            if (src != null) Synergies.After(src, this, amount, true);
             return true;
         }
+        if (src != null) Synergies.After(src, this, amount, false);
         return false;
     }
 

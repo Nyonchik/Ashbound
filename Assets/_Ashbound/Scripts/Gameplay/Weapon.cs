@@ -16,6 +16,7 @@ public partial class Weapon : MonoBehaviour
     public bool Golden => Awakened || IsEvolved;
     public bool CanLevel => !IsEvolved && Level < MaxLevel;
     public Sprite Icon => Awakened && Def.awakenIcon != null ? Def.awakenIcon : Def.icon;
+    public string Element => Def != null ? Def.element : null;
     public string DisplayName => Awakened && !string.IsNullOrEmpty(Def.awakeningName) ? Def.awakeningName : Def.weaponName;
 
     /// <summary>Weapon at Lv 5 and its paired passive at Lv 5 (max).</summary>

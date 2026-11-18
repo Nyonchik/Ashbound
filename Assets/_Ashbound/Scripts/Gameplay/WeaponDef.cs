@@ -50,6 +50,7 @@ public class WeaponDef : ScriptableObject
 
     [Header("Look")]
     public WeaponStyle style;
+    [Tooltip("Element for synergies: Fire, Frost, Lightning, Poison, Shadow, Holy, Blood, Earth, Arcane, Physical")] public string element;
     [Tooltip("Impact / burst sprite (explosions, nova)")] public Sprite effect;
     [Tooltip("Icon after Awakening (Lv 6)")] public Sprite awakenIcon;
     [Tooltip("Projectile / orb sprite after Awakening")] public Sprite awakenProjectile;
