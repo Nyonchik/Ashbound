@@ -64,3 +64,14 @@ Test runs with F5 counted as real progress in the save (Berserker Beast path unl
   Multishot 10, Shadow Daggers 6 dmg, Arcane Orb 11, Magic Missile 12, Black Hole 22 dmg / 3.6s, Whirlwind 14 dmg / 0.45s ticks,
   Phantom Blades 12 dmg / 1.1s, Reach +8%. Path skills land ~150-200 crowd DPS at Lv5 and ~420-480 awakened; evolutions ~280-440.
 - New editor keys: G god mode, B switch to the next stage's boss set.
+
+## Equipment + Store
+- Main menu: Gear and Store buttons, Gems counter.
+- Gear (Scripts/Core/Gear.cs, UI/GearPanel.cs): one shared bag, each hero wears 6 slots (Weapon, Helmet, Armor, Gloves, Boots, Amulet).
+  Weapons are class-locked. 15 items, rarities Common..Legendary (level caps 10/20/30/40/50).
+  Merge 3 copies of the same item + rarity into the next rarity (keeps the highest level). Level up with gold. Sell for gold.
+  Power: Common Lv 1 = 12% of an item's max, x1.8 by its rarity cap, Legendary Lv 50 = 100%.
+  Max (Legendary Lv 50): weapon +50% damage, plate +150 HP, helm 15% damage reduction (total cap 50%), gauntlets 15% cooldowns (cap 30%), boots 15% speed, amulet 25% area.
+- Store (UI/StorePanel.cs): daily free Wooden Chest (every 20h), Wooden 200 gold, Silver 40 gems, Royal 120 gems; chest opening animation.
+- Gems: +3 per boss, +5 for reaching 10:00, +20 per win, +30 first win on a stage. Existing saves got 40 gems.
+- Icons in Resources/Gear (made in ChatGPT). UI is built at runtime with UI/UIKit.cs.

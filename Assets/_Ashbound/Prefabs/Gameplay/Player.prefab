@@ -228,6 +228,7 @@ MonoBehaviour:
   areaMul: 1
   moveMul: 1
   pickupMul: 1
+  damageReduction: 0
   flashRenderers:
   - {fileID: 1217309169888902599}
   pickupRing: {fileID: 3804441245440577912}

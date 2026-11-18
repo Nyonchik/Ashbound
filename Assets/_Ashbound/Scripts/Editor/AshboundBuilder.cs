@@ -1002,17 +1002,22 @@ public static class AshboundBuilder
         var v = menu.gameObject.AddComponent<VerticalLayoutGroup>(); v.spacing = 14;
         v.childControlWidth = true; v.childControlHeight = true; v.childForceExpandWidth = true; v.childForceExpandHeight = false;
         var play = Btn(Inst(prefabsCache.primary, menu, "Play"), "Play");
-        var heroes = Btn(Inst(prefabsCache.secondary, menu, "Heroes"), "Heroes");
-        var unlocks = Btn(Inst(prefabsCache.secondary, menu, "Unlocks"), "Unlocks");
+        var shopRow = Row(menu, "GearStoreRow", 14);
+        var gearBtn = Btn(Inst(prefabsCache.secondary, shopRow, "Gear"), "Gear", 218, 78);
+        var storeBtn = Btn(Inst(prefabsCache.secondary, shopRow, "Store"), "Store", 218, 78);
+        var infoRow = Row(menu, "HeroesUnlocksRow", 14);
+        var heroes = Btn(Inst(prefabsCache.secondary, infoRow, "Heroes"), "Heroes", 218, 78);
+        var unlocks = Btn(Inst(prefabsCache.secondary, infoRow, "Unlocks"), "Unlocks", 218, 78);
         var upgrades = Btn(Inst(prefabsCache.secondary, menu, "Upgrades"), "Upgrades");
         var settings = Btn(Inst(prefabsCache.secondary, menu, "Settings"), "Settings");
         var quit = Btn(Inst(prefabsCache.secondary, menu, "Quit"), "Quit");
 
-        var stats = Node("TopRight", canvas); Place(stats, TopRight, TopRight, TopRight, new Vector2(-72, -60), new Vector2(700, 84));
+        var stats = Node("TopRight", canvas); Place(stats, TopRight, TopRight, TopRight, new Vector2(-72, -60), new Vector2(980, 84));
         var sh = stats.gameObject.AddComponent<HorizontalLayoutGroup>(); sh.spacing = 18; sh.childAlignment = TextAnchor.MiddleRight;
         sh.childControlWidth = true; sh.childControlHeight = true; sh.childForceExpandWidth = false; sh.childForceExpandHeight = true;
         var crownVal = StatPill(stats, "CrownShards", "Crown shards", "0 / 3", Palette.Gold);
         var goldVal = StatPill(stats, "Gold", "Gold", "0", Amber);
+        var gemsVal = StatPill(stats, "Gems", "Gems", "0", new Color(0.66f, 0.44f, 1f));
 
         var ver = Txt(canvas, "Version", "Prototype v0.1", fBold, 21, Palette.TextMuted);
         Place(ver.rectTransform, new Vector2(1, 0), new Vector2(1, 0), new Vector2(1, 0), new Vector2(-40, 24), new Vector2(400, 32));
@@ -1025,7 +1030,9 @@ public static class AshboundBuilder
         UnityEventTools.AddPersistentListener(unlocks.onClick, new UnityAction(mm.OpenUnlocks));
         UnityEventTools.AddPersistentListener(upgrades.onClick, new UnityAction(mm.OpenUpgrades));
         UnityEventTools.AddPersistentListener(settings.onClick, new UnityAction(mm.OpenSettings));
-        Set(mm, "goldText", goldVal); Set(mm, "crownText", crownVal);
+        Set(mm, "goldText", goldVal); Set(mm, "crownText", crownVal); Set(mm, "gemsText", gemsVal);
+        UnityEventTools.AddPersistentListener(gearBtn.onClick, new UnityAction(mm.OpenGear));
+        UnityEventTools.AddPersistentListener(storeBtn.onClick, new UnityAction(mm.OpenStore));
 
         // ---- Settings
         var (setRoot, setPanel) = MenuOverlay(canvas, "SettingsPanel", "SETTINGS", new Vector2(760, 920));
@@ -1094,6 +1101,28 @@ public static class AshboundBuilder
         SetArr(unp, "columns", unCols); Set(unp, "closeButton", unClose); Set(unp, "menu", mm);
         Set(mm, "unlocksPanel", unRoot.gameObject); unRoot.gameObject.SetActive(false);
 
+        // ---- Gear (contents built at runtime by GearPanel)
+        ImportGearArt();
+        var (geRoot, gePanel) = MenuOverlay(canvas, "GearPanel", "EQUIPMENT", new Vector2(1720, 1000));
+        var geBody = Node("Body", gePanel); Fixed(geBody, 1624, 700);
+        var geClose = Btn(Inst(prefabsCache.primary, gePanel, "Close"), "Close", 300, 84);
+        var gp = geRoot.gameObject.AddComponent<GearPanel>();
+        SetArr(gp, "classes", classesCache.ConvertAll(c => (Object)c));
+        Set(gp, "body", geBody); Set(gp, "closeButton", geClose); Set(gp, "menu", mm);
+        Set(gp, "font", fBold); Set(gp, "boldFont", fBlack); Set(gp, "panelSprite", sPanel); Set(gp, "fillSprite", sFill);
+        Set(mm, "gearPanel", geRoot.gameObject); geRoot.gameObject.SetActive(false);
+
+        // ---- Store
+        var (stRoot, stPanel) = MenuOverlay(canvas, "StorePanel", "STORE", new Vector2(1500, 920));
+        var stBody = Node("Body", stPanel); Fixed(stBody, 1404, 650);
+        var stClose = Btn(Inst(prefabsCache.primary, stPanel, "Close"), "Close", 300, 84);
+        var stp = stRoot.gameObject.AddComponent<StorePanel>();
+        SetArr(stp, "classes", classesCache.ConvertAll(c => (Object)c));
+        Set(stp, "body", stBody); Set(stp, "closeButton", stClose); Set(stp, "menu", mm);
+        Set(stp, "font", fBold); Set(stp, "boldFont", fBlack); Set(stp, "panelSprite", sPanel); Set(stp, "fillSprite", sFill);
+        Set(stp, "glowSprite", sGlow); Set(stp, "fallbackChest", Icon("pickup_chest"));
+        Set(mm, "storePanel", stRoot.gameObject); stRoot.gameObject.SetActive(false);
+
         Set(mm, "settingsPanel", setRoot.gameObject); Set(mm, "upgradesPanel", upRoot.gameObject); Set(mm, "heroesPanel", heRoot.gameObject);
         setRoot.gameObject.SetActive(false); upRoot.gameObject.SetActive(false); heRoot.gameObject.SetActive(false);
 
@@ -1101,6 +1130,23 @@ public static class AshboundBuilder
     }
 
     static Prefabs prefabsCache;
+
+    // Gear, chest and gem icons live in Resources/Gear so the game can load them by id.
+    static void ImportGearArt()
+    {
+        string dir = $"{Root}/Resources/Gear";
+        if (!AssetDatabase.IsValidFolder(dir)) return;
+        foreach (var file in System.IO.Directory.GetFiles(dir, "*.png"))
+        {
+            string path = file.Replace('\\', '/');
+            var ti = (TextureImporter)AssetImporter.GetAtPath(path);
+            if (ti == null) continue;
+            ti.textureType = TextureImporterType.Sprite; ti.spriteImportMode = SpriteImportMode.Single;
+            ti.spritePixelsPerUnit = 100; ti.alphaIsTransparency = true; ti.mipmapEnabled = false;
+            ti.textureCompression = TextureImporterCompression.Uncompressed; ti.maxTextureSize = 1024;
+            ti.SaveAndReimport();
+        }
+    }
 
     static (RectTransform root, RectTransform panel) MenuOverlay(Transform canvas, string name, string title, Vector2 size)
     {

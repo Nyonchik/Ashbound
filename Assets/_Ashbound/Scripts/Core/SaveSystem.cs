@@ -21,6 +21,11 @@ public class SaveData
     public bool showDamageNumbers = true;
     public bool screenShake = true;
     public List<string> seenTips = new();
+    // equipment + store
+    public List<GearItem> gear = new();
+    public int nextGearId = 1;
+    public int gems = 40;            // existing saves start with 40 gems too
+    public long lastFreeChest;
 }
 
 /// <summary>Progress and settings, stored as JSON in PlayerPrefs.</summary>

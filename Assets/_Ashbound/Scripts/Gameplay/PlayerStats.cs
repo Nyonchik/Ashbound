@@ -10,6 +10,7 @@ public class PlayerStats : MonoBehaviour
     public float invulnerableTime = 0.75f;
 
     [HideInInspector] public float damageMul = 1f, cooldownMul = 1f, areaMul = 1f, moveMul = 1f, pickupMul = 1f;
+    [HideInInspector] public float damageReduction;   // from gear, capped at 50%
     float bonusHealth;
 
     [SerializeField] SpriteRenderer[] flashRenderers;
@@ -44,7 +45,7 @@ public class PlayerStats : MonoBehaviour
     public void TakeDamage(float amount)
     {
         if (IsDead || invuln > 0f || godMode) return;
-        Health = Mathf.Max(0f, Health - amount);
+        Health = Mathf.Max(0f, Health - amount * (1f - Mathf.Clamp(damageReduction, 0f, 0.5f)));
         invuln = invulnerableTime;
         AudioManager.Play("hurt", 0.7f, 1f, 0.1f);
         CameraFollow.Shake(0.12f, 0.15f);

@@ -53,7 +53,8 @@ public class RunManager : MonoBehaviour
     public float RunTime { get; private set; }
     public bool IsOver { get; private set; }
 
-    int level = 1, xp, xpNeeded, kills, gold, pendingLevelUps, bossesAlive, activeNumbers;
+    int level = 1, xp, xpNeeded, kills, gold, pendingLevelUps, bossesAlive, activeNumbers, bossesKilled;
+    float gearGold;
     float lastBossWarning = -1f;
     Weapon pathWeapon;
     readonly List<Weapon> weapons = new();
@@ -147,6 +148,8 @@ public class RunManager : MonoBehaviour
         stats.damageMul += MetaUpgrades.Bonus("damage");
         stats.moveMul += MetaUpgrades.Bonus("speed");
         stats.pickupMul += MetaUpgrades.Bonus("pickup");
+        // the hero's equipment
+        if (RunSelection.Class != null) gearGold = Gear.ApplyTo(stats, RunSelection.Class.className);
 
         float lastHealth = stats.Health;
         stats.OnHealthChanged += (h, m) =>
@@ -276,7 +279,7 @@ public class RunManager : MonoBehaviour
 
         if (e.IsBoss)
         {
-            bossesAlive--;
+            bossesAlive--; bossesKilled++;
             gold += 50; hud.SetGold(gold);
             CameraFollow.Shake(0.4f, 0.5f);
             SpawnPickup(PickupKind.Chest, position + Vector2.left * 0.8f);
@@ -389,9 +392,13 @@ public class RunManager : MonoBehaviour
         var cls = RunSelection.Class;
         save.runsPlayed++;
         save.totalKills += kills;
-        int earned = Mathf.RoundToInt(gold * (stage != null ? stage.goldMultiplier : 1f) * (1f + MetaUpgrades.Bonus("greed")));
+        int earned = Mathf.RoundToInt(gold * (stage != null ? stage.goldMultiplier : 1f) * (1f + MetaUpgrades.Bonus("greed") + gearGold));
         save.gold += earned;
+        int gemsEarned = bossesKilled * 3 + (RunTime >= 600f ? 5 : 0) + (won ? 20 : 0);
+        if (won && stage != null && !save.stagesWon.Contains(stage.stageName)) gemsEarned += 30;
+        save.gems += gemsEarned;
         var notes = new List<string> { $"+{earned} gold" };
+        if (gemsEarned > 0) notes.Add($"+{gemsEarned} gems");
 
         if (RunTime >= 600f)
         {
