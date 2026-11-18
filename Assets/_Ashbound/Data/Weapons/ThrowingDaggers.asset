@@ -19,7 +19,7 @@ MonoBehaviour:
   icon: {fileID: 21300000, guid: 2d2dfabb826bb4080bf784e3710cb091, type: 3}
   projectile: {fileID: 21300000, guid: 73f822af2dc514658a4381933a00a607, type: 3}
   damage: 6
-  cooldown: 0.6
+  cooldown: 0.7
   speed: 15
   area: 0.7
   lifetime: 0.9

@@ -347,6 +347,8 @@ public class RunManager : MonoBehaviour
             }
         if (k != null && k.f4Key.wasPressedThisFrame && !IsOver) player.Stats.TakeDamage(99999f);
         if (k != null && k.f5Key.wasPressedThisFrame && !IsOver && spawner.NextBossTime > RunTime) RunTime = spawner.NextBossTime - 1f;
+        if (k != null && k.gKey.wasPressedThisFrame) { player.Stats.godMode = !player.Stats.godMode; Debug.Log("[Ashbound] God mode " + player.Stats.godMode); }
+        if (k != null && k.bKey.wasPressedThisFrame && !IsOver) Debug.Log("[Ashbound] Boss set now starts with " + spawner.DebugNextBossSet());
         if (k != null && k.cKey.wasPressedThisFrame && !IsOver) SpawnPickup(PickupKind.Chest, (Vector2)player.transform.position + Vector2.right * 1.5f);
     }
 #endif

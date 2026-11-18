@@ -39,9 +39,11 @@ public class PlayerStats : MonoBehaviour
         if (pickupRing != null) pickupRing.localScale = Vector3.one * (PickupRadius * 2f);
     }
 
+    [System.NonSerialized] public bool godMode;   // editor test key G
+
     public void TakeDamage(float amount)
     {
-        if (IsDead || invuln > 0f) return;
+        if (IsDead || invuln > 0f || godMode) return;
         Health = Mathf.Max(0f, Health - amount);
         invuln = invulnerableTime;
         AudioManager.Play("hurt", 0.7f, 1f, 0.1f);

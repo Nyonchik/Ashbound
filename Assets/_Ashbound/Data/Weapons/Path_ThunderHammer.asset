@@ -18,7 +18,7 @@ MonoBehaviour:
   kind: 2
   icon: {fileID: 21300000, guid: f585591bc35b6495a937a3ec826ab55e, type: 3}
   projectile: {fileID: 0}
-  damage: 18
+  damage: 14
   cooldown: 2
   speed: 0
   area: 0.9

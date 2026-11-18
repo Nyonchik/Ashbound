@@ -18,8 +18,8 @@ MonoBehaviour:
   kind: 0
   icon: {fileID: 21300000, guid: 2d2dfabb826bb4080bf784e3710cb091, type: 3}
   projectile: {fileID: 21300000, guid: 73f822af2dc514658a4381933a00a607, type: 3}
-  damage: 9
-  cooldown: 0.55
+  damage: 6
+  cooldown: 0.7
   speed: 16
   area: 0.8
   lifetime: 1
@@ -54,10 +54,10 @@ MonoBehaviour:
     explode: 0
   awakening:
     damage: 0.5
-    count: 3
+    count: 2
     cooldown: 0
     area: 0
-    pierce: 3
+    pierce: 2
     explode: 0
   style: 0
   effect: {fileID: 0}
@@ -72,4 +72,4 @@ MonoBehaviour:
   - +25% damage
   - Throws 15% faster, pierces 1 more
   - +1 dagger, +20% damage
-  - 'Night Reaper: +3 daggers that cut through whole packs'
+  - 'Night Reaper: +2 daggers, +50% damage, pierce 2 more'

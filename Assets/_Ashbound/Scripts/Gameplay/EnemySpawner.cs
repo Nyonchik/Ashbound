@@ -13,11 +13,21 @@ public class EnemySpawner : MonoBehaviour
         new() { name = "Hollow Brute", health = 45, speed = 1.0f, damage = 7, scale = 1.6f, xp = 5, tint = new Color(0.78f, 0.84f, 0.78f), startTime = 150, weight = 2 },
     };
 
+    [Tooltip("3 bosses per stage, in stage order: Ashen Fields, Hollow Forest, Ruined Capital")]
     [SerializeField] EnemyType[] bosses =
     {
-        new() { name = "The Ash Warden", title = "Keeper of the Ember Gate", health = 900, speed = 1.3f, damage = 16, scale = 3f, xp = 40, tint = new Color(0.75f, 0.75f, 0.85f), isBoss = true, startTime = 300 },
-        new() { name = "The Rotting Matriarch", title = "Mother of the Rot", health = 2600, speed = 1.5f, damage = 20, scale = 3.2f, xp = 80, tint = new Color(0.85f, 0.7f, 0.9f), isBoss = true, startTime = 600 },
-        new() { name = "The Hollow King", title = "Lord of the Hollow", health = 6500, speed = 1.4f, damage = 28, scale = 3.6f, xp = 150, tint = new Color(0.62f, 0.58f, 0.8f), isBoss = true, startTime = 900 },
+        // Ashen Fields
+        new() { name = "The Ash Warden", title = "Keeper of the Ember Gate", health = 2500, speed = 1.3f, damage = 16, scale = 3f, xp = 40, tint = new Color(0.75f, 0.75f, 0.85f), isBoss = true, startTime = 300 },
+        new() { name = "The Rotting Matriarch", title = "Mother of the Rot", health = 7000, speed = 1.5f, damage = 20, scale = 3.2f, xp = 80, tint = new Color(0.85f, 0.7f, 0.9f), isBoss = true, startTime = 600 },
+        new() { name = "The Hollow King", title = "Lord of the Hollow", health = 16000, speed = 1.4f, damage = 26, scale = 3.6f, xp = 150, tint = new Color(0.62f, 0.58f, 0.8f), isBoss = true, startTime = 900 },
+        // Hollow Forest
+        new() { name = "The Elder Treant", title = "Heart of the Rotwood", health = 2500, speed = 1.0f, damage = 16, scale = 3.2f, xp = 40, tint = new Color(0.62f, 0.85f, 0.55f), isBoss = true, startTime = 300 },
+        new() { name = "Gray Fang", title = "Alpha of the Hollow Pack", health = 6000, speed = 2.1f, damage = 18, scale = 2.8f, xp = 80, tint = new Color(0.75f, 0.85f, 0.75f), isBoss = true, startTime = 600 },
+        new() { name = "The Mycelium Colossus", title = "Bloom of a Thousand Spores", health = 16000, speed = 1.1f, damage = 26, scale = 3.8f, xp = 150, tint = new Color(0.7f, 0.9f, 0.6f), isBoss = true, startTime = 900 },
+        // Ruined Capital
+        new() { name = "The Fallen Champion", title = "Last Knight of the Capital", health = 2500, speed = 1.6f, damage = 18, scale = 3f, xp = 40, tint = new Color(0.7f, 0.78f, 0.95f), isBoss = true, startTime = 300 },
+        new() { name = "The Plague Alchemist", title = "Brewer of the Black Rot", health = 6500, speed = 1.3f, damage = 20, scale = 3f, xp = 80, tint = new Color(0.75f, 0.9f, 0.75f), isBoss = true, startTime = 600 },
+        new() { name = "The Hollow Emperor", title = "Crown of Ash and Bone", health = 16000, speed = 1.4f, damage = 28, scale = 3.8f, xp = 150, tint = new Color(0.8f, 0.75f, 1f), isBoss = true, startTime = 900 },
     };
 
     [Tooltip("Enemies spawned per second over run time (seconds)")]
@@ -30,15 +40,22 @@ public class EnemySpawner : MonoBehaviour
     Color tint = Color.white;
     RunManager run;
     float accumulator;
-    int nextBoss;
+    int nextBoss, bossBase, stageOrder;
+    EnemyType Boss(int i) => bosses[Mathf.Clamp(bossBase + i, 0, bosses.Length - 1)];
 
-    public float NextBossTime => nextBoss < bosses.Length ? bosses[nextBoss].startTime : -1f;
-    public string NextBossName => nextBoss < bosses.Length ? bosses[nextBoss].name : "";
-    public bool AllBossesSpawned => nextBoss >= bosses.Length;
+#if UNITY_EDITOR
+    /// <summary>Editor test: switch to the next stage's boss trio and restart the boss order.</summary>
+    public string DebugNextBossSet() { bossBase = (bossBase + 3) % bosses.Length; nextBoss = 0; return Boss(0).name; }
+#endif
+    public float NextBossTime => nextBoss < 3 ? Boss(nextBoss).startTime : -1f;
+    public string NextBossName => nextBoss < 3 ? Boss(nextBoss).name : "";
+    public bool AllBossesSpawned => nextBoss >= 3;
 
     public void SetStage(StageData stage)
     {
         if (stage == null) return;
+        stageOrder = Mathf.Max(0, stage.order);
+        bossBase = stageOrder * 3 + 2 < bosses.Length ? stageOrder * 3 : 0;
         hpMul = stage.enemyHealth; dmgMul = stage.enemyDamage; spawnMul = stage.spawnRate; tint = stage.enemyTint;
         // Stage art: walker, hound and brute get this stage's own sprites (copies, so the scene data stays untouched)
         if (stage.enemySprites != null)
@@ -75,14 +92,15 @@ public class EnemySpawner : MonoBehaviour
             if (Enemy.Active.Count < maxAlive) Spawn(Pick(t), healthScale.Evaluate(t) * hpMul);
         }
 
-        if (nextBoss < bosses.Length && t >= bosses[nextBoss].startTime)
+        if (nextBoss < 3 && t >= Boss(nextBoss).startTime)
         {
-            var boss = Spawn(bosses[nextBoss], hpMul);
+            var def = Boss(nextBoss);
+            var boss = Spawn(def, hpMul);
             if (boss != null)
             {
                 if (!boss.TryGetComponent(out BossAI ai)) ai = boss.gameObject.AddComponent<BossAI>();
-                ai.Begin(boss, nextBoss, RunSelection.Stage != null ? RunSelection.Stage.order : 0);
-                run.OnBossSpawned(boss, bosses[nextBoss].name, bosses[nextBoss].title);
+                ai.Begin(boss, bossBase + nextBoss, stageOrder);
+                run.OnBossSpawned(boss, def.name, def.title);
             }
             nextBoss++;
         }
@@ -103,10 +121,10 @@ public class EnemySpawner : MonoBehaviour
     }
 
     /// <summary>Boss minions: a walker or hound right next to the boss.</summary>
-    public void SpawnMinion(Vector2 pos)
+    public void SpawnMinion(Vector2 pos, int typeIndex = 0)
     {
         if (Enemy.Active.Count >= maxAlive + 60) return;
-        var type = types[Random.value < 0.6f ? 0 : Mathf.Min(1, types.Length - 1)];
+        var type = types[Mathf.Clamp(typeIndex, 0, types.Length - 1)];
         var e = pool.Get();
         e.Init(this, type, healthScale.Evaluate(run.RunTime) * hpMul, dmgMul, tint, pos);
         if (e.TryGetComponent(out BossAI ai)) ai.enabled = false;

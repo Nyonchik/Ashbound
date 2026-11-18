@@ -53,10 +53,10 @@ MonoBehaviour:
     pierce: 0
     explode: 0
   awakening:
-    damage: 0.5
+    damage: 0.3
     count: 0
     cooldown: 0.3
-    area: 0.4
+    area: 0.3
     pierce: 0
     explode: 0
   style: 7

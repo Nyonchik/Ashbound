@@ -273,7 +273,7 @@ public class Weapon : MonoBehaviour
                 Run.SpawnVfx(to, 0.4f, col, 0.15f);
                 cur.TakeDamage(dmg, (to - from).normalized, Def.knockback);
                 from = to;
-                dmg *= 0.85f;
+                dmg *= 0.8f;
                 cur = NearestExcluding(from, range, chainHit);
             }
         }
@@ -437,7 +437,7 @@ public class Weapon : MonoBehaviour
         tick -= Time.deltaTime;
         if (tick <= 0f)
         {
-            tick = 0.3f;
+            tick = 0.45f;
             HitAll(c, 2.6f * Area, Damage, Def.knockback, buffer);
         }
     }

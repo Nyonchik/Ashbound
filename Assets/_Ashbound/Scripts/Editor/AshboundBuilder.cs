@@ -399,7 +399,9 @@ public static class AshboundBuilder
             if (sp != null) art[key] = sp;
         }
 
-        foreach (var (key, file) in new[] { ("Boss0", "boss_ash_warden"), ("Boss1", "boss_rotting_matriarch"), ("Boss2", "boss_hollow_king") })
+        foreach (var (key, file) in new[] { ("Boss0", "boss_ash_warden"), ("Boss1", "boss_rotting_matriarch"), ("Boss2", "boss_hollow_king"),
+                 ("Boss3", "boss_elder_treant"), ("Boss4", "boss_gray_fang"), ("Boss5", "boss_mycelium_colossus"),
+                 ("Boss6", "boss_fallen_champion"), ("Boss7", "boss_plague_alchemist"), ("Boss8", "boss_hollow_emperor") })
         {
             var sp = ArtFile($"InGame/Bosses/{file}.png", 256f, bottomPivot: true);
             if (sp != null) art[key] = sp;
@@ -506,39 +508,39 @@ public static class AshboundBuilder
             "Inferno Core: +2 fireballs, +50% damage, bigger explosions");
         pathWeapons["Water"] = Wpn("Path_TidalWave", "Tidal Wave", "Maelstrom", "#3DA5F4", WeaponKind.Nova,
             10, 2.4f, 0, 1f, 0, 9f, 1, 0, false,
-            new[] { B(area: .3f), B(dmg: .25f), B(cd: .2f), B(dmg: .2f, area: .3f) }, B(dmg: .5f, cd: .3f, area: .4f),
+            new[] { B(area: .3f), B(dmg: .25f), B(cd: .2f), B(dmg: .2f, area: .3f) }, B(dmg: .3f, cd: .3f, area: .3f),
             "A wave bursts out around you and shoves enemies back", "Wave 30% wider", "+25% damage", "Waves 20% more often", "+20% damage, 30% wider",
             "Maelstrom: huge, frequent waves with +50% damage");
         pathWeapons["Air"] = Wpn("Path_ChainLightning", "Chain Lightning", "Thunderstorm Heart", "#6FE3D1", WeaponKind.Projectile,
             10, 0.8f, 16, 0.8f, 1.2f, 0.5f, 1, 2, false,
-            new[] { B(pierce: 2), B(count: 1), B(dmg: .25f), B(count: 1, pierce: 2) }, B(dmg: .4f, count: 2, pierce: 4),
-            "A fast bolt that passes through 3 enemies", "Passes through 2 more", "+1 bolt", "+25% damage", "+1 bolt, passes through 2 more",
-            "Thunderstorm Heart: +2 bolts that rip through everything");
+            new[] { B(pierce: 1), B(count: 1), B(dmg: .25f), B(count: 1, pierce: 1) }, B(dmg: .4f, count: 1, pierce: 2),
+            "Lightning strikes an enemy and jumps to 2 more", "Jumps to 1 more enemy", "+1 bolt", "+25% damage", "+1 bolt, jumps to 1 more",
+            "Thunderstorm Heart: +1 bolt, longer chains and lightning strikes from the sky");
         pathWeapons["Bloodlust"] = Wpn("Path_BloodAxes", "Blood Axes", "Crimson Rampage", "#E5484D", WeaponKind.Orbit,
-            13, 0, 6, 1f, 0, 3f, 2, 0, false,
-            new[] { B(count: 1), B(dmg: .25f), B(area: .25f), B(count: 1) }, B(dmg: .5f, count: 2, area: .2f),
+            15, 0, 6, 1f, 0, 3f, 2, 0, false,
+            new[] { B(count: 1), B(dmg: .25f), B(area: .25f), B(count: 1) }, B(dmg: .7f, count: 2, area: .3f),
             "Two axes spin around you, cutting through the Hollow", "+1 axe", "+25% damage", "Axes orbit 25% wider", "+1 axe",
             "Crimson Rampage: +2 axes, +50% damage");
         pathWeapons["Thunder"] = Wpn("Path_ThunderHammer", "Thunder Hammer", "Storm Echo", "#6FE3D1", WeaponKind.Nova,
-            18, 2.0f, 0, 0.9f, 0, 4f, 1, 0, false,
+            14, 2.0f, 0, 0.9f, 0, 4f, 1, 0, false,
             new[] { B(dmg: .25f), B(area: .25f), B(cd: .2f), B(dmg: .25f, area: .2f) }, B(dmg: .5f, cd: .3f, explode: true),
             "Slams the ground, hitting everything near you", "+25% damage", "Slam 25% wider", "Slams 20% more often", "+25% damage, 20% wider",
             "Storm Echo: faster slams that set off a second blast");
         pathWeapons["Sniper"] = Wpn("Path_PiercingShot", "Piercing Shot", "Railshot", "#F2B33D", WeaponKind.Projectile,
-            24, 1.4f, 18, 1f, 1.5f, 2f, 1, 3, false,
+            26, 1.4f, 18, 1f, 1.5f, 2f, 1, 3, false,
             new[] { B(dmg: .25f), B(pierce: 3), B(cd: .2f), B(dmg: .4f) }, B(dmg: .6f, count: 1, pierce: 20),
             "A heavy arrow that pierces 4 enemies", "+25% damage", "Pierces 3 more", "Shoots 20% faster", "+40% damage",
             "Railshot: +1 arrow that pierces the whole screen, +60% damage");
         pathWeapons["Storm"] = Wpn("Path_Multishot", "Multishot", "Arrow Storm", "#F2B33D", WeaponKind.Projectile,
-            8, 1.0f, 12, 0.9f, 1.2f, 1f, 3, 0, false,
+            10, 1.0f, 12, 0.9f, 1.2f, 1f, 3, 0, false,
             new[] { B(count: 2), B(dmg: .2f), B(cd: .15f), B(count: 2) }, B(dmg: .3f, count: 4, cd: .25f),
             "Fires a spread of 3 arrows", "+2 arrows", "+20% damage", "Fires 15% faster", "+2 arrows",
             "Arrow Storm: +4 arrows, much faster volleys");
         Wpn("Path_ShadowDaggers", "Shadow Daggers", "Night Reaper", "#4CC38A", WeaponKind.Projectile,
-            9, 0.55f, 16, 0.8f, 1f, 0.5f, 2, 1, false,
-            new[] { B(count: 1), B(dmg: .25f), B(cd: .15f, pierce: 1), B(count: 1, dmg: .2f) }, B(dmg: .5f, count: 3, pierce: 3),
+            6, 0.7f, 16, 0.8f, 1f, 0.5f, 2, 1, false,
+            new[] { B(count: 1), B(dmg: .25f), B(cd: .15f, pierce: 1), B(count: 1, dmg: .2f) }, B(dmg: .5f, count: 2, pierce: 2),
             "Flings shadow daggers at the nearest enemies", "+1 dagger", "+25% damage", "Throws 15% faster, pierces 1 more", "+1 dagger, +20% damage",
-            "Night Reaper: +3 daggers that cut through whole packs");
+            "Night Reaper: +2 daggers, +50% damage, pierce 2 more");
         Wpn("Path_GuardianShields", "Guardian Shields", "Aegis Wall", "#4A8FE7", WeaponKind.Orbit,
             12, 0, 3.5f, 1.1f, 0, 6f, 2, 0, false,
             new[] { B(count: 1), B(dmg: .25f), B(area: .2f), B(count: 1) }, B(dmg: .6f, count: 2, area: .3f),
@@ -548,11 +550,11 @@ public static class AshboundBuilder
 
         // ---- weapons found in level-ups
         c.weaponPool.Add(Wpn("ArcaneOrb", "Arcane Orb", "Black Hole", "#8E6BEF", WeaponKind.Orbit,
-            9, 0, 4, 1f, 0, 1f, 1, 0, false,
+            11, 0, 4, 1f, 0, 1f, 1, 0, false,
             new[] { B(count: 1), B(dmg: .25f), B(count: 1), B(area: .3f) }, B(dmg: .5f, count: 2, area: .5f),
             "An orb of arcane energy circles you", "+1 orb", "+25% damage", "+1 orb", "Orbs 30% bigger", "Black Hole: +2 huge orbs, +50% damage"));
         c.weaponPool.Add(Wpn("MagicMissile", "Magic Missile", "Starfall", "#B9A6FF", WeaponKind.Projectile,
-            10, 1.2f, 10, 0.8f, 2f, 0.5f, 2, 0, false,
+            12, 1.2f, 10, 0.8f, 2f, 0.5f, 2, 0, false,
             new[] { B(count: 1), B(dmg: .25f), B(cd: .2f), B(count: 2) }, B(dmg: .3f, count: 3, explode: true),
             "Fires 2 missiles at the nearest enemy", "+1 missile", "+25% damage", "Fires 20% faster", "+2 missiles", "Starfall: +3 missiles that explode"));
         c.weaponPool.Add(Wpn("FrostNova", "Frost Nova", "Glacier", "#7CC4F8", WeaponKind.Nova,
@@ -564,7 +566,7 @@ public static class AshboundBuilder
             new[] { B(dmg: .25f), B(count: 1), B(area: .25f), B(count: 1) }, B(dmg: .5f, count: 2),
             "A heavy axe whirls around you", "+25% damage", "+1 axe", "Orbit 25% wider", "+1 axe", "Crimson Whirlwind: +2 axes, +50% damage"));
         c.weaponPool.Add(Wpn("ThrowingDaggers", "Throwing Daggers", "Phantom Blades", "#4CC38A", WeaponKind.Projectile,
-            6, 0.6f, 15, 0.7f, 0.9f, 0.5f, 1, 1, false,
+            6, 0.7f, 15, 0.7f, 0.9f, 0.5f, 1, 1, false,
             new[] { B(count: 1), B(cd: .2f), B(pierce: 1, count: 1), B(dmg: .3f) }, B(dmg: .4f, count: 3, pierce: 3),
             "Quickly throws daggers that pass through 2 enemies", "+1 dagger", "Throws 20% faster", "+1 dagger, pierces 1 more", "+30% damage",
             "Phantom Blades: +3 daggers that slice through crowds"));
@@ -575,7 +577,7 @@ public static class AshboundBuilder
         c.passives.Add(Pas("Haste", "#6FE3D1", PassiveStat.Cooldown, 0.08f, "Weapons fire 8% faster"));
         c.passives.Add(Pas("Swiftness", "#4CC38A", PassiveStat.MoveSpeed, 0.1f, "+10% movement speed"));
         c.passives.Add(Pas("Vitality", "#FF8A8A", PassiveStat.MaxHealth, 20f, "+20 max health"));
-        c.passives.Add(Pas("Reach", "#8E6BEF", PassiveStat.Area, 0.1f, "+10% weapon area"));
+        c.passives.Add(Pas("Reach", "#8E6BEF", PassiveStat.Area, 0.08f, "+8% weapon area"));
         c.passives.Add(Pas("Magnet", "#3DA5F4", PassiveStat.Pickup, 0.3f, "+30% XP pickup range"));
         foreach (PassiveDef pd in c.passives) passiveByName[pd.passiveName] = pd;
 
@@ -591,15 +593,15 @@ public static class AshboundBuilder
         {
             var w = c.byFile[baseFile]; w.evolvePassive = passiveByName[passive]; w.evolvesInto = evo; EditorUtility.SetDirty(w);
         }
-        Pair("ArcaneOrb", "Reach", Evo("Evo_BlackHole", "Black Hole", "#9B5DE5", WeaponKind.Nova, 30, 3.2f, 0, 1.2f, 0, 0f, 1, 0, false,
+        Pair("ArcaneOrb", "Reach", Evo("Evo_BlackHole", "Black Hole", "#9B5DE5", WeaponKind.Nova, 22, 3.6f, 0, 1.2f, 0, 0f, 1, 0, false,
             "EVOLVED: opens on the biggest crowd, pulls everything in, then explodes"));
         Pair("MagicMissile", "Haste", Evo("Evo_Starfall", "Starfall", "#C9B8FF", WeaponKind.Projectile, 26, 1.5f, 0, 1f, 0, 3f, 6, 0, false,
             "EVOLVED: volleys of 6 stars fall on enemies all over the screen"));
         Pair("FrostNova", "Vitality", Evo("Evo_Glacier", "Glacier", "#9BD8FF", WeaponKind.Nova, 26, 2.0f, 0, 1.4f, 0, 3f, 1, 0, false,
             "EVOLVED: ice spikes erupt around you and slow enemies by 75%"));
-        Pair("SpinningAxe", "Might", Evo("Evo_CrimsonWhirlwind", "Crimson Whirlwind", "#E5484D", WeaponKind.Orbit, 22, 0, 9, 1.0f, 0, 5f, 4, 0, false,
+        Pair("SpinningAxe", "Might", Evo("Evo_CrimsonWhirlwind", "Crimson Whirlwind", "#E5484D", WeaponKind.Orbit, 14, 0, 9, 1.0f, 0, 5f, 4, 0, false,
             "EVOLVED: a giant red tornado full of axes surrounds you"));
-        Pair("ThrowingDaggers", "Swiftness", Evo("Evo_PhantomBlades", "Phantom Blades", "#4CC38A", WeaponKind.Projectile, 16, 0.9f, 12, 1f, 1.1f, 0.5f, 3, 0, false,
+        Pair("ThrowingDaggers", "Swiftness", Evo("Evo_PhantomBlades", "Phantom Blades", "#4CC38A", WeaponKind.Projectile, 12, 1.1f, 12, 1f, 1.1f, 0.5f, 3, 0, false,
             "EVOLVED: 3 ghost blades boomerang back to you, 2 more circle you"));
         // ---- looks: styles, impact art, awakened icons
         void Look(string file, WeaponStyle style, string effect = null, string awakenIcon = null, string awakenProj = null)
@@ -1251,13 +1253,19 @@ public static class AshboundBuilder
         var sso = new SerializedObject(spawner);
         var bossProp = sso.FindProperty("bosses");
         float[] bossScale = { 1.9f, 2.0f, 2.2f };
-        for (int i = 0; i < bossProp.arraySize && i < 3; i++)
+        for (int i = 0; i < bossProp.arraySize && i < 9; i++)
         {
-            if (!art.TryGetValue("Boss" + i, out var bossArt)) continue;
             var b = bossProp.GetArrayElementAtIndex(i);
-            b.FindPropertyRelative("sprite").objectReferenceValue = bossArt;
-            b.FindPropertyRelative("tint").colorValue = Color.white;
-            b.FindPropertyRelative("scale").floatValue = bossScale[i];
+            if (art.TryGetValue("Boss" + i, out var bossArt))
+            {   // own art: show it untinted
+                b.FindPropertyRelative("sprite").objectReferenceValue = bossArt;
+                b.FindPropertyRelative("tint").colorValue = Color.white;
+            }
+            else if (art.TryGetValue("Boss" + (i % 3), out var stand))
+            {   // no art yet: reuse the Ashen Fields boss of the same slot, keeping the stage tint from the spawner
+                b.FindPropertyRelative("sprite").objectReferenceValue = stand;
+            }
+            b.FindPropertyRelative("scale").floatValue = bossScale[i % 3];
         }
         sso.ApplyModifiedPropertiesWithoutUndo();
 
