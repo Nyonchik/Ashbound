@@ -59,8 +59,7 @@ Test runs with F5 counted as real progress in the save (Berserker Beast path unl
   - Hollow Forest: Elder Treant (telegraphed root lines, sapling summons), Gray Fang (leaps, wolf pack), Mycelium Colossus (spore fields, spit, rings).
   - Ruined Capital: Fallen Champion (charges, sword waves), Plague Alchemist (flask rain, spit), Hollow Emperor (bullet spiral, teleports, rings).
   - Every attack is telegraphed. HP 2500 / ~6500 / 16000. Later stages attack a bit faster (x0.9 / x0.8 cooldowns) and hit by the stage damage multiplier.
-- Forest/capital bosses use tinted placeholder sprites until art is made. Drop boss_elder_treant.png, boss_gray_fang.png, boss_mycelium_colossus.png,
-  boss_fallen_champion.png, boss_plague_alchemist.png, boss_hollow_emperor.png into Art/InGame/Bosses and run Build Everything - picked up automatically.
+- All 9 bosses have their own art in Art/InGame/Bosses (forest + capital bosses made in ChatGPT, cut out and sized to match the Ashen Fields bosses).
 - Balance (no outliers): Chain Lightning levels reworked (+20% falloff per jump), Blood Axes / Tidal Wave awaken toned, Hammer 14, Piercing 26,
   Multishot 10, Shadow Daggers 6 dmg, Arcane Orb 11, Magic Missile 12, Black Hole 22 dmg / 3.6s, Whirlwind 14 dmg / 0.45s ticks,
   Phantom Blades 12 dmg / 1.1s, Reach +8%. Path skills land ~150-200 crowd DPS at Lv5 and ~420-480 awakened; evolutions ~280-440.
